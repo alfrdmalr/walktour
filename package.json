@@ -1,0 +1,28 @@
+{
+  "name": "react-wizard",
+  "version": "1.0.0",
+  "description": "Simple Wizard component for React.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilyapasyuk/react-wizard.git"
+  },
+  "keywords": [
+    "wizard",
+    "react",
+    "component"
+  ],
+  "author": "pasyuk.com@gmail.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ilyapasyuk/react-wizard/issues"
+  },
+  "homepage": "https://github.com/ilyapasyuk/react-wizard#readme",
+  "dependencies": {
+    "prop-types": "^15.6.0",
+    "react": "^16.2.0"
+  }
+}
