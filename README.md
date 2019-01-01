@@ -2,7 +2,7 @@
 Simple wizard component for React.js
 
 ### Preview
-![image](https://user-images.githubusercontent.com/5953765/50577419-c7874800-0e38-11e9-8837-de6e5e6ba71e.png)
+![preview](https://user-images.githubusercontent.com/5953765/50577446-28168500-0e39-11e9-9dfd-0a44a42d3268.gif)
 
 ### Installation
 
