@@ -1,6 +1,9 @@
 # react-onboarding
 Simple wizard component for React.js
 
+### Preview
+![image](https://user-images.githubusercontent.com/5953765/50577419-c7874800-0e38-11e9-8837-de6e5e6ba71e.png)
+
 ### Installation
 
 * `npm install --save react-onboarding`
