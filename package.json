@@ -1,10 +1,10 @@
 {
   "name": "react-onboarding",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "Simple Wizard component for React.js",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,16 @@
   "homepage": "https://github.com/ilyapasyuk/react-onboarding#readme",
   "dependencies": {
     "prop-types": "^15.6.0",
-    "react": "^16.2.0"
+    "react": "^16.2.0",
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.1.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.5.1"
   }
 }
