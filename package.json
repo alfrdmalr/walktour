@@ -1,6 +1,6 @@
 {
-  "name": "react-wizard",
-  "version": "1.0.0",
+  "name": "react-onboarding",
+  "version": "1.0.1",
   "description": "Simple Wizard component for React.js",
   "main": "index.js",
   "scripts": {
@@ -8,19 +8,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ilyapasyuk/react-wizard.git"
+    "url": "git+https://github.com/ilyapasyuk/react-onboarding.git"
   },
   "keywords": [
     "wizard",
     "react",
-    "component"
+    "component",
+    "onboarding"
   ],
   "author": "pasyuk.com@gmail.com",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/ilyapasyuk/react-wizard/issues"
+    "url": "https://github.com/ilyapasyuk/react-onboarding/issues"
   },
-  "homepage": "https://github.com/ilyapasyuk/react-wizard#readme",
+  "homepage": "https://github.com/ilyapasyuk/react-onboarding#readme",
   "dependencies": {
     "prop-types": "^15.6.0",
     "react": "^16.2.0"
