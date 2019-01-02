@@ -1,6 +1,10 @@
 # react-onboarding
 Simple wizard component for React.js
 
+[NPM](https://www.npmjs.com/package/react-onboarding) |
+[Github](https://www.npmjs.com/package/react-onboarding) |
+[Feature request](https://github.com/ilyapasyuk/react-onboarding/issues/new)
+
 ### Preview
 ![preview](https://user-images.githubusercontent.com/5953765/50577446-28168500-0e39-11e9-9dfd-0a44a42d3268.gif)
 
@@ -50,7 +54,7 @@ const rule = [
 class App extends Component {
   render() {
     return (
-        <Wizard isShow rule={rule} nextButtonTitle="Next click" prevButtonTitle="Prev click"  />
+        <Wizard rule={rule} nextButtonTitle="Next click" prevButtonTitle="Prev click"  />
     );
   }
 }
