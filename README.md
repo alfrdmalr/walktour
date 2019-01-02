@@ -36,13 +36,11 @@ import Wizard from "react-onboarding";
 
 const rule = [
     {
-        position: 1,
         elementId: 'elementIdOne',
         title: 'Title 1',
         description: 'description 1',
     },
     {
-        position: 5,
         elementId: 'elementIdTwo',
         title: 'Title 2',
         description: 'description 2',
