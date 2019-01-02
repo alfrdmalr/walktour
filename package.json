@@ -1,6 +1,6 @@
 {
   "name": "react-onboarding",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Simple Wizard component for React.js",
   "main": "build/index.js",
   "scripts": {
