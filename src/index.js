@@ -162,11 +162,10 @@ class Wizard extends Component {
 
         return (
             <div style={wrapperStyle}>
-                <button onClick={() => this.onCloseButtonClick()} style={styles.closeButton}>
-                    X
-                </button>
-
                 <div style={styles.wizard}>
+                    <button onClick={() => this.onCloseButtonClick()} style={styles.closeButton}>
+                        X
+                    </button>
                     <div style={styles.info}>
                         <div style={styles.stepsCount}>
                             {this.currentStepNumber + 1} of {this.props.rule.length}
