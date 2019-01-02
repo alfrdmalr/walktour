@@ -224,12 +224,13 @@ class Wizard extends Component {
 
 Wizard.propTypes = {
     rule: PropTypes.array.isRequired,
-    isShow: PropTypes.bool.isRequired,
+    isShow: PropTypes.bool,
     prevButtonTitle: PropTypes.string,
     nextButtonTitle: PropTypes.string,
 }
 
 Wizard.defaultProps = {
+    isShow: true,
     prevButtonTitle: 'Prev',
     nextButtonTitle: 'Next',
 }
