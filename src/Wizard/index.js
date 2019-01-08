@@ -141,7 +141,9 @@ class Wizard extends Component {
 
     handleScroll() {
         this.setState({
-            position: getCoords(getStep(this.currentStepNumber, this.props.rule).elementId),
+            position: getCoords(
+                getStep(this.currentStepNumber, this.props.rule).elementId,
+            ),
             transition: null,
         })
     }
@@ -163,7 +165,10 @@ class Wizard extends Component {
         return (
             <div style={wrapperStyle}>
                 <div style={styles.wizard}>
-                    <button onClick={() => this.onCloseButtonClick()} style={styles.closeButton}>
+                    <button
+                        onClick={() => this.onCloseButtonClick()}
+                        style={styles.closeButton}
+                    >
                         X
                     </button>
                     <div style={styles.info}>
@@ -175,7 +180,8 @@ class Wizard extends Component {
                                 return (
                                     <div
                                         className={`WizardInfo__step WizardInfo__step_${
-                                            this.currentStepNumber > this.props.rule.indexOf(step)
+                                            this.currentStepNumber >
+                                            this.props.rule.indexOf(step)
                                                 ? 'passed'
                                                 : ''
                                         }`}
@@ -191,14 +197,18 @@ class Wizard extends Component {
                         style={styles.title}
                     />
                     <div
-                        dangerouslySetInnerHTML={{ __html: currentStepContent.description }}
+                        dangerouslySetInnerHTML={{
+                            __html: currentStepContent.description,
+                        }}
                         style={styles.description}
                     />
 
                     <div style={styles.footer}>
                         {this.currentStepNumber !== 0 && (
                             <button
-                                onClick={() => this.onStepButtonClick(this.currentStepNumber - 1)}
+                                onClick={() =>
+                                    this.onStepButtonClick(this.currentStepNumber - 1)
+                                }
                                 style={styles.button}
                             >
                                 {this.props.prevButtonTitle}
@@ -206,8 +216,12 @@ class Wizard extends Component {
                         )}
 
                         <button
-                            onClick={() => this.onStepButtonClick(this.currentStepNumber + 1)}
-                            disabled={this.currentStepNumber + 1 === this.props.rule.length}
+                            onClick={() =>
+                                this.onStepButtonClick(this.currentStepNumber + 1)
+                            }
+                            disabled={
+                                this.currentStepNumber + 1 === this.props.rule.length
+                            }
                             style={styles.button}
                         >
                             {this.props.nextButtonTitle}

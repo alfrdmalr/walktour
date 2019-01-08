@@ -1,6 +1,6 @@
 const path = require('path')
 const HtmlPlugin = require('html-webpack-plugin')
-const webpack = require('webpack');
+const webpack = require('webpack')
 
 const ENV = {
     DEVELOPMENT: 'development',
@@ -44,7 +44,7 @@ const config = {
                 conservativeCollapse: true,
             },
         }),
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
     ],
     module: {
         rules: [
