@@ -1,6 +1,8 @@
 # react-onboarding
 Simple wizard component for React.js
 
+![size](https://img.shields.io/bundlephobia/min/react-onboarding.svg)
+
 [NPM](https://www.npmjs.com/package/react-onboarding) |
 [Github](https://www.npmjs.com/package/react-onboarding) |
 [Feature request](https://github.com/ilyapasyuk/react-onboarding/issues/new)
