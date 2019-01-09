@@ -12,7 +12,12 @@
     "wizard",
     "react",
     "component",
-    "onboarding"
+    "onboarding",
+    "guide",
+    "tour",
+    "usertour",
+    "tourguide",
+    "guide"
   ],
   "author": "pasyuk.com@gmail.com",
   "license": "Apache-2.0",
