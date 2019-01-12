@@ -8,7 +8,8 @@ Simple wizard component for React.js
 [Feature request](https://github.com/ilyapasyuk/react-onboarding/issues/new)
 
 ### Preview
-![preview](https://user-images.githubusercontent.com/5953765/50577446-28168500-0e39-11e9-9dfd-0a44a42d3268.gif)
+![](https://user-images.githubusercontent.com/5953765/50577446-28168500-0e39-11e9-9dfd-0a44a42d3268.gif)
+![](https://img.shields.io/npm/v/react-onboarding.svg?style=flat-square)
 
 ### Installation
 
