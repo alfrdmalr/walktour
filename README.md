@@ -1,7 +1,9 @@
-# react-onboarding
+# react-onboarding [![](https://img.shields.io/twitter/url/http/shields.io.svg?style=social?style=social)](https://github.com/ilyapasyuk/react-onboarding)
+ 
 Simple wizard component for React.js
 
 ![size](https://img.shields.io/bundlephobia/min/react-onboarding.svg)
+![](https://img.shields.io/npm/v/react-onboarding.svg?style=flat-square)
 
 [NPM](https://www.npmjs.com/package/react-onboarding) |
 [Github](https://github.com/ilyapasyuk/react-onboarding) |
@@ -9,7 +11,6 @@ Simple wizard component for React.js
 
 ### Preview
 ![](https://user-images.githubusercontent.com/5953765/50577446-28168500-0e39-11e9-9dfd-0a44a42d3268.gif)
-![](https://img.shields.io/npm/v/react-onboarding.svg?style=flat-square)
 
 ### Installation
 
