@@ -80,7 +80,7 @@ const config = {
     resolve: {
         extensions: ['.js', '.jsx'],
     },
-    stats: 'errors-only'
+    stats: 'errors-only',
 }
 
 module.exports = config
