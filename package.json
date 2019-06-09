@@ -5,7 +5,8 @@
   "main": "build/index.js",
   "scripts": {
     "build": "webpack --config ./webpack.build.js",
-    "dev": "webpack-dev-server --config ./webpack.dev.js"
+    "dev": "yarn && webpack-dev-server --config ./webpack.dev.js",
+    "preview": "webpack --mode=production --config ./webpack.preview.js"
   },
   "repository": "git+https://github.com/ilyapasyuk/react-onboarding.git",
   "keywords": [
@@ -26,22 +27,25 @@
   },
   "homepage": "https://github.com/ilyapasyuk/react-onboarding#readme",
   "dependencies": {
-    "prop-types": "^15.6.0",
-    "react": "^16.2.0"
+    "react": "^16.8.6"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-core": "^6.24.1",
-    "babel-loader": "^7.0.0",
-    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "@babel/core": "7.4.4",
+    "@babel/plugin-proposal-class-properties": "7.4.4",
+    "@babel/plugin-proposal-decorators": "7.4.4",
+    "@babel/plugin-syntax-dynamic-import": "7.2.0",
+    "@babel/preset-env": "7.4.4",
+    "@babel/preset-react": "7.0.0",
+    "babel-loader": "8.0.6",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.5.1",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
-    "prettier": "^1.15.3",
-    "react-dom": "^16.7.0",
-    "webpack": "^4.28.3",
-    "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.14"
+    "prettier": "^1.17.1",
+    "react-dom": "^16.8.6",
+    "terser-webpack-plugin": "^1.3.0",
+    "webpack": "^4.32.2",
+    "webpack-cli": "^3.3.2",
+    "webpack-dev-server": "^3.4.1"
   }
 }

@@ -23,11 +23,11 @@ const styleElementTwo = {
     top: 300,
 }
 
-const App = ({}) => (
+const App = () => (
     <div>
-        <div id="one" style={styleElementOne} />
-        <div id="two" style={styleElementTwo} />
-        <Wizard rule={rule} />
+        <div id={rule[0].elementId} style={styleElementOne} />
+        <div id={rule[1].elementId} style={styleElementTwo} />
+        <Wizard rule={rule} isShow />
     </div>
 )
 

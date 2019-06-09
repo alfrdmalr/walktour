@@ -1,5 +1,4 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import React, { useState, useEffect } from 'react'
 
 const styles = {
     wizard: {
@@ -52,10 +51,6 @@ const styles = {
         width: '35%',
         fontSize: 12,
     },
-    steps: {
-        display: 'flex',
-        width: 100,
-    },
     pin: {
         position: 'absolute',
         zIndex: 2,
@@ -97,155 +92,93 @@ const styles = {
     },
 }
 
-class Wizard extends Component {
-    constructor(props) {
-        super(props)
+const defaultPrevButtonTitle = 'Prev'
+const defaultNextButtonTitle = 'Next'
 
-        this.state = {
-            isShow: props.isShow,
-            transition: null,
-        }
+const Wizard = ({
+    isShow,
+    rule,
+    defaultStepNumber = 0,
+    prevButtonTitle = defaultPrevButtonTitle,
+    nextButtonTitle = defaultNextButtonTitle,
+}) => {
+    const [isShowState, setShow] = useState(isShow)
+    const [transition, setTransition] = useState(null)
+    const [position, setPosition] = useState(undefined)
+    const [currentStepNumber, setCurrentStepNumber] = useState(defaultStepNumber)
+    const currentStepContent = getStep(currentStepNumber, rule)
 
-        this.currentStepNumber = 0
-
-        this.handleScroll = this.handleScroll.bind(this)
-        this.onStepButtonClick = this.onStepButtonClick.bind(this)
-        this.onCloseButtonClick = this.onCloseButtonClick.bind(this)
+    const wrapperStyle = {
+        position: 'absolute',
+        zIndex: 99,
+        transition: transition,
+        ...position,
     }
 
-    componentDidMount() {
-        window.addEventListener('scroll', this.handleScroll)
-        this.setState({
-            position: getCoords(getStep(0, this.props.rule).elementId),
-        })
+    useEffect(() => {
+        setPosition(getCoords(getStep(currentStepNumber, rule).elementId))
+    }, [])
+
+    function onStepButtonClick(stepNumber) {
+        setCurrentStepNumber(stepNumber)
+        setPosition(getCoords(getStep(stepNumber, rule).elementId))
+        setTransition('all 100ms ease')
     }
 
-    componentWillUnmount() {
-        window.removeEventListener('scroll', this.handleScroll)
+    if (!isShowState || !position) {
+        return null
     }
-
-    onStepButtonClick(stepNumber) {
-        this.currentStepNumber = stepNumber
-
-        this.setState({
-            position: getCoords(getStep(stepNumber, this.props.rule).elementId),
-            transition: 'all 100ms ease',
-        })
-    }
-
-    onCloseButtonClick() {
-        this.setState({
-            isShow: false,
-        })
-    }
-
-    handleScroll() {
-        this.setState({
-            position: getCoords(
-                getStep(this.currentStepNumber, this.props.rule).elementId,
-            ),
-            transition: null,
-        })
-    }
-
-    render() {
-        if (!this.state.isShow) {
-            return null
-        }
-
-        const wrapperStyle = {
-            position: 'fixed',
-            zIndex: 99,
-            transition: this.state.transition,
-            ...this.state.position,
-        }
-
-        const currentStepContent = getStep(this.currentStepNumber, this.props.rule)
-
-        return (
-            <div style={wrapperStyle}>
-                <div style={styles.wizard}>
-                    <button
-                        onClick={() => this.onCloseButtonClick()}
-                        style={styles.closeButton}
-                    >
-                        X
-                    </button>
-                    <div style={styles.info}>
-                        <div style={styles.stepsCount}>
-                            {this.currentStepNumber + 1} of {this.props.rule.length}
-                        </div>
-                        <div style={styles.steps}>
-                            {this.props.rule.map((step) => {
-                                return (
-                                    <div
-                                        className={`WizardInfo__step WizardInfo__step_${
-                                            this.currentStepNumber >
-                                            this.props.rule.indexOf(step)
-                                                ? 'passed'
-                                                : ''
-                                        }`}
-                                        key={`step-${step.elementId}`}
-                                    />
-                                )
-                            })}
-                        </div>
-                    </div>
-
-                    <div
-                        dangerouslySetInnerHTML={{ __html: currentStepContent.title }}
-                        style={styles.title}
-                    />
-                    <div
-                        dangerouslySetInnerHTML={{
-                            __html: currentStepContent.description,
-                        }}
-                        style={styles.description}
-                    />
-
-                    <div style={styles.footer}>
-                        {this.currentStepNumber !== 0 && (
-                            <button
-                                onClick={() =>
-                                    this.onStepButtonClick(this.currentStepNumber - 1)
-                                }
-                                style={styles.button}
-                            >
-                                {this.props.prevButtonTitle}
-                            </button>
-                        )}
-
-                        <button
-                            onClick={() =>
-                                this.onStepButtonClick(this.currentStepNumber + 1)
-                            }
-                            disabled={
-                                this.currentStepNumber + 1 === this.props.rule.length
-                            }
-                            style={styles.button}
-                        >
-                            {this.props.nextButtonTitle}
-                        </button>
+    console.log(
+        '%c currentStepNumber ',
+        'color: white; background-color: #2274A5',
+        currentStepNumber,
+    )
+    return (
+        <div style={wrapperStyle}>
+            <div style={styles.wizard}>
+                <button onClick={() => setShow(false)} style={styles.closeButton}>
+                    X
+                </button>
+                <div style={styles.info}>
+                    <div style={styles.stepsCount}>
+                        {currentStepNumber + 1} of {rule.length}
                     </div>
                 </div>
-                <div style={styles.pin} />
-                <div style={styles.pinLine} />
+
+                <div
+                    dangerouslySetInnerHTML={{ __html: currentStepContent.title }}
+                    style={styles.title}
+                />
+                <div
+                    dangerouslySetInnerHTML={{
+                        __html: currentStepContent.description,
+                    }}
+                    style={styles.description}
+                />
+
+                <div style={styles.footer}>
+                    {currentStepNumber !== 0 && (
+                        <button
+                            onClick={() => onStepButtonClick(currentStepNumber - 1)}
+                            style={styles.button}
+                        >
+                            {prevButtonTitle}
+                        </button>
+                    )}
+
+                    <button
+                        onClick={() => onStepButtonClick(currentStepNumber + 1)}
+                        disabled={currentStepNumber + 1 === rule.length}
+                        style={styles.button}
+                    >
+                        {nextButtonTitle}
+                    </button>
+                </div>
             </div>
-        )
-    }
-}
-
-Wizard.propTypes = {
-    rule: PropTypes.array.isRequired,
-    isShow: PropTypes.bool,
-    prevButtonTitle: PropTypes.string,
-    nextButtonTitle: PropTypes.string,
-}
-
-Wizard.defaultProps = {
-    isShow: true,
-    prevButtonTitle: 'Prev',
-    nextButtonTitle: 'Next',
+            <div style={styles.pin} />
+            <div style={styles.pinLine} />
+        </div>
+    )
 }
 
 function getStep(stepNumber, rules) {
