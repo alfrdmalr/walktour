@@ -6,11 +6,12 @@ const styles = {
         minHeight: 100,
         backgroundColor: 'white',
         padding: 10,
-        border: '1px solid #d9d9d9',
-        boxShadow: '0 3px 8px 0 rgba(0,0,0,.15)',
         transform: 'translate(22px, -50px)',
         zIndex: 2,
         position: 'relative',
+        borderRadius: '5px',
+        fontFamily: 'Roboto, sans-serif',
+        boxShadow: '0 3px 8px 0 rgba(0,0,0,.25)',
     },
     closeButton: {
         position: 'absolute',
@@ -31,8 +32,7 @@ const styles = {
         marginBottom: 8,
         letterSpacing: 'normal',
         color: '#000000',
-        fontSize: 14,
-        fontWeight: 600,
+        fontSize: 24,
         fontStyle: 'normal',
     },
     description: {
@@ -43,9 +43,11 @@ const styles = {
     },
     info: {
         display: 'flex',
+        fontSize: 18,
         width: '87%',
         marginBottom: 10,
         alignItems: 'center',
+        
     },
     stepsCount: {
         width: '35%',
@@ -134,31 +136,36 @@ const Wizard = ({
         currentStepNumber,
     )
     return (
-        <div style={wrapperStyle}>
-            <div style={styles.wizard}>
-                <button onClick={() => setShow(false)} style={styles.closeButton}>
+        <div id="outermost-container" style={wrapperStyle}>
+            <div id="container" style={styles.wizard}>
+                {/* <button onClick={() => setShow(false)} style={styles.closeButton}>
                     X
-                </button>
-                <div style={styles.info}>
-                    <div style={styles.stepsCount}>
+                </button> */}
+                <div id="info" style={styles.info}>
+                    {/* <div id="stepcount" style={styles.stepsCount}>
                         {currentStepNumber + 1} of {rule.length}
-                    </div>
+                    </div> */}
                 </div>
 
                 <div
                     dangerouslySetInnerHTML={{ __html: currentStepContent.title }}
                     style={styles.title}
+                    id="title"
                 />
                 <div
                     dangerouslySetInnerHTML={{
                         __html: currentStepContent.description,
                     }}
                     style={styles.description}
+                    id="description"
                 />
 
-                <div style={styles.footer}>
+                <div id="footer" style={styles.footer}>
+                    <button id="skipbutton" onClick={() => setShow(false)} style={{...styles.button, backgroundColor: 'gray'}}>
+                      Skip
+                    </button>
                     {currentStepNumber !== 0 && (
-                        <button
+                        <button id="prevbutton"
                             onClick={() => onStepButtonClick(currentStepNumber - 1)}
                             style={styles.button}
                         >
@@ -166,7 +173,7 @@ const Wizard = ({
                         </button>
                     )}
 
-                    <button
+                    <button id="nextbutton"
                         onClick={() => onStepButtonClick(currentStepNumber + 1)}
                         disabled={currentStepNumber + 1 === rule.length}
                         style={styles.button}
@@ -175,8 +182,8 @@ const Wizard = ({
                     </button>
                 </div>
             </div>
-            <div style={styles.pin} />
-            <div style={styles.pinLine} />
+            <div style={styles.pin} id="pin" />
+            <div style={styles.pinLine} id="pin-inline" />
         </div>
     )
 }
