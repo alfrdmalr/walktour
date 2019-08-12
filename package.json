@@ -1,11 +1,11 @@
 {
-  "name": "react-onboarding",
+  "name": "carbon-tour",
   "version": "1.1.3",
   "description": "Simple Wizard component for React.js",
-  "main": "build/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "parcel build src/App/index.jsx -o build/index.js",
-    "dev": "parcel src/App/index.html"
+    "build": "parcel build src/Wizard/index.js -o dist/index.js",
+    "dev": "parcel src/App/index.html --open"
   },
   "repository": "git+https://github.com/ilyapasyuk/react-onboarding.git",
   "keywords": [
@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/ilyapasyuk/react-onboarding#readme",
   "dependencies": {
+    "@types/react": "^16.9.1",
+    "@types/react-dom": "^16.8.5",
     "react": "^16.8.6"
   },
   "devDependencies": {
@@ -37,10 +39,13 @@
     "@babel/plugin-transform-react-jsx": "^7.0.0",
     "@babel/preset-env": "7.4.4",
     "@babel/preset-react": "7.0.0",
+    "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "8.0.6",
     "cssnano": "^4.1.10",
     "html-loader": "^0.5.5",
     "prettier": "^1.17.1",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "source-map-loader": "^0.2.4",
+    "typescript": "^3.5.3"
   }
 }
