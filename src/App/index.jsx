@@ -6,6 +6,7 @@ import Wizard from '../Wizard/index'
 const rule = [
     { elementId: 'one', title: 'Title one', description: 'Description one' },
     { elementId: 'two', title: 'Title two', description: 'Description two' },
+    { elementId: 'one', title: 'Title Three: testing long values for the title and such', description: 'description two here I am testing long values for the body as well just to see how it natively handles this type of thing'}
 ]
 
 const styleElementOne = {
