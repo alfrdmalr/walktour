@@ -4,8 +4,8 @@
   "description": "Simple Wizard component for React.js",
   "main": "dist/index.js",
   "scripts": {
-    "build": "parcel build src/Wizard/index.js -o dist/index.js",
-    "dev": "parcel src/App/index.html --open"
+    "build": "parcel build src/index.tsx -o dist/index.js",
+    "start-dev": "parcel App/index.html --open --no-minify"
   },
   "repository": "git+https://github.com/ilyapasyuk/react-onboarding.git",
   "keywords": [
