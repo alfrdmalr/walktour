@@ -49,7 +49,7 @@ export const Walktour = (props: WalktourProps) => {
     setPosition(getCoords(getStep(currentStepNumber, rule).elementId))
   }, [])
 
-  function onStepButtonClick(stepNumber) {
+  function onStepButtonClick(stepNumber: number) {
     setCurrentStepNumber(stepNumber)
     setPosition(getCoords(getStep(stepNumber, rule).elementId))
     setTransition('all 100ms ease')
@@ -118,11 +118,11 @@ export const Walktour = (props: WalktourProps) => {
   )
 }
 
-function getStep(stepNumber, rules) {
-  return rules[stepNumber]
+function getStep(stepNumber: number, steps: Step[]) {
+  return steps[stepNumber]
 }
 
-function getCoords(elementId): Position {
+function getCoords(elementId: string): Position {
   const element = document.getElementById(elementId)
   const coordinates = element && element.getBoundingClientRect()
 
@@ -134,5 +134,4 @@ function getCoords(elementId): Position {
   } else {
     return null;
   }
-
 }
