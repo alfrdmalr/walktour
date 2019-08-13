@@ -72,18 +72,13 @@ export const Walktour = (props: WalktourProps) => {
     <div id="outermost-container" style={wrapperStyle}>
       <div id="container" style={styles.container}>
 
-        <div
-          dangerouslySetInnerHTML={{ __html: currentStepContent.title }}
-          style={styles.title}
-          id="title"
-        />
+        <div style={styles.title}>
+          {currentStepContent.title}
+        </div>
 
-        <div
-          dangerouslySetInnerHTML={{
-            __html: currentStepContent.description,
-          }}
-          style={styles.description}
-        />
+        <div style={styles.description}>
+          {currentStepContent.description}
+        </div>
 
         <div style={styles.footer}>
           <button onClick={() => setShow(false)} style={{ ...styles.button, backgroundColor: 'gray' }}>
