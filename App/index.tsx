@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
-import { Wizard } from '../src/index'
+import { Walktour } from '../src/index'
 
 const rule = [
     { elementId: 'one', title: 'Title one', description: 'Description one' },
@@ -29,7 +29,7 @@ const App = () => (
       <h1>Welcome to the Tour Playground</h1>
         <div id={rule[0].elementId} style={styleElementOne} />
         <div id={rule[1].elementId} style={styleElementTwo} />
-        <Wizard steps={rule} isShow />
+        <Walktour steps={rule} isShow />
     </div>
 )
 

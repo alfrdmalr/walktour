@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 
 const styles = {
-  wizard: {
+  container: {
     width: 226,
     minHeight: 100,
     backgroundColor: 'white',
@@ -101,7 +101,7 @@ interface Step {
   description: string //TODO change to allow custom html content?
 }
 
-interface WizardProps {
+interface WalktourProps {
   steps: Step[];
   isShow: boolean;
   defaultStepNumber?: number;
@@ -116,7 +116,7 @@ interface Position {
   right?: number;
 }
 
-export const Wizard = (props: WizardProps) => {
+export const Walktour = (props: WalktourProps) => {
   let { 
     isShow, 
     steps: rule, 
@@ -157,7 +157,7 @@ export const Wizard = (props: WizardProps) => {
   )
   return (
     <div id="outermost-container" style={wrapperStyle}>
-      <div id="container" style={styles.wizard}>
+      <div id="container" style={styles.container}>
         {/* <button onClick={() => setShow(false)} style={styles.closeButton}>
                     X
                 </button> */}
