@@ -11,10 +11,11 @@ interface Step {
 
 interface WalktourProps {
   steps: Step[];
-  isShow: boolean;
+  isVisible: boolean;
   defaultStepNumber?: number;
-  prevButtonTitle?: string;
-  nextButtonTitle?: string;
+  prevLabel?: string;
+  nextLabel?: string;
+  skipLabel?: string;
 }
 
 interface Position {
@@ -25,95 +26,90 @@ interface Position {
 }
 
 export const Walktour = (props: WalktourProps) => {
-  let { 
-    isShow, 
-    steps: rule, 
-    defaultStepNumber, 
-    prevButtonTitle, 
-    nextButtonTitle } = {defaultStepNumber: 0, prevButtonTitle: 'prev', nextButtonTitle: 'next', ...props};
-    
-  const [isShowState, setShow] = useState<boolean>(isShow)
+  let {
+    isVisible,
+    steps,
+    defaultStepNumber,
+    prevLabel,
+    nextLabel,
+    skipLabel }: WalktourProps = {
+    defaultStepNumber: 0,
+    prevLabel: 'prev',
+    nextLabel: 'next',
+    skipLabel: 'skip',
+    ...props
+  };
+
+  const [isVisibleState, setShow] = useState<boolean>(isVisible)
   const [transition, setTransition] = useState<string>(null)
   const [position, setPosition] = useState<Position>(undefined)
   const [currentStepNumber, setCurrentStepNumber] = useState<number>(defaultStepNumber || 0)
-  const currentStepContent = getStep(currentStepNumber, rule)
+  const currentStepContent = getStep(currentStepNumber, steps)
 
   const wrapperStyle = {
     position: 'absolute',
     zIndex: 99,
     transition: transition,
-    ...position, 
+    ...position,
   }
 
   useEffect(() => {
-    setPosition(getCoords(getStep(currentStepNumber, rule).elementId))
+    setPosition(getCoords(getStep(currentStepNumber, steps).elementId))
   }, [])
 
   function onStepButtonClick(stepNumber: number) {
     setCurrentStepNumber(stepNumber)
-    setPosition(getCoords(getStep(stepNumber, rule).elementId))
+    setPosition(getCoords(getStep(stepNumber, steps).elementId))
     setTransition('all 100ms ease')
   }
 
-  if (!isShowState || !position) {
+  if (!isVisibleState || !position) {
     return null
   }
-  console.log(
-    '%c currentStepNumber ',
-    'color: white; background-color: #2274A5',
-    currentStepNumber,
-  );
 
   const styles = defaultStyles;
   return (
     <div id="outermost-container" style={wrapperStyle}>
       <div id="container" style={styles.container}>
-        {/* <button onClick={() => setShow(false)} style={styles.closeButton}>
-                    X
-                </button> */}
-        <div id="info" style={styles.info}>
-          {/* <div id="stepcount" style={styles.stepsCount}>
-                        {currentStepNumber + 1} of {rule.length}
-                    </div> */}
-        </div>
 
         <div
           dangerouslySetInnerHTML={{ __html: currentStepContent.title }}
           style={styles.title}
           id="title"
         />
+
         <div
           dangerouslySetInnerHTML={{
             __html: currentStepContent.description,
           }}
           style={styles.description}
-          id="description"
         />
 
-        <div id="footer" style={styles.footer}>
-          <button id="skipbutton" onClick={() => setShow(false)} style={{ ...styles.button, backgroundColor: 'gray' }}>
-            Skip
-                    </button>
+        <div style={styles.footer}>
+          <button onClick={() => setShow(false)} style={{ ...styles.button, backgroundColor: 'gray' }}>
+            {skipLabel}
+          </button>
+
           {currentStepNumber !== 0 && (
-            <button id="prevbutton"
+            <button
               onClick={() => onStepButtonClick(currentStepNumber - 1)}
               style={styles.button}
             >
-              {prevButtonTitle}
+              {prevLabel}
             </button>
           )}
 
-          <button id="nextbutton"
+          <button
             onClick={() => onStepButtonClick(currentStepNumber + 1)}
-            disabled={currentStepNumber + 1 === rule.length}
+            disabled={currentStepNumber + 1 === steps.length}
             style={styles.button}
           >
-            {nextButtonTitle}
+            {nextLabel}
           </button>
         </div>
       </div>
-      <div style={styles.pin} id="pin" />
-      <div style={styles.pinLine} id="pin-inline" />
+      <div style={styles.pin} />
+      <div style={styles.pinLine} />
     </div>
   )
 }
