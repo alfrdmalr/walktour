@@ -29,7 +29,7 @@ const App = () => (
       <h1>Welcome to the Tour Playground</h1>
         <div id={rule[0].elementId} style={styleElementOne} />
         <div id={rule[1].elementId} style={styleElementTwo} />
-        <Walktour steps={rule} isShow />
+        <Walktour steps={rule} isVisible />
     </div>
 )
 
