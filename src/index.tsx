@@ -2,13 +2,13 @@ import * as React from 'react';
 import { defaultStyles } from './defaultstyles';
 
 
-interface Step {
-  elementId: string,
+export interface Step {
+  querySelector: string,
   title: string,
   description: string //TODO change to allow custom html content?
 }
 
-interface WalktourProps {
+export interface WalktourProps {
   steps: Step[];
   isVisible: boolean;
   defaultStepIndex?: number;
@@ -46,15 +46,13 @@ export const Walktour = (props: WalktourProps) => {
   const currentStepContent = getStep(currentStepIndex, steps);
 
   React.useEffect(() => {
-    setPosition(getCoords(getStep(currentStepIndex, steps).elementId))
+    setPosition(getCoords(getStep(currentStepIndex, steps).querySelector))
   }, []);
 
   const onStepButtonClick = (stepIndex: number) => {
     setCurrentStepIndex(stepIndex)
-    setPosition(getCoords(getStep(stepIndex, steps).elementId))
+    setPosition(getCoords(getStep(stepIndex, steps).querySelector))
   };
-
- 
 
   const styles = defaultStyles;
   const wrapperStyle = {
@@ -111,8 +109,8 @@ function getStep(stepIndex: number, steps: Step[]) {
   return steps[stepIndex]
 }
 
-function getCoords(elementId: string): Position {
-  const element = document.getElementById(elementId)
+function getCoords(selector: string): Position {
+  const element = document.querySelector(selector)
   const coordinates = element && element.getBoundingClientRect()
 
   if (coordinates) {
@@ -121,7 +119,7 @@ function getCoords(elementId: string): Position {
       left: coordinates.left + coordinates.width,
     }
   } else {
-    console.log(`element ${elementId} could not be found`)
+    console.log(`element specified by  "${selector}" could not be found`)
     return null;
   }
 }
