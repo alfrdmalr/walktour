@@ -50,8 +50,8 @@ export const Walktour = (props: WalktourProps) => {
   }, []);
 
   const goToStep = (stepIndex: number) => {
-    if (stepIndex > steps.length) {
-      throw new Error(`step index "${stepIndex}" out of bounds`);
+    if (stepIndex >= steps.length) {
+      return;
     }
     setCurrentStepIndex(stepIndex);
     setPosition(getCoords(getStep(stepIndex, steps).querySelector));
