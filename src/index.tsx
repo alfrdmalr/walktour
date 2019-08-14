@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 import { defaultStyles } from './defaultstyles';
 
 
@@ -12,7 +11,7 @@ interface Step {
 interface WalktourProps {
   steps: Step[];
   isVisible: boolean;
-  defaultStepNumber?: number;
+  defaultStepIndex?: number;
   prevLabel?: string;
   nextLabel?: string;
   skipLabel?: string;
@@ -29,48 +28,47 @@ export const Walktour = (props: WalktourProps) => {
   let {
     isVisible,
     steps,
-    defaultStepNumber,
+    defaultStepIndex,
     prevLabel,
     nextLabel,
     skipLabel }: WalktourProps = {
-    defaultStepNumber: 0,
+    defaultStepIndex: 0,
     prevLabel: 'prev',
     nextLabel: 'next',
     skipLabel: 'skip',
     ...props
   };
 
-  const [isVisibleState, setShow] = useState<boolean>(isVisible)
-  const [transition, setTransition] = useState<string>(null)
-  const [position, setPosition] = useState<Position>(undefined)
-  const [currentStepNumber, setCurrentStepNumber] = useState<number>(defaultStepNumber || 0)
-  const currentStepContent = getStep(currentStepNumber, steps)
+  const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
+  const [position, setPosition] = React.useState<Position>(undefined);
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(defaultStepIndex);
 
-  const wrapperStyle = {
-    position: 'absolute',
-    zIndex: 99,
-    transition: transition,
-    ...position,
-  }
+  const currentStepContent = getStep(currentStepIndex, steps);
 
-  useEffect(() => {
-    setPosition(getCoords(getStep(currentStepNumber, steps).elementId))
-  }, [])
+  React.useEffect(() => {
+    setPosition(getCoords(getStep(currentStepIndex, steps).elementId))
+  }, []);
 
-  function onStepButtonClick(stepNumber: number) {
-    setCurrentStepNumber(stepNumber)
-    setPosition(getCoords(getStep(stepNumber, steps).elementId))
-    setTransition('all 100ms ease')
-  }
+  const onStepButtonClick = (stepIndex: number) => {
+    setCurrentStepIndex(stepIndex)
+    setPosition(getCoords(getStep(stepIndex, steps).elementId))
+  };
 
-  if (!isVisibleState || !position) {
-    return null
-  }
+ 
 
   const styles = defaultStyles;
+  const wrapperStyle = {
+    ...styles.wrapper,
+    ...position,
+  };
+  
+  if (!isVisibleState || !position) {
+    return null
+  };
+
   return (
-    <div id="outermost-container" style={wrapperStyle}>
-      <div id="container" style={styles.container}>
+    <div style={wrapperStyle}>
+      <div style={styles.container}>
 
         <div style={styles.title}>
           {currentStepContent.title}
@@ -81,26 +79,26 @@ export const Walktour = (props: WalktourProps) => {
         </div>
 
         <div style={styles.footer}>
-          <button onClick={() => setShow(false)} style={{ ...styles.button, backgroundColor: 'gray' }}>
+          <button onClick={() => setVisible(false)} style={{ ...styles.button, backgroundColor: 'gray' }}>
             {skipLabel}
           </button>
-
-          {currentStepNumber !== 0 && (
+          {currentStepIndex !== 0 && (
             <button
-              onClick={() => onStepButtonClick(currentStepNumber - 1)}
+              onClick={() => onStepButtonClick(currentStepIndex - 1)}
               style={styles.button}
             >
               {prevLabel}
             </button>
           )}
-
-          <button
-            onClick={() => onStepButtonClick(currentStepNumber + 1)}
-            disabled={currentStepNumber + 1 === steps.length}
-            style={styles.button}
-          >
-            {nextLabel}
-          </button>
+          {currentStepIndex + 1 !== steps.length && (
+            <button
+              onClick={() => onStepButtonClick(currentStepIndex + 1)}
+              // disabled={currentStepIndex + 1 === steps.length}
+              style={styles.button}
+            >
+              {nextLabel}
+            </button>
+          )}
         </div>
       </div>
       <div style={styles.pin} />
@@ -109,8 +107,8 @@ export const Walktour = (props: WalktourProps) => {
   )
 }
 
-function getStep(stepNumber: number, steps: Step[]) {
-  return steps[stepNumber]
+function getStep(stepIndex: number, steps: Step[]) {
+  return steps[stepIndex]
 }
 
 function getCoords(elementId: string): Position {
@@ -123,6 +121,7 @@ function getCoords(elementId: string): Position {
       left: coordinates.left + coordinates.width,
     }
   } else {
+    console.log(`element ${elementId} could not be found`)
     return null;
   }
 }

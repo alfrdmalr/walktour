@@ -13,6 +13,7 @@ interface DefaultStyles {
   pin: CSSProperties;
   pinLine: CSSProperties;
   button: CSSProperties;
+  wrapper: CSSProperties;
 }
 
 export const defaultStyles: DefaultStyles = {
@@ -107,4 +108,9 @@ export const defaultStyles: DefaultStyles = {
     fontSize: 14,
     marginLeft: 10,
   },
+  wrapper: {
+    position: 'absolute',
+    zIndex: 99,
+    transition: 'all 100ms ease',
+  }
 }
