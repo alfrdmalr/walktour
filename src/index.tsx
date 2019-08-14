@@ -49,10 +49,28 @@ export const Walktour = (props: WalktourProps) => {
     setPosition(getCoords(getStep(currentStepIndex, steps).querySelector))
   }, []);
 
-  const onStepButtonClick = (stepIndex: number) => {
-    setCurrentStepIndex(stepIndex)
-    setPosition(getCoords(getStep(stepIndex, steps).querySelector))
-  };
+  const goToStep = (stepIndex: number) => {
+    if (stepIndex > steps.length) {
+      throw new Error(`step index "${stepIndex}" out of bounds`);
+    }
+    setCurrentStepIndex(stepIndex);
+    setPosition(getCoords(getStep(stepIndex, steps).querySelector));
+  }
+  
+  const next = () => {
+    goToStep(currentStepIndex + 1);
+  }
+
+  const prev = () => {
+    goToStep(currentStepIndex - 1);
+  }
+
+  const skip = () => {
+    goToStep(0);
+    setVisible(false);
+  }
+
+  
 
   const styles = defaultStyles;
   const wrapperStyle = {
@@ -77,12 +95,12 @@ export const Walktour = (props: WalktourProps) => {
         </div>
 
         <div style={styles.footer}>
-          <button onClick={() => setVisible(false)} style={{ ...styles.button, backgroundColor: 'gray' }}>
+          <button onClick={skip} style={{ ...styles.button, backgroundColor: 'gray' }}>
             {skipLabel}
           </button>
           {currentStepIndex !== 0 && (
             <button
-              onClick={() => onStepButtonClick(currentStepIndex - 1)}
+              onClick={prev}
               style={styles.button}
             >
               {prevLabel}
@@ -90,7 +108,7 @@ export const Walktour = (props: WalktourProps) => {
           )}
           {currentStepIndex + 1 !== steps.length && (
             <button
-              onClick={() => onStepButtonClick(currentStepIndex + 1)}
+              onClick={next}
               // disabled={currentStepIndex + 1 === steps.length}
               style={styles.button}
             >
