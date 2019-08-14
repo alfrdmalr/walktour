@@ -15,6 +15,12 @@ interface WalktourProps {
   prevLabel?: string;
   nextLabel?: string;
   skipLabel?: string;
+  buttonStyles?: {
+    primary?: React.CSSProperties;
+    secondary?: React.CSSProperties;
+    tertiary?: React.CSSProperties;
+    disabled?: React.CSSProperties;
+  }
 }
 
 interface Position {
@@ -25,17 +31,26 @@ interface Position {
 }
 
 export const Walktour = (props: WalktourProps) => {
+  const styles = defaultStyles;
+
   let {
     isVisible,
     steps,
     defaultStepIndex,
     prevLabel,
     nextLabel,
-    skipLabel }: WalktourProps = {
+    skipLabel,
+    buttonStyles }: WalktourProps = { //pseudo-default props
     defaultStepIndex: 0,
     prevLabel: 'prev',
     nextLabel: 'next',
     skipLabel: 'skip',
+    buttonStyles: {
+      primary: styles.primaryButton,
+      secondary: styles.secondaryButton,
+      tertiary: styles.tertiaryButton,
+      disabled: styles.disabledButton
+    },
     ...props
   };
 
@@ -54,14 +69,13 @@ export const Walktour = (props: WalktourProps) => {
     setPosition(getCoords(getStep(stepIndex, steps).elementId))
   };
 
- 
 
-  const styles = defaultStyles;
+
   const wrapperStyle = {
     ...styles.wrapper,
     ...position,
   };
-  
+
   if (!isVisibleState || !position) {
     return null
   };
@@ -79,26 +93,23 @@ export const Walktour = (props: WalktourProps) => {
         </div>
 
         <div style={styles.footer}>
-          <button onClick={() => setVisible(false)} style={{ ...styles.button, backgroundColor: 'gray' }}>
+          <button onClick={() => setVisible(false)} style={buttonStyles.tertiary}>
             {skipLabel}
           </button>
-          {currentStepIndex !== 0 && (
-            <button
-              onClick={() => onStepButtonClick(currentStepIndex - 1)}
-              style={styles.button}
-            >
-              {prevLabel}
-            </button>
-          )}
-          {currentStepIndex + 1 !== steps.length && (
-            <button
-              onClick={() => onStepButtonClick(currentStepIndex + 1)}
-              // disabled={currentStepIndex + 1 === steps.length}
-              style={styles.button}
-            >
-              {nextLabel}
-            </button>
-          )}
+          <button
+            onClick={() => onStepButtonClick(currentStepIndex - 1)}
+            disabled={currentStepIndex === 0}
+            style={currentStepIndex !== 0 ? buttonStyles.secondary : buttonStyles.disabled}
+          >
+            {prevLabel}
+          </button>
+          <button
+            onClick={() => onStepButtonClick(currentStepIndex + 1)}
+            disabled={currentStepIndex + 1 === steps.length}
+            style={currentStepIndex + 1 !== steps.length ? buttonStyles.primary : buttonStyles.disabled}
+          >
+            {nextLabel}
+          </button>
         </div>
       </div>
       <div style={styles.pin} />
