@@ -6,6 +6,7 @@ export interface Step {
   querySelector: string,
   title: string,
   description: string //TODO change to allow custom html content?
+  disableMaskInteraction?: boolean;
 }
 
 export interface WalktourProps {
@@ -16,6 +17,7 @@ export interface WalktourProps {
   nextLabel?: string;
   skipLabel?: string;
   maskPadding?: number;
+  disableMaskInteraction?: boolean;
 }
 
 interface Position {
@@ -31,7 +33,8 @@ export const Walktour = (props: WalktourProps) => {
     prevLabel,
     nextLabel,
     skipLabel,
-    maskPadding }: WalktourProps = {
+    maskPadding,
+    disableMaskInteraction }: WalktourProps = {
     initialStepIndex: 0,
     prevLabel: 'prev',
     nextLabel: 'next',
@@ -85,7 +88,7 @@ export const Walktour = (props: WalktourProps) => {
   };
 
   return (<>
-    {TourMask(targetData, maskPadding)}
+    {TourMask(targetData, maskPadding, (disableMaskInteraction || currentStepContent.disableMaskInteraction))}
     <div style={wrapperStyle}>
       <div style={styles.container}>
 
@@ -151,7 +154,7 @@ function getTooltipPosition(target: ClientRect): Position {
   }
 }
 
-function TourMask(target: ClientRect, padding: number = 5): JSX.Element {
+function TourMask(target: ClientRect, padding: number = 5, disableMaskInteraction: boolean): JSX.Element {
   return (
     <div
       style={{
@@ -161,7 +164,8 @@ function TourMask(target: ClientRect, padding: number = 5): JSX.Element {
         height: target.height + (padding * 2),
         width: target.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
-        borderRadius: '5px'
+        borderRadius: '5px',
+        pointerEvents: disableMaskInteraction ? 'auto' : 'none'
       }}
     >
     </div>
