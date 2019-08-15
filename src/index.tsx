@@ -51,7 +51,6 @@ export const Walktour = (props: WalktourProps) => {
 
   React.useEffect(() => {
     goToStep(currentStepIndex)
-    // setPosition(getTooltipPosition(getTargetData(getStep(currentStepIndex, steps).querySelector)))
   }, []);
 
   const goToStep = (stepIndex: number) => {
@@ -86,6 +85,7 @@ export const Walktour = (props: WalktourProps) => {
   if (!isVisibleState || !position) {
     return null
   };
+
 
   return (<>
     {TourMask(targetData, maskPadding, (disableMaskInteraction || currentStepContent.disableMaskInteraction))}
@@ -135,7 +135,7 @@ function getStep(stepIndex: number, steps: Step[]) {
 
 function getTargetData(selector: string): ClientRect {
   const element = document.querySelector(selector)
-  const targetData = element && element.getBoundingClientRect()
+  const targetData = element && element.getBoundingClientRect();
 
   if (targetData) {
     return targetData
@@ -155,12 +155,14 @@ function getTooltipPosition(target: ClientRect): Position {
 }
 
 function TourMask(target: ClientRect, padding: number = 5, disableMaskInteraction: boolean): JSX.Element {
+  const adjustedTop = target.top + (window.pageYOffset || document.documentElement.scrollTop);
+  const adjustedLeft = target.left + (window.pageXOffset || document.documentElement.scrollLeft);
   return (
     <div
       style={{
         position: 'absolute',
-        top: target.top - padding,
-        left: target.left - padding,
+        top: adjustedTop - padding,
+        left: adjustedLeft - padding,
         height: target.height + (padding * 2),
         width: target.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
