@@ -6,33 +6,36 @@ export interface Step {
   querySelector: string,
   title: string,
   description: string //TODO change to allow custom html content?
+  disableMaskInteraction?: boolean;
 }
 
 export interface WalktourProps {
   steps: Step[];
   isVisible: boolean;
-  defaultStepIndex?: number;
+  initialStepIndex?: number;
   prevLabel?: string;
   nextLabel?: string;
   skipLabel?: string;
+  maskPadding?: number;
+  disableMaskInteraction?: boolean;
 }
 
 interface Position {
   top: number;
   left: number;
-  bottom?: number;
-  right?: number;
 }
 
 export const Walktour = (props: WalktourProps) => {
   let {
     isVisible,
     steps,
-    defaultStepIndex,
+    initialStepIndex,
     prevLabel,
     nextLabel,
-    skipLabel }: WalktourProps = {
-    defaultStepIndex: 0,
+    skipLabel,
+    maskPadding,
+    disableMaskInteraction }: WalktourProps = {
+    initialStepIndex: 0,
     prevLabel: 'prev',
     nextLabel: 'next',
     skipLabel: 'skip',
@@ -41,22 +44,26 @@ export const Walktour = (props: WalktourProps) => {
 
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
   const [position, setPosition] = React.useState<Position>(undefined);
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(defaultStepIndex);
-
+  const [targetData, setTargetData] = React.useState<ClientRect>(undefined);
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex);
   const currentStepContent = getStep(currentStepIndex, steps);
 
+
   React.useEffect(() => {
-    setPosition(getCoords(getStep(currentStepIndex, steps).querySelector))
+    goToStep(currentStepIndex)
+    // setPosition(getTooltipPosition(getTargetData(getStep(currentStepIndex, steps).querySelector)))
   }, []);
 
   const goToStep = (stepIndex: number) => {
-    if (stepIndex >= steps.length) {
+    if (stepIndex >= steps.length || stepIndex < 0) {
       return;
     }
+    const data = getTargetData(getStep(stepIndex, steps).querySelector);
+    setTargetData(data);
+    setPosition(getTooltipPosition(data));
     setCurrentStepIndex(stepIndex);
-    setPosition(getCoords(getStep(stepIndex, steps).querySelector));
   }
-  
+
   const next = () => {
     goToStep(currentStepIndex + 1);
   }
@@ -70,19 +77,18 @@ export const Walktour = (props: WalktourProps) => {
     setVisible(false);
   }
 
-  
-
   const styles = defaultStyles;
   const wrapperStyle = {
     ...styles.wrapper,
     ...position,
   };
-  
+
   if (!isVisibleState || !position) {
     return null
   };
 
-  return (
+  return (<>
+    {TourMask(targetData, maskPadding, (disableMaskInteraction || currentStepContent.disableMaskInteraction))}
     <div style={wrapperStyle}>
       <div style={styles.container}>
 
@@ -120,24 +126,50 @@ export const Walktour = (props: WalktourProps) => {
       <div style={styles.pin} />
       <div style={styles.pinLine} />
     </div>
-  )
+  </>)
 }
 
 function getStep(stepIndex: number, steps: Step[]) {
   return steps[stepIndex]
 }
 
-function getCoords(selector: string): Position {
+function getTargetData(selector: string): ClientRect {
   const element = document.querySelector(selector)
-  const coordinates = element && element.getBoundingClientRect()
+  const targetData = element && element.getBoundingClientRect()
 
-  if (coordinates) {
-    return {
-      top: coordinates.top + coordinates.height / 2,
-      left: coordinates.left + coordinates.width,
-    }
+  if (targetData) {
+    return targetData
   } else {
-    console.log(`element specified by  "${selector}" could not be found`)
-    return null;
+    throw new Error(`element specified by  "${selector}" could not be found`);
   }
 }
+
+//at the moment, the tooltip is always positioned to the right, halfway down the height of the target element
+function getTooltipPosition(target: ClientRect): Position {
+  if (target) {
+    return {
+      top: target.top + target.height / 2,
+      left: target.left + target.width
+    }
+  }
+}
+
+function TourMask(target: ClientRect, padding: number = 5, disableMaskInteraction: boolean): JSX.Element {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: target.top - padding,
+        left: target.left - padding,
+        height: target.height + (padding * 2),
+        width: target.width + (padding * 2),
+        boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
+        borderRadius: '5px',
+        pointerEvents: disableMaskInteraction ? 'auto' : 'none'
+      }}
+    >
+    </div>
+    );
+}
+
+
