@@ -50,12 +50,12 @@ export const Walktour = (props: WalktourProps) => {
   }, []);
 
   React.useEffect(() => {
-    const container: HTMLElement = document.getElementById('walktour-container');
+    const container: HTMLElement = document.getElementById('walktour-keyboard-nav');
     container && isVisibleState && container.focus();
   })
 
   const goToStep = (stepIndex: number) => {
-    if (stepIndex >= steps.length) {
+    if (stepIndex >= steps.length || stepIndex < 0) {
       return;
     }
     setCurrentStepIndex(stepIndex);
@@ -75,10 +75,41 @@ export const Walktour = (props: WalktourProps) => {
     setVisible(false);
   }
 
+  const keyPressHandler = (event: React.KeyboardEvent) => {
+    switch (event.key) {
+      case "Escape":
+        skip();
+        event.preventDefault();
+        break;
+      case "Enter":
+      case " ":
+      case "ArrowRight":
+        next();
+        event.preventDefault();
+        break;
+      case "ArrowLeft":
+        prev();
+        event.preventDefault();
+        break;
+      case "Backspace":
+        prev();
+        event.preventDefault();
+        break;
+    }
+  }
+
   const styles = defaultStyles;
   const wrapperStyle = {
     ...styles.wrapper,
     ...position,
+  };
+  const navStyle = {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    pointerEvents: 'none'
   };
 
   if (!isVisibleState || !position) {
@@ -87,8 +118,13 @@ export const Walktour = (props: WalktourProps) => {
 
   return (
     <div style={wrapperStyle}>
-      <div id="walktour-container" tabIndex={0} style={styles.container}>
-
+      <div style={styles.container}>
+        <div id="walktour-keyboard-nav" tabIndex={0} style={navStyle} onKeyDown={keyPressHandler}>
+          {/*at the moment this div exists to grab focus during the tour and handle the keyboard navigation logic
+          it's its own div and not the container so that keyboard events on the rest of the content (individual buttons, custom html, etc) 
+          doesn't bubble up
+          */}
+        </div>
         <div style={styles.title}>
           {currentStepContent.title}
         </div>
@@ -98,15 +134,9 @@ export const Walktour = (props: WalktourProps) => {
         </div>
 
         <div style={styles.footer}>
-          {currentStepIndex + 1 !== steps.length && (
-            <button
-              onClick={next}
-              // disabled={currentStepIndex + 1 === steps.length}
-              style={styles.button}
-            >
-              {nextLabel}
-            </button>
-          )}
+          <button onClick={skip} style={{ ...styles.button, backgroundColor: 'gray' }}>
+            {skipLabel}
+          </button>
 
           {currentStepIndex !== 0 && (
             <button
@@ -117,10 +147,18 @@ export const Walktour = (props: WalktourProps) => {
             </button>
           )}
 
-          <button onClick={skip} style={{ ...styles.button, backgroundColor: 'gray' }}>
-            {skipLabel}
-          </button>
+          {currentStepIndex + 1 !== steps.length && (
+            <button
+              onClick={next}
+              // disabled={currentStepIndex + 1 === steps.length}
+              style={styles.button}
+            >
+              {nextLabel}
+            </button>
+          )}
+
         </div>
+
       </div>
       <div style={styles.pin} />
       <div style={styles.pinLine} />

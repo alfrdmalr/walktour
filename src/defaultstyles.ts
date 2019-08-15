@@ -44,7 +44,6 @@ export const defaultStyles: DefaultStyles = {
     padding: '10px 0 0',
     textAlign: 'right',
     display: 'flex',
-    flexDirection: 'row-reverse'
   },
   title: {
     marginBottom: 8,
