@@ -49,6 +49,11 @@ export const Walktour = (props: WalktourProps) => {
     setPosition(getCoords(getStep(currentStepIndex, steps).querySelector))
   }, []);
 
+  React.useEffect(() => {
+    const container: HTMLElement = document.getElementById('walktour-container');
+    container && isVisibleState && container.focus();
+  })
+
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= steps.length) {
       return;
@@ -56,7 +61,7 @@ export const Walktour = (props: WalktourProps) => {
     setCurrentStepIndex(stepIndex);
     setPosition(getCoords(getStep(stepIndex, steps).querySelector));
   }
-  
+
   const next = () => {
     goToStep(currentStepIndex + 1);
   }
@@ -70,21 +75,19 @@ export const Walktour = (props: WalktourProps) => {
     setVisible(false);
   }
 
-  
-
   const styles = defaultStyles;
   const wrapperStyle = {
     ...styles.wrapper,
     ...position,
   };
-  
+
   if (!isVisibleState || !position) {
     return null
   };
 
   return (
     <div style={wrapperStyle}>
-      <div style={styles.container}>
+      <div id="walktour-container" tabIndex={0} style={styles.container}>
 
         <div style={styles.title}>
           {currentStepContent.title}
@@ -95,17 +98,6 @@ export const Walktour = (props: WalktourProps) => {
         </div>
 
         <div style={styles.footer}>
-          <button onClick={skip} style={{ ...styles.button, backgroundColor: 'gray' }}>
-            {skipLabel}
-          </button>
-          {currentStepIndex !== 0 && (
-            <button
-              onClick={prev}
-              style={styles.button}
-            >
-              {prevLabel}
-            </button>
-          )}
           {currentStepIndex + 1 !== steps.length && (
             <button
               onClick={next}
@@ -115,6 +107,19 @@ export const Walktour = (props: WalktourProps) => {
               {nextLabel}
             </button>
           )}
+
+          {currentStepIndex !== 0 && (
+            <button
+              onClick={prev}
+              style={styles.button}
+            >
+              {prevLabel}
+            </button>
+          )}
+
+          <button onClick={skip} style={{ ...styles.button, backgroundColor: 'gray' }}>
+            {skipLabel}
+          </button>
         </div>
       </div>
       <div style={styles.pin} />
