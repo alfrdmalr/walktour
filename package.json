@@ -7,9 +7,11 @@
     "build": "parcel build src/index.tsx -o dist/index.js",
     "start-dev": "parcel App/index.html --open"
   },
-  "repository": "git+https://github.com/ilyapasyuk/react-onboarding.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alfrdmalr/walktour"
+  },
   "keywords": [
-    "wizard",
     "react",
     "component",
     "onboarding",
@@ -18,18 +20,33 @@
     "usertour",
     "tourguide",
     "guide",
-    "walkthrough"
+    "walkthrough",
+    "walk",
+    "through",
+    "contextual",
+    "help"
   ],
-  "author": "pasyuk.com@gmail.com",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ilyapasyuk/react-onboarding/issues"
+  "author": {
+    "name": "Alfred Maler",
+    "email": "alfrdmalr@gmail.com"
   },
-  "homepage": "https://github.com/ilyapasyuk/react-onboarding#readme",
-  "dependencies": {
+  "contributors": [
+    {
+      "name": "Ilya Pasyuk",
+      "email": "pasyuk.com@gmail.com"
+    },
+    {
+      "name": "Alfred Maler",
+      "email": "alfrdmalr@gmail.com"
+    }
+  ],
+  "license": "MIT",
+  "bugs": "https://github.com/alfrdmalr/walktour/issues",
+  "peerDependencies": {
     "@types/react": "^16.9.1",
     "@types/react-dom": "^16.8.5",
-    "react": "^16.8.6"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
   },
   "devDependencies": {
     "@babel/core": "7.4.4",
@@ -45,7 +62,6 @@
     "cssnano": "^4.1.10",
     "html-loader": "^0.5.5",
     "prettier": "^1.17.1",
-    "react-dom": "^16.8.6",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.5.3"
   }
