@@ -154,15 +154,21 @@ function getTooltipPosition(target: ClientRect): Position {
   }
 }
 
+function adjustForScroll(pos: Position): Position {
+  return {
+    top: pos.top + (document.documentElement.scrollTop || window.pageYOffset),
+    left: pos.left + (document.documentElement.scrollLeft || window.pageXOffset)
+  }
+}
+
 function TourMask(target: ClientRect, padding: number = 5, disableMaskInteraction: boolean): JSX.Element {
-  const adjustedTop = target.top + (window.pageYOffset || document.documentElement.scrollTop);
-  const adjustedLeft = target.left + (window.pageXOffset || document.documentElement.scrollLeft);
+  const adjustedPos: Position = adjustForScroll({top: target.top, left: target.left});
   return (
     <div
       style={{
         position: 'absolute',
-        top: adjustedTop - padding,
-        left: adjustedLeft - padding,
+        top: adjustedPos.top - padding,
+        left: adjustedPos.left - padding,
         height: target.height + (padding * 2),
         width: target.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
