@@ -88,7 +88,7 @@ export const Walktour = (props: WalktourProps) => {
 
 
   return (<>
-    {TourMask(targetData, maskPadding, (disableMaskInteraction || currentStepContent.disableMaskInteraction))}
+    {TourMask(targetData, (disableMaskInteraction || currentStepContent.disableMaskInteraction), maskPadding)}
     <div style={wrapperStyle}>
       <div style={styles.container}>
 
@@ -147,35 +147,43 @@ function getTargetData(selector: string): ClientRect {
 //at the moment, the tooltip is always positioned to the right, halfway down the height of the target element
 function getTooltipPosition(target: ClientRect): Position {
   if (target) {
+    const pos: Position = getElementPosition(target);
     return {
-      top: target.top + target.height / 2,
-      left: target.left + target.width
+      top: pos.top + target.height / 2,
+      left: pos.left + target.width
     }
   }
 }
 
-function adjustForScroll(pos: Position): Position {
+function getElementPosition(element: ClientRect, adjustForScroll: boolean = true): Position {
+  if (!adjustForScroll) {
+    return {
+      top: element.top, 
+      left: element.left
+     }
+  }
+
   return {
-    top: pos.top + (document.documentElement.scrollTop || window.pageYOffset),
-    left: pos.left + (document.documentElement.scrollLeft || window.pageXOffset)
+    top: element.top + (document.documentElement.scrollTop || window.pageYOffset),
+    left: element.left + (document.documentElement.scrollLeft || window.pageXOffset)
   }
 }
 
-function TourMask(target: ClientRect, padding: number = 5, disableMaskInteraction: boolean): JSX.Element {
-  const adjustedPos: Position = adjustForScroll({top: target.top, left: target.left});
+function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 5, roundedCutout: boolean = true ): JSX.Element {
+  const pos: Position = getElementPosition(target);
   return (
     <div
       style={{
         position: 'absolute',
-        top: adjustedPos.top - padding,
-        left: adjustedPos.left - padding,
+        top: pos.top - padding,
+        left: pos.left - padding,
         height: target.height + (padding * 2),
         width: target.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
-        borderRadius: '5px',
+        borderRadius: roundedCutout ? '5px' : 0,
         pointerEvents: disableMaskInteraction ? 'auto' : 'none'
       }}
-    >
+    > 
     </div>
     );
 }
