@@ -1,7 +1,7 @@
 {
   "name": "walktour",
   "version": "0.1.0",
-  "description": "Guided tour/walthrough component for react",
+  "description": "Guided tour/walkthrough component for react",
   "main": "dist/index.js",
   "scripts": {
     "build": "parcel build src/index.tsx -o dist/index.js",
@@ -21,7 +21,7 @@
     "walkthrough"
   ],
   "author": "pasyuk.com@gmail.com",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ilyapasyuk/react-onboarding/issues"
   },
