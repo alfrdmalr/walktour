@@ -16,6 +16,12 @@ export interface WalktourProps {
   prevLabel?: string;
   nextLabel?: string;
   skipLabel?: string;
+  buttonStyles?: {
+    primary?: React.CSSProperties;
+    secondary?: React.CSSProperties;
+    tertiary?: React.CSSProperties;
+    disabled?: React.CSSProperties;
+  }
   maskPadding?: number;
   disableMaskInteraction?: boolean;
 }
@@ -26,6 +32,8 @@ interface Position {
 }
 
 export const Walktour = (props: WalktourProps) => {
+  const styles = defaultStyles;
+
   let {
     isVisible,
     steps,
@@ -33,12 +41,19 @@ export const Walktour = (props: WalktourProps) => {
     prevLabel,
     nextLabel,
     skipLabel,
+    buttonStyles,
     maskPadding,
     disableMaskInteraction }: WalktourProps = {
     initialStepIndex: 0,
     prevLabel: 'prev',
     nextLabel: 'next',
     skipLabel: 'skip',
+    buttonStyles: {
+      primary: styles.primaryButton,
+      secondary: styles.secondaryButton,
+      tertiary: styles.tertiaryButton,
+      disabled: styles.disabledButton
+    },
     ...props
   };
 
@@ -76,7 +91,7 @@ export const Walktour = (props: WalktourProps) => {
     setVisible(false);
   }
 
-  const styles = defaultStyles;
+
   const wrapperStyle = {
     ...styles.wrapper,
     ...position,
@@ -101,26 +116,23 @@ export const Walktour = (props: WalktourProps) => {
         </div>
 
         <div style={styles.footer}>
-          <button onClick={skip} style={{ ...styles.button, backgroundColor: 'gray' }}>
+          <button onClick={skip} style={buttonStyles.tertiary}>
             {skipLabel}
           </button>
-          {currentStepIndex !== 0 && (
-            <button
-              onClick={prev}
-              style={styles.button}
-            >
-              {prevLabel}
-            </button>
-          )}
-          {currentStepIndex + 1 !== steps.length && (
-            <button
-              onClick={next}
-              // disabled={currentStepIndex + 1 === steps.length}
-              style={styles.button}
-            >
-              {nextLabel}
-            </button>
-          )}
+          <button
+            onClick={prev}
+            disabled={currentStepIndex === 0}
+            style={currentStepIndex !== 0 ? buttonStyles.secondary : buttonStyles.disabled}
+          >
+            {prevLabel}
+          </button>
+          <button
+            onClick={next}
+            disabled={currentStepIndex + 1 === steps.length}
+            style={currentStepIndex + 1 !== steps.length ? buttonStyles.primary : buttonStyles.disabled}
+          >
+            {nextLabel}
+          </button>
         </div>
       </div>
       <div style={styles.pin} />
@@ -158,9 +170,9 @@ function getTooltipPosition(target: ClientRect): Position {
 function getElementPosition(element: ClientRect, adjustForScroll: boolean = true): Position {
   if (!adjustForScroll) {
     return {
-      top: element.top, 
+      top: element.top,
       left: element.left
-     }
+    }
   }
 
   return {
@@ -169,7 +181,7 @@ function getElementPosition(element: ClientRect, adjustForScroll: boolean = true
   }
 }
 
-function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 5, roundedCutout: boolean = true ): JSX.Element {
+function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 5, roundedCutout: boolean = true): JSX.Element {
   const pos: Position = getElementPosition(target);
   return (
     <div
@@ -183,9 +195,9 @@ function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: 
         borderRadius: roundedCutout ? '5px' : 0,
         pointerEvents: disableMaskInteraction ? 'auto' : 'none'
       }}
-    > 
+    >
     </div>
-    );
+  );
 }
 
 
