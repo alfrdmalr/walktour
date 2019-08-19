@@ -101,14 +101,14 @@ export const defaultStyles: DefaultStyles = {
   },
   primaryButton: {
     ...baseButtonStyle,
-    backgroundColor: "#025c53",
+    backgroundColor: "#0084ff",
     color: "#ffffff"
   },
   secondaryButton: {
     ...baseButtonStyle,
-    backgroundColor: "#333333",
+    backgroundColor: "#00a7ff",
     color: "#ffffff",
-    border: "solid 1px #333333"
+    border: "solid 1px #00a7ff"
   },
   tertiaryButton: {
     ...baseButtonStyle,

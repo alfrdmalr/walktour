@@ -2,16 +2,17 @@ import * as React from 'react';
 import { defaultStyles } from './defaultstyles';
 
 
-interface Step {
-  elementId: string,
+export interface Step {
+  querySelector: string,
   title: string,
   description: string //TODO change to allow custom html content?
+  disableMaskInteraction?: boolean;
 }
 
-interface WalktourProps {
+export interface WalktourProps {
   steps: Step[];
   isVisible: boolean;
-  defaultStepIndex?: number;
+  initialStepIndex?: number;
   prevLabel?: string;
   nextLabel?: string;
   skipLabel?: string;
@@ -21,13 +22,13 @@ interface WalktourProps {
     tertiary?: React.CSSProperties;
     disabled?: React.CSSProperties;
   }
+  maskPadding?: number;
+  disableMaskInteraction?: boolean;
 }
 
 interface Position {
   top: number;
   left: number;
-  bottom?: number;
-  right?: number;
 }
 
 export const Walktour = (props: WalktourProps) => {
@@ -36,12 +37,14 @@ export const Walktour = (props: WalktourProps) => {
   let {
     isVisible,
     steps,
-    defaultStepIndex,
+    initialStepIndex,
     prevLabel,
     nextLabel,
     skipLabel,
-    buttonStyles }: WalktourProps = { //pseudo-default props
-    defaultStepIndex: 0,
+    buttonStyles,
+    maskPadding,
+    disableMaskInteraction }: WalktourProps = {
+    initialStepIndex: 0,
     prevLabel: 'prev',
     nextLabel: 'next',
     skipLabel: 'skip',
@@ -56,19 +59,37 @@ export const Walktour = (props: WalktourProps) => {
 
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
   const [position, setPosition] = React.useState<Position>(undefined);
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(defaultStepIndex);
-
+  const [targetData, setTargetData] = React.useState<ClientRect>(undefined);
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex);
   const currentStepContent = getStep(currentStepIndex, steps);
 
+
   React.useEffect(() => {
-    setPosition(getCoords(getStep(currentStepIndex, steps).elementId))
+    goToStep(currentStepIndex)
   }, []);
 
-  const onStepButtonClick = (stepIndex: number) => {
-    setCurrentStepIndex(stepIndex)
-    setPosition(getCoords(getStep(stepIndex, steps).elementId))
-  };
+  const goToStep = (stepIndex: number) => {
+    if (stepIndex >= steps.length || stepIndex < 0) {
+      return;
+    }
+    const data = getTargetData(getStep(stepIndex, steps).querySelector);
+    setTargetData(data);
+    setPosition(getTooltipPosition(data));
+    setCurrentStepIndex(stepIndex);
+  }
 
+  const next = () => {
+    goToStep(currentStepIndex + 1);
+  }
+
+  const prev = () => {
+    goToStep(currentStepIndex - 1);
+  }
+
+  const skip = () => {
+    goToStep(0);
+    setVisible(false);
+  }
 
 
   const wrapperStyle = {
@@ -80,7 +101,9 @@ export const Walktour = (props: WalktourProps) => {
     return null
   };
 
-  return (
+
+  return (<>
+    {TourMask(targetData, (disableMaskInteraction || currentStepContent.disableMaskInteraction), maskPadding)}
     <div style={wrapperStyle}>
       <div style={styles.container}>
 
@@ -93,18 +116,18 @@ export const Walktour = (props: WalktourProps) => {
         </div>
 
         <div style={styles.footer}>
-          <button onClick={() => setVisible(false)} style={buttonStyles.tertiary}>
+          <button onClick={skip} style={buttonStyles.tertiary}>
             {skipLabel}
           </button>
           <button
-            onClick={() => onStepButtonClick(currentStepIndex - 1)}
+            onClick={prev}
             disabled={currentStepIndex === 0}
             style={currentStepIndex !== 0 ? buttonStyles.secondary : buttonStyles.disabled}
           >
             {prevLabel}
           </button>
           <button
-            onClick={() => onStepButtonClick(currentStepIndex + 1)}
+            onClick={next}
             disabled={currentStepIndex + 1 === steps.length}
             style={currentStepIndex + 1 !== steps.length ? buttonStyles.primary : buttonStyles.disabled}
           >
@@ -115,24 +138,66 @@ export const Walktour = (props: WalktourProps) => {
       <div style={styles.pin} />
       <div style={styles.pinLine} />
     </div>
-  )
+  </>)
 }
 
 function getStep(stepIndex: number, steps: Step[]) {
   return steps[stepIndex]
 }
 
-function getCoords(elementId: string): Position {
-  const element = document.getElementById(elementId)
-  const coordinates = element && element.getBoundingClientRect()
+function getTargetData(selector: string): ClientRect {
+  const element = document.querySelector(selector)
+  const targetData = element && element.getBoundingClientRect();
 
-  if (coordinates) {
-    return {
-      top: coordinates.top + coordinates.height / 2,
-      left: coordinates.left + coordinates.width,
-    }
+  if (targetData) {
+    return targetData
   } else {
-    console.log(`element ${elementId} could not be found`)
-    return null;
+    throw new Error(`element specified by  "${selector}" could not be found`);
   }
 }
+
+//at the moment, the tooltip is always positioned to the right, halfway down the height of the target element
+function getTooltipPosition(target: ClientRect): Position {
+  if (target) {
+    const pos: Position = getElementPosition(target);
+    return {
+      top: pos.top + target.height / 2,
+      left: pos.left + target.width
+    }
+  }
+}
+
+function getElementPosition(element: ClientRect, adjustForScroll: boolean = true): Position {
+  if (!adjustForScroll) {
+    return {
+      top: element.top,
+      left: element.left
+    }
+  }
+
+  return {
+    top: element.top + (document.documentElement.scrollTop || window.pageYOffset),
+    left: element.left + (document.documentElement.scrollLeft || window.pageXOffset)
+  }
+}
+
+function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 5, roundedCutout: boolean = true): JSX.Element {
+  const pos: Position = getElementPosition(target);
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: pos.top - padding,
+        left: pos.left - padding,
+        height: target.height + (padding * 2),
+        width: target.width + (padding * 2),
+        boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
+        borderRadius: roundedCutout ? '5px' : 0,
+        pointerEvents: disableMaskInteraction ? 'auto' : 'none'
+      }}
+    >
+    </div>
+  );
+}
+
+
