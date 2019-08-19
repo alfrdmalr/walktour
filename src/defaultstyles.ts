@@ -4,7 +4,6 @@ import { CSSProperties } from "react";
 // this file and it's contents are temporary: this logic is moved here to clean up the index.tsx file during refactoring and will be relocated
 interface DefaultStyles {
   container: CSSProperties;
-  closeButton: CSSProperties;
   footer: CSSProperties;
   title: CSSProperties;
   description: CSSProperties;
@@ -12,9 +11,32 @@ interface DefaultStyles {
   stepsCount: CSSProperties;
   pin: CSSProperties;
   pinLine: CSSProperties;
-  button: CSSProperties;
   wrapper: CSSProperties;
+  primaryButton: CSSProperties;
+  secondaryButton: CSSProperties;
+  tertiaryButton: CSSProperties;
+  disabledButton: CSSProperties;
 }
+const baseButtonStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontWeight: 300,
+  cursor: 'pointer',
+  height: 32,
+  lineHeight: '32px',
+  padding: '0 16px',
+  textAlign: 'center',
+  whiteSpace: 'nowrap',
+  userSelect: 'none',
+  border: 0,
+  borderRadius: 3,
+  outline: 'none',
+  backgroundColor: '#0084ff',
+  color: '#fff',
+  fontSize: 14,
+  marginLeft: 10,
+};
 
 export const defaultStyles: DefaultStyles = {
   container: {
@@ -28,17 +50,6 @@ export const defaultStyles: DefaultStyles = {
     borderRadius: '5px',
     fontFamily: 'Roboto, sans-serif',
     boxShadow: '0 3px 8px 0 rgba(0,0,0,.25)',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 8,
-    right: 10,
-    padding: 0,
-    cursor: 'pointer',
-    color: 'grey',
-    border: 0,
-    outline: 'none',
-    background: 'transparent',
   },
   footer: {
     padding: '10px 0 0',
@@ -89,25 +100,29 @@ export const defaultStyles: DefaultStyles = {
     zIndex: 1,
     background: '#1787fc',
   },
-  button: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 300,
-    cursor: 'pointer',
-    height: 32,
-    lineHeight: '32px',
-    padding: '0 16px',
-    textAlign: 'center',
-    whiteSpace: 'nowrap',
-    userSelect: 'none',
-    border: 0,
-    borderRadius: 3,
-    outline: 'none',
-    backgroundColor: '#0084ff',
-    color: '#fff',
-    fontSize: 14,
-    marginLeft: 10,
+  primaryButton: {
+    ...baseButtonStyle,
+    backgroundColor: "#0084ff",
+    color: "#ffffff"
+  },
+  secondaryButton: {
+    ...baseButtonStyle,
+    backgroundColor: `transparent`,
+    color: "#025c53",
+    border: "solid 1px #025c53"
+  },
+  tertiaryButton: {
+    ...baseButtonStyle,
+    backgroundColor: "#8400ff",
+    color: "#fff",
+    border: "solid 1px #8400ff"
+
+  },
+  disabledButton: {
+    ...baseButtonStyle,
+    backgroundColor: "#bebebe",
+    color: "#989898",
+    cursor: "default"
   },
   wrapper: {
     position: 'absolute',
