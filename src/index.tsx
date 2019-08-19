@@ -51,7 +51,6 @@ export const Walktour = (props: WalktourProps) => {
 
   React.useEffect(() => {
     goToStep(currentStepIndex)
-    // setPosition(getTooltipPosition(getTargetData(getStep(currentStepIndex, steps).querySelector)))
   }, []);
 
   React.useEffect(() => {
@@ -123,8 +122,9 @@ export const Walktour = (props: WalktourProps) => {
     return null
   };
 
+
   return (<>
-    {TourMask(targetData, maskPadding, (disableMaskInteraction || currentStepContent.disableMaskInteraction))}
+    {TourMask(targetData, (disableMaskInteraction || currentStepContent.disableMaskInteraction), maskPadding)}
     <div style={wrapperStyle}>
       <div style={styles.container}>
         <div id="walktour-keyboard-nav" tabIndex={0} style={navStyle} onKeyDown={keyPressHandler}>
@@ -180,7 +180,7 @@ function getStep(stepIndex: number, steps: Step[]) {
 
 function getTargetData(selector: string): ClientRect {
   const element = document.querySelector(selector)
-  const targetData = element && element.getBoundingClientRect()
+  const targetData = element && element.getBoundingClientRect();
 
   if (targetData) {
     return targetData
@@ -192,27 +192,43 @@ function getTargetData(selector: string): ClientRect {
 //at the moment, the tooltip is always positioned to the right, halfway down the height of the target element
 function getTooltipPosition(target: ClientRect): Position {
   if (target) {
+    const pos: Position = getElementPosition(target);
     return {
-      top: target.top + target.height / 2,
-      left: target.left + target.width
+      top: pos.top + target.height / 2,
+      left: pos.left + target.width
     }
   }
 }
 
-function TourMask(target: ClientRect, padding: number = 5, disableMaskInteraction: boolean): JSX.Element {
+function getElementPosition(element: ClientRect, adjustForScroll: boolean = true): Position {
+  if (!adjustForScroll) {
+    return {
+      top: element.top, 
+      left: element.left
+     }
+  }
+
+  return {
+    top: element.top + (document.documentElement.scrollTop || window.pageYOffset),
+    left: element.left + (document.documentElement.scrollLeft || window.pageXOffset)
+  }
+}
+
+function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 5, roundedCutout: boolean = true ): JSX.Element {
+  const pos: Position = getElementPosition(target);
   return (
     <div
       style={{
         position: 'absolute',
-        top: target.top - padding,
-        left: target.left - padding,
+        top: pos.top - padding,
+        left: pos.left - padding,
         height: target.height + (padding * 2),
         width: target.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
-        borderRadius: '5px',
+        borderRadius: roundedCutout ? '5px' : 0,
         pointerEvents: disableMaskInteraction ? 'auto' : 'none'
       }}
-    >
+    > 
     </div>
     );
 }
