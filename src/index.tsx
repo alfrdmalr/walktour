@@ -70,7 +70,7 @@ export const Walktour = (props: WalktourProps) => {
   }, []);
 
   React.useEffect(() => {
-    const container: HTMLElement = document.getElementById('walktour-keyboard-nav');
+    const container: HTMLElement = document.getElementById('walktour-tooltip-container');
     container && isVisibleState && container.focus();
   })
 
@@ -98,22 +98,17 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   const keyPressHandler = (event: React.KeyboardEvent) => {
+    console.log('keyevent fired')
     switch (event.key) {
       case "Escape":
         skip();
         event.preventDefault();
         break;
-      case "Enter":
-      case " ":
       case "ArrowRight":
         next();
         event.preventDefault();
         break;
       case "ArrowLeft":
-        prev();
-        event.preventDefault();
-        break;
-      case "Backspace":
         prev();
         event.preventDefault();
         break;
@@ -124,14 +119,6 @@ export const Walktour = (props: WalktourProps) => {
     ...styles.wrapper,
     ...position,
   };
-  const navStyle = {
-    width: "100%",
-    height: "100%",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    pointerEvents: 'none'
-  };
 
   if (!isVisibleState || !position) {
     return null
@@ -141,13 +128,8 @@ export const Walktour = (props: WalktourProps) => {
   return (<>
     {TourMask(targetData, (disableMaskInteraction || currentStepContent.disableMaskInteraction), maskPadding)}
     <div style={wrapperStyle}>
-      <div style={styles.container}>
-        <div id="walktour-keyboard-nav" tabIndex={0} style={navStyle} onKeyDown={keyPressHandler}>
-          {/*at the moment this div exists to grab focus during the tour and handle the keyboard navigation logic
-          it's its own div and not the container so that keyboard events on the rest of the content (individual buttons, custom html, etc) 
-          doesn't bubble up
-          */}
-        </div>
+      <div id="walktour-tooltip-container" style={styles.container} onKeyDown={keyPressHandler} tabIndex={0}>
+
         <div style={styles.title}>
           {currentStepContent.title}
         </div>
