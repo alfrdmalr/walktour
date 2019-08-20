@@ -1,12 +1,23 @@
 import * as React from 'react';
 import { defaultStyles } from './defaultstyles';
 
-
 export interface Step {
   querySelector: string,
   title: string,
   description: string //TODO change to allow custom html content?
   disableMaskInteraction?: boolean;
+}
+
+enum TooltipOrientation {
+  East = "EAST",
+  South = "SOUTH",
+  West = "WEST",
+  North = "NORTH"
+}
+
+interface Coords {
+  x: number;
+  y: number;
 }
 
 export interface WalktourProps {
@@ -24,11 +35,6 @@ export interface WalktourProps {
   }
   maskPadding?: number;
   disableMaskInteraction?: boolean;
-}
-
-interface Position {
-  top: number;
-  left: number;
 }
 
 const styles = defaultStyles;
@@ -59,7 +65,7 @@ export const Walktour = (props: WalktourProps) => {
   };
 
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
-  const [position, setPosition] = React.useState<Position>(undefined);
+  const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [targetData, setTargetData] = React.useState<ClientRect>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex);
   const currentStepContent = getStep(currentStepIndex, steps);
@@ -80,7 +86,7 @@ export const Walktour = (props: WalktourProps) => {
     }
     const data = getTargetData(getStep(stepIndex, steps).querySelector);
     setTargetData(data);
-    setPosition(getTooltipPosition(data));
+    setTooltipPosition(getTooltipPosition(data));
     setCurrentStepIndex(stepIndex);
   }
 
@@ -116,10 +122,11 @@ export const Walktour = (props: WalktourProps) => {
 
   const wrapperStyle = {
     ...styles.wrapper,
-    ...position,
+    top: tooltipPosition && tooltipPosition.y,
+    left: tooltipPosition && tooltipPosition.x
   };
 
-  if (!isVisibleState || !position) {
+  if (!isVisibleState || !tooltipPosition) {
     return null
   };
 
@@ -180,38 +187,38 @@ function getTargetData(selector: string): ClientRect {
 }
 
 //at the moment, the tooltip is always positioned to the right, halfway down the height of the target element
-function getTooltipPosition(target: ClientRect): Position {
+function getTooltipPosition(target: ClientRect): Coords {
   if (target) {
-    const pos: Position = getElementPosition(target);
+    const coords: Coords = getElementCoords(target);
     return {
-      top: pos.top + target.height / 2,
-      left: pos.left + target.width
+      y: coords.y + target.height / 2,
+      x: coords.x + target.width
     }
   }
 }
 
-function getElementPosition(element: ClientRect, adjustForScroll: boolean = true): Position {
+function getElementCoords(element: ClientRect, adjustForScroll: boolean = true): Coords {
   if (!adjustForScroll) {
     return {
-      top: element.top,
-      left: element.left
+      x: element.left,
+      y: element.top
     }
   }
 
   return {
-    top: element.top + (document.documentElement.scrollTop || window.pageYOffset),
-    left: element.left + (document.documentElement.scrollLeft || window.pageXOffset)
+    x: element.left + (document.documentElement.scrollLeft || window.pageXOffset),
+    y: element.top + (document.documentElement.scrollTop || window.pageYOffset)
   }
 }
 
 function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 5, roundedCutout: boolean = true): JSX.Element {
-  const pos: Position = getElementPosition(target);
+  const coords: Coords = getElementCoords(target);
   return (
     <div
       style={{
         position: 'absolute',
-        top: pos.top - padding,
-        left: pos.left - padding,
+        top: coords.y - padding,
+        left: coords.x - padding,
         height: target.height + (padding * 2),
         width: target.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
