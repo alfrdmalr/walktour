@@ -74,19 +74,22 @@ export const Walktour = (props: WalktourProps) => {
 
 
   React.useEffect(() => {
+    console.log(1)
     goToStep(currentStepIndex)
   }, []);
 
   React.useEffect(() => {
-    const data = getTargetData(getStep(currentStepIndex, steps).querySelector);
-    setTargetData(data);
-    setTooltipPosition(getTooltipPosition(data, maskPadding, 10));
-  }, [currentStepIndex])
+    const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
+    const tooltipData: ClientRect = tooltip && tooltip.getBoundingClientRect();
+    const targetData = getTargetData(getStep(currentStepIndex, steps).querySelector);
 
-  React.useEffect(() => {
-    const container: HTMLElement = document.getElementById('walktour-tooltip-container');
-    container && isVisibleState && container.focus();
-  })
+    setTargetData(targetData);
+    setTooltipPosition(getTooltipPosition(targetData, tooltipData, maskPadding, 10));
+
+    tooltip && isVisibleState && tooltip.focus();
+
+    console.log(2, currentStepIndex, tooltipData)
+  }, [currentStepIndex])
 
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= steps.length || stepIndex < 0) {
@@ -203,44 +206,47 @@ function getElementCoords(element: ClientRect, adjustForScroll: boolean = true):
   }
 }
 
-function getCenterPosition(): Coords {
+function getCenterPosition(element?: ClientRect): Coords {
+  const xOffset: number = element ? element.width / 2 : 0;
+  const yOffset: number = element ? element.height / 2 : 0;
   return {
-    x: Math.max(document.documentElement.clientWidth, window.innerWidth),
-    y: Math.max(document.documentElement.clientHeight, window.innerWidth)
+    x: (Math.max(document.documentElement.clientWidth, window.innerWidth) / 2) - xOffset,
+    y: (Math.max(document.documentElement.clientHeight, window.innerHeight) / 2) - yOffset
   }
 }
 
-function getTooltipPosition(target: ClientRect, padding: number = 0, buffer: number = 0): Coords {
-  if (target) {
-    return (getBestTooltipPosition(getTooltipPositionCandidates(target, padding, buffer)));
+function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, padding: number = 0, buffer: number = 0): Coords {
+  if (targetData) {
+    return (chooseBestTooltipPosition(getTooltipPositionCandidates(targetData, tooltipData, padding, buffer)));
   } else {
-    return getCenterPosition();
+    return getCenterPosition(tooltipData);
   }
 }
 
-function getTooltipPositionCandidates(target: ClientRect, padding: number, buffer: number): TooltipPositionCandidates {
-  const coords: Coords = getElementCoords(target);
+function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: ClientRect, padding: number, buffer: number): TooltipPositionCandidates {
+  const coords: Coords = getElementCoords(targetData);
 
   const east: Coords = {
-    x: coords.x + target.width + padding + buffer,
+    x: coords.x + targetData.width + padding + buffer,
     y: coords.y - padding
   }
 
   const south: Coords = {
-    x: coords.x - padding,
-    y: coords.y + target.height + padding + buffer
+    x: coords.x - (tooltipData.width - targetData.width) + padding,
+    y: coords.y + targetData.height + padding + buffer
   }
 
   const west: Coords = {
-    x: coords.x - padding - buffer, //need to subtract tooltip width
-    y: coords.y - padding
+    x: coords.x - tooltipData.width - padding - buffer,
+    y: coords.y - (tooltipData.height - targetData.height) + padding
   };
 
   const north: Coords = {
     x: coords.x - padding,
-    y: coords.y + padding + buffer //need to add tooltip height
+    y: coords.y - tooltipData.height - padding - buffer 
   };
-  const center: Coords = getCenterPosition();
+
+  const center: Coords = getCenterPosition(tooltipData);
 
   return {
     east,
@@ -251,9 +257,8 @@ function getTooltipPositionCandidates(target: ClientRect, padding: number, buffe
   }
 }
 
-function getBestTooltipPosition(candidates: TooltipPositionCandidates): Coords {
-  //temporarily return east to mimick older behavior
-  return candidates.east;
+function chooseBestTooltipPosition(candidates: TooltipPositionCandidates): Coords {
+  return candidates.east; //temporarily we indiscriminately return east, to mirror original functionality
 }
 
 function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 0, roundedCutout: boolean = true): JSX.Element {
