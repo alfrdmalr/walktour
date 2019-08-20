@@ -40,11 +40,9 @@ const baseButtonStyle: React.CSSProperties = {
 
 export const defaultStyles: DefaultStyles = {
   container: {
-    width: 226,
-    minHeight: 100,
+    maxWidth: 500,
     backgroundColor: 'white',
     padding: 10,
-    transform: 'translate(22px, -50px)',
     zIndex: 2,
     position: 'relative',
     borderRadius: '5px',

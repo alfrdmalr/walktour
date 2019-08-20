@@ -8,11 +8,12 @@ export interface Step {
   disableMaskInteraction?: boolean;
 }
 
-enum TooltipOrientation {
-  East = "EAST",
-  South = "SOUTH",
-  West = "WEST",
-  North = "NORTH"
+interface TooltipPositionCandidates {
+  east: Coords;
+  south: Coords;
+  west: Coords;
+  north: Coords;
+  center: Coords;
 }
 
 interface Coords {
@@ -61,6 +62,7 @@ export const Walktour = (props: WalktourProps) => {
       tertiary: styles.tertiaryButton,
       disabled: styles.disabledButton
     },
+    maskPadding: 5,
     ...props
   };
 
@@ -86,7 +88,7 @@ export const Walktour = (props: WalktourProps) => {
     }
     const data = getTargetData(getStep(stepIndex, steps).querySelector);
     setTargetData(data);
-    setTooltipPosition(getTooltipPosition(data));
+    setTooltipPosition(getTooltipPosition(data, maskPadding, 10));
     setCurrentStepIndex(stepIndex);
   }
 
@@ -125,6 +127,8 @@ export const Walktour = (props: WalktourProps) => {
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x
   };
+
+
 
   if (!isVisibleState || !tooltipPosition) {
     return null
@@ -165,8 +169,6 @@ export const Walktour = (props: WalktourProps) => {
         </div>
 
       </div>
-      <div style={styles.pin} />
-      <div style={styles.pinLine} />
     </div>
   </>)
 }
@@ -186,17 +188,6 @@ function getTargetData(selector: string): ClientRect {
   }
 }
 
-//at the moment, the tooltip is always positioned to the right, halfway down the height of the target element
-function getTooltipPosition(target: ClientRect): Coords {
-  if (target) {
-    const coords: Coords = getElementCoords(target);
-    return {
-      y: coords.y + target.height / 2,
-      x: coords.x + target.width
-    }
-  }
-}
-
 function getElementCoords(element: ClientRect, adjustForScroll: boolean = true): Coords {
   if (!adjustForScroll) {
     return {
@@ -211,7 +202,51 @@ function getElementCoords(element: ClientRect, adjustForScroll: boolean = true):
   }
 }
 
-function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 5, roundedCutout: boolean = true): JSX.Element {
+function getTooltipPosition(target: ClientRect, padding: number = 0, buffer: number = 0): Coords {
+  if (target) {
+    return(getBestTooltipPosition(getTooltipPositionCandidates(target, padding, buffer)));
+  }
+}
+
+function getTooltipPositionCandidates(target: ClientRect, padding: number, buffer: number): TooltipPositionCandidates {
+  const coords: Coords = getElementCoords(target);
+
+  const east: Coords = {
+    x: coords.x + target.width + padding + buffer,
+    y: coords.y - padding
+  }
+
+  const south: Coords = {
+    x: coords.x - padding,
+    y: coords.y + target.height + padding + buffer
+  }
+
+  const west: Coords = {
+    x: coords.x - padding - buffer, //need to subtract tooltip width
+    y: coords.y - padding
+  };
+
+  const north: Coords = {
+    x: coords.x - padding,
+    y: coords.y + padding + buffer //need to add tooltip height
+  };
+  const center: Coords = null;
+
+  return {
+    east, 
+    south,
+    west,
+    north,
+    center
+  }
+}
+
+function getBestTooltipPosition(candidates: TooltipPositionCandidates): Coords {
+  //temporarily return east to mimick older behavior
+  return candidates.east;
+}
+
+function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 0, roundedCutout: boolean = true): JSX.Element {
   const coords: Coords = getElementCoords(target);
   return (
     <div
