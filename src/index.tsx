@@ -98,7 +98,6 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   const keyPressHandler = (event: React.KeyboardEvent) => {
-    console.log('keyevent fired')
     switch (event.key) {
       case "Escape":
         skip();
