@@ -125,15 +125,13 @@ export const Walktour = (props: WalktourProps) => {
   const wrapperStyle = {
     ...styles.wrapper,
     top: tooltipPosition && tooltipPosition.y,
-    left: tooltipPosition && tooltipPosition.x
+    left: tooltipPosition && tooltipPosition.x,
   };
-
 
 
   if (!isVisibleState || !tooltipPosition) {
     return null
   };
-
 
   return (<>
     {TourMask(targetData, (disableMaskInteraction || currentStepContent.disableMaskInteraction), maskPadding)}
@@ -202,9 +200,18 @@ function getElementCoords(element: ClientRect, adjustForScroll: boolean = true):
   }
 }
 
+function getCenterPosition(): Coords {
+  return {
+    x: Math.max(document.documentElement.clientWidth, window.innerWidth),
+    y: Math.max(document.documentElement.clientHeight, window.innerWidth)
+  }
+}
+
 function getTooltipPosition(target: ClientRect, padding: number = 0, buffer: number = 0): Coords {
   if (target) {
-    return(getBestTooltipPosition(getTooltipPositionCandidates(target, padding, buffer)));
+    return (getBestTooltipPosition(getTooltipPositionCandidates(target, padding, buffer)));
+  } else {
+    return getCenterPosition();
   }
 }
 
@@ -230,10 +237,10 @@ function getTooltipPositionCandidates(target: ClientRect, padding: number, buffe
     x: coords.x - padding,
     y: coords.y + padding + buffer //need to add tooltip height
   };
-  const center: Coords = null;
+  const center: Coords = getCenterPosition();
 
   return {
-    east, 
+    east,
     south,
     west,
     north,
@@ -247,6 +254,9 @@ function getBestTooltipPosition(candidates: TooltipPositionCandidates): Coords {
 }
 
 function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 0, roundedCutout: boolean = true): JSX.Element {
+  if (!target) {
+    return null;
+  }
   const coords: Coords = getElementCoords(target);
   return (
     <div
