@@ -31,8 +31,9 @@ interface Position {
   left: number;
 }
 
+const styles = defaultStyles;
+
 export const Walktour = (props: WalktourProps) => {
-  const styles = defaultStyles;
 
   let {
     isVisible,
@@ -68,6 +69,11 @@ export const Walktour = (props: WalktourProps) => {
     goToStep(currentStepIndex)
   }, []);
 
+  React.useEffect(() => {
+    const container: HTMLElement = document.getElementById('walktour-tooltip-container');
+    container && isVisibleState && container.focus();
+  })
+
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= steps.length || stepIndex < 0) {
       return;
@@ -91,6 +97,23 @@ export const Walktour = (props: WalktourProps) => {
     setVisible(false);
   }
 
+  const keyPressHandler = (event: React.KeyboardEvent) => {
+    console.log('keyevent fired')
+    switch (event.key) {
+      case "Escape":
+        skip();
+        event.preventDefault();
+        break;
+      case "ArrowRight":
+        next();
+        event.preventDefault();
+        break;
+      case "ArrowLeft":
+        prev();
+        event.preventDefault();
+        break;
+    }
+  }
 
   const wrapperStyle = {
     ...styles.wrapper,
@@ -105,7 +128,7 @@ export const Walktour = (props: WalktourProps) => {
   return (<>
     {TourMask(targetData, (disableMaskInteraction || currentStepContent.disableMaskInteraction), maskPadding)}
     <div style={wrapperStyle}>
-      <div style={styles.container}>
+      <div id="walktour-tooltip-container" style={styles.container} onKeyDown={keyPressHandler} tabIndex={0}>
 
         <div style={styles.title}>
           {currentStepContent.title}
@@ -134,6 +157,7 @@ export const Walktour = (props: WalktourProps) => {
             {nextLabel}
           </button>
         </div>
+
       </div>
       <div style={styles.pin} />
       <div style={styles.pinLine} />
