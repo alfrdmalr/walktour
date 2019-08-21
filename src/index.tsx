@@ -226,27 +226,80 @@ function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, pad
 function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: ClientRect, padding: number, buffer: number): TooltipPositionCandidates {
   const coords: Coords = getElementCoords(targetData);
 
+  const centerX: number = coords.x - (Math.abs(tooltipData.width - targetData.width) / 2);
+  const centerY: number = coords.y - (Math.abs(tooltipData.height - targetData.height) / 2);
+  const eastAlign: number = coords.x - (tooltipData.width - targetData.width) + padding;
+  const southAlign: number = coords.y + targetData.height + padding + buffer;
+  const westAlign: number = coords.x - padding;
+  const northAlign: number = coords.y - padding;
+  const eastOffset: number = coords.x + targetData.width + padding + buffer;
+  const southOffset: number = coords.y + targetData.height + padding + buffer;
+  const westOffset: number = coords.x - tooltipData.width - padding - buffer;
+  const northOffset: number = coords.y - tooltipData.height - padding - buffer;
+  
+
   const east: Coords = {
-    x: coords.x + targetData.width + padding + buffer,
-    y: coords.y - padding
+    x: eastOffset,
+    y: centerY
   }
 
   const south: Coords = {
-    x: coords.x - (tooltipData.width - targetData.width) + padding,
-    y: coords.y + targetData.height + padding + buffer
+    x: centerX,
+    y: southOffset
   }
 
   const west: Coords = {
-    x: coords.x - tooltipData.width - padding - buffer,
-    y: coords.y - (tooltipData.height - targetData.height) + padding
+    x: westOffset,
+    y: centerY
   };
 
   const north: Coords = {
-    x: coords.x - padding,
-    y: coords.y - tooltipData.height - padding - buffer 
+    x: centerX,
+    y: northOffset 
   };
 
   const center: Coords = getCenterPosition(tooltipData);
+
+  const eastNorth: Coords = {
+    x: eastOffset,
+    y: northAlign
+  }
+
+  const eastSouth: Coords = {
+    x: eastOffset,
+    y: southAlign
+  }
+
+  const southEast: Coords = {
+    x: eastAlign,
+    y: southOffset
+  }
+
+  const southWest: Coords = {
+    x: westAlign,
+    y: southOffset
+  }
+
+  const westSouth: Coords = {
+    x: westOffset,
+    y: southAlign
+  }
+
+  const westNorth: Coords = {
+    x: westOffset,
+    y: northAlign
+  }
+
+  const northWest: Coords = {
+    x: westAlign,
+    y: northOffset
+  }
+
+  const northEast: Coords = {
+    x: eastAlign,
+    y: northOffset
+  }
+
 
   return {
     east,
@@ -258,7 +311,7 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
 }
 
 function chooseBestTooltipPosition(candidates: TooltipPositionCandidates): Coords {
-  return candidates.east; //temporarily we indiscriminately return east, to mirror original functionality
+  return candidates.west; //temporarily we indiscriminately return east, to mirror original functionality
 }
 
 function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 0, roundedCutout: boolean = true): JSX.Element {
