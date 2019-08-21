@@ -1,24 +1,12 @@
 import * as React from 'react';
 import { defaultStyles } from './defaultstyles';
+import {Coords, getElementCoords, getTooltipPosition} from '../utils/positioning'
 
 export interface Step {
   querySelector: string,
   title: string,
   description: string //TODO change to allow custom html content?
   disableMaskInteraction?: boolean;
-}
-
-interface TooltipPositionCandidates {
-  east: Coords;
-  south: Coords;
-  west: Coords;
-  north: Coords;
-  center: Coords;
-}
-
-interface Coords {
-  x: number;
-  y: number;
 }
 
 export interface WalktourProps {
@@ -79,6 +67,9 @@ export const Walktour = (props: WalktourProps) => {
   }, []);
 
   React.useEffect(() => {
+    if (isVisibleState === false) {
+      return;
+    }
     const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
     const tooltipData: ClientRect = tooltip && tooltip.getBoundingClientRect();
     const targetData = getTargetData(getStep(currentStepIndex, steps).querySelector);
@@ -86,7 +77,7 @@ export const Walktour = (props: WalktourProps) => {
     setTargetData(targetData);
     setTooltipPosition(getTooltipPosition(targetData, tooltipData, maskPadding, 10));
 
-    tooltip && isVisibleState && tooltip.focus();
+    tooltip && tooltip.focus();
 
     console.log(2, currentStepIndex, tooltipData)
   }, [currentStepIndex])
@@ -190,128 +181,6 @@ function getTargetData(selector: string): ClientRect {
   } else {
     throw new Error(`element specified by  "${selector}" could not be found`);
   }
-}
-
-function getElementCoords(element: ClientRect, adjustForScroll: boolean = true): Coords {
-  if (!adjustForScroll) {
-    return {
-      x: element.left,
-      y: element.top
-    }
-  }
-
-  return {
-    x: element.left + (document.documentElement.scrollLeft || window.pageXOffset),
-    y: element.top + (document.documentElement.scrollTop || window.pageYOffset)
-  }
-}
-
-function getCenterPosition(element?: ClientRect): Coords {
-  const xOffset: number = element ? element.width / 2 : 0;
-  const yOffset: number = element ? element.height / 2 : 0;
-  return {
-    x: (Math.max(document.documentElement.clientWidth, window.innerWidth) / 2) - xOffset,
-    y: (Math.max(document.documentElement.clientHeight, window.innerHeight) / 2) - yOffset
-  }
-}
-
-function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, padding: number = 0, buffer: number = 0): Coords {
-  if (targetData) {
-    return (chooseBestTooltipPosition(getTooltipPositionCandidates(targetData, tooltipData, padding, buffer)));
-  } else {
-    return getCenterPosition(tooltipData);
-  }
-}
-
-function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: ClientRect, padding: number, buffer: number): TooltipPositionCandidates {
-  const coords: Coords = getElementCoords(targetData);
-
-  const centerX: number = coords.x - (Math.abs(tooltipData.width - targetData.width) / 2);
-  const centerY: number = coords.y - (Math.abs(tooltipData.height - targetData.height) / 2);
-  const eastAlign: number = coords.x - (tooltipData.width - targetData.width) + padding;
-  const southAlign: number = coords.y + targetData.height + padding + buffer;
-  const westAlign: number = coords.x - padding;
-  const northAlign: number = coords.y - padding;
-  const eastOffset: number = coords.x + targetData.width + padding + buffer;
-  const southOffset: number = coords.y + targetData.height + padding + buffer;
-  const westOffset: number = coords.x - tooltipData.width - padding - buffer;
-  const northOffset: number = coords.y - tooltipData.height - padding - buffer;
-  
-
-  const east: Coords = {
-    x: eastOffset,
-    y: centerY
-  }
-
-  const south: Coords = {
-    x: centerX,
-    y: southOffset
-  }
-
-  const west: Coords = {
-    x: westOffset,
-    y: centerY
-  };
-
-  const north: Coords = {
-    x: centerX,
-    y: northOffset 
-  };
-
-  const center: Coords = getCenterPosition(tooltipData);
-
-  const eastNorth: Coords = {
-    x: eastOffset,
-    y: northAlign
-  }
-
-  const eastSouth: Coords = {
-    x: eastOffset,
-    y: southAlign
-  }
-
-  const southEast: Coords = {
-    x: eastAlign,
-    y: southOffset
-  }
-
-  const southWest: Coords = {
-    x: westAlign,
-    y: southOffset
-  }
-
-  const westSouth: Coords = {
-    x: westOffset,
-    y: southAlign
-  }
-
-  const westNorth: Coords = {
-    x: westOffset,
-    y: northAlign
-  }
-
-  const northWest: Coords = {
-    x: westAlign,
-    y: northOffset
-  }
-
-  const northEast: Coords = {
-    x: eastAlign,
-    y: northOffset
-  }
-
-
-  return {
-    east,
-    south,
-    west,
-    north,
-    center
-  }
-}
-
-function chooseBestTooltipPosition(candidates: TooltipPositionCandidates): Coords {
-  return candidates.west; //temporarily we indiscriminately return east, to mirror original functionality
 }
 
 function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 0, roundedCutout: boolean = true): JSX.Element {
