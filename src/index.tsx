@@ -79,6 +79,9 @@ export const Walktour = (props: WalktourProps) => {
   }, []);
 
   React.useEffect(() => {
+    if (isVisibleState === false) {
+      return;
+    }
     const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
     const tooltipData: ClientRect = tooltip && tooltip.getBoundingClientRect();
     const targetData = getTargetData(getStep(currentStepIndex, steps).querySelector);
@@ -86,7 +89,7 @@ export const Walktour = (props: WalktourProps) => {
     setTargetData(targetData);
     setTooltipPosition(getTooltipPosition(targetData, tooltipData, maskPadding, 10));
 
-    tooltip && isVisibleState && tooltip.focus();
+    tooltip && tooltip.focus();
 
     console.log(2, currentStepIndex, tooltipData)
   }, [currentStepIndex])
