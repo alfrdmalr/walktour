@@ -2,7 +2,7 @@ import { CSSProperties } from "react";
 
 
 // this file and it's contents are temporary: this logic is moved here to clean up the index.tsx file during refactoring and will be relocated
-interface DefaultStyles {
+export interface DefaultStyles {
   container: CSSProperties;
   footer: CSSProperties;
   title: CSSProperties;
