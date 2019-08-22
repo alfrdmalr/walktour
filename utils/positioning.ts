@@ -5,14 +5,14 @@ enum CardinalAlignment {
   WEST = 'west',
   NORTH = 'north',
   CENTER = 'center',
-  EASTNORTH = 'eastnorth',
-  EASTSOUTH = 'eastsouth',
-  SOUTHEAST = 'southeast',
-  SOUTHWEST = 'southwest',
-  WESTSOUTH = 'westsouth',
-  WESTNORTH = 'westnorth',
-  NORTHWEST = 'northwest',
-  NORTHEAST = 'northeast'
+  EASTNORTH = 'east-north',
+  EASTSOUTH = 'east-south',
+  SOUTHEAST = 'south-east',
+  SOUTHWEST = 'south-west',
+  WESTSOUTH = 'west-south',
+  WESTNORTH = 'west-north',
+  NORTHWEST = 'north-west',
+  NORTHEAST = 'north-east'
 }
 
 export interface Coords {
