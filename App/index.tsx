@@ -41,7 +41,7 @@ const styleElementFour: React.CSSProperties = {
   width: 200,
   height: 100,
   left: 600,
-  top: 700,
+  top: 1800,
   position: 'absolute'
 }
 
