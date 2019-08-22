@@ -1,5 +1,5 @@
 
-enum CardinalAlignment {
+enum CardinalOrientation {
   EAST = 'east',
   SOUTH = 'south',
   WEST = 'west',
@@ -21,7 +21,7 @@ export interface Coords {
 }
 
 interface CardinalCoords {
-  alignment: CardinalAlignment;
+  orientation: CardinalOrientation;
   coords: Coords;
 }
 
@@ -80,10 +80,10 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
   const center: Coords = getCenterCoords(tooltipData);
 
   const standardPositions = [
-    { alignment: CardinalAlignment.EAST, coords: east },
-    { alignment: CardinalAlignment.SOUTH, coords: south },
-    { alignment: CardinalAlignment.WEST, coords: west },
-    { alignment: CardinalAlignment.NORTH, coords: north },
+    { orientation: CardinalOrientation.EAST, coords: east },
+    { orientation: CardinalOrientation.SOUTH, coords: south },
+    { orientation: CardinalOrientation.WEST, coords: west },
+    { orientation: CardinalOrientation.NORTH, coords: north },
   ];
 
   let additionalPositions: CardinalCoords[];
@@ -103,21 +103,21 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
     const northEast: Coords = { x: eastAlign, y: northOffset }
 
     additionalPositions = [
-      { alignment: CardinalAlignment.EASTNORTH, coords: eastNorth },
-      { alignment: CardinalAlignment.EASTSOUTH, coords: eastSouth },
-      { alignment: CardinalAlignment.SOUTHEAST, coords: southEast },
-      { alignment: CardinalAlignment.SOUTHWEST, coords: southWest },
-      { alignment: CardinalAlignment.WESTSOUTH, coords: westSouth },
-      { alignment: CardinalAlignment.WESTNORTH, coords: westNorth },
-      { alignment: CardinalAlignment.NORTHWEST, coords: northWest },
-      { alignment: CardinalAlignment.NORTHEAST, coords: northEast }
+      { orientation: CardinalOrientation.EASTNORTH, coords: eastNorth },
+      { orientation: CardinalOrientation.EASTSOUTH, coords: eastSouth },
+      { orientation: CardinalOrientation.SOUTHEAST, coords: southEast },
+      { orientation: CardinalOrientation.SOUTHWEST, coords: southWest },
+      { orientation: CardinalOrientation.WESTSOUTH, coords: westSouth },
+      { orientation: CardinalOrientation.WESTNORTH, coords: westNorth },
+      { orientation: CardinalOrientation.NORTHWEST, coords: northWest },
+      { orientation: CardinalOrientation.NORTHEAST, coords: northEast }
     ]
   }
 
   return [
     ...standardPositions,
     ...additionalPositions,
-    { alignment: CardinalAlignment.CENTER, coords: center }
+    { orientation: CardinalOrientation.CENTER, coords: center }
   ]
 }
 
