@@ -131,7 +131,6 @@ function isElementInView(elementData: ClientRect, atPosition?: Coords): boolean 
 }
 
 function chooseBestTooltipPosition(tooltip: ClientRect, candidates: CardinalCoords[]): Coords {
-  //iterate through and choose position that's in view
   for (let i: number = 0; i < candidates.length; i++) {
     const pos: CardinalCoords = candidates[i];
     if (isElementInView(tooltip, pos.coords)) {
@@ -141,9 +140,8 @@ function chooseBestTooltipPosition(tooltip: ClientRect, candidates: CardinalCoor
 }
 
 export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, padding: number = 0, buffer: number = 0): Coords {
-  
   return chooseBestTooltipPosition(tooltipData, 
       getTooltipPositionCandidates(targetData, tooltipData, padding, buffer, true)) ||
-    getCenterCoords(tooltipData);
+    getCenterCoords(tooltipData); //if no position can be determined, default to the center of the screen
 }
 
