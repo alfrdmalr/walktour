@@ -62,7 +62,6 @@ export const Walktour = (props: WalktourProps) => {
 
 
   React.useEffect(() => {
-    console.log(1)
     goToStep(currentStepIndex)
   }, []);
 
@@ -79,7 +78,6 @@ export const Walktour = (props: WalktourProps) => {
 
     tooltip && tooltip.focus();
 
-    console.log(2, currentStepIndex, tooltipData)
   }, [currentStepIndex])
 
   const goToStep = (stepIndex: number) => {
@@ -123,6 +121,7 @@ export const Walktour = (props: WalktourProps) => {
     ...styles.wrapper,
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
+    visibility: (!tooltipPosition) ? 'hidden' : 'visible'
   };
 
 
