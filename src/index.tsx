@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { defaultStyles } from './defaultstyles';
-import {Coords, getElementCoords, getTooltipPosition} from '../utils/positioning'
+import { defaultStyles, DefaultStyles } from './defaultstyles';
+import {Coords, getElementCoords, getTooltipPosition, CardinalOrientation} from '../utils/positioning'
 
 export interface Step {
   querySelector: string,
   title: string,
   description: string //TODO change to allow custom html content?
   disableMaskInteraction?: boolean;
+  orientation?: CardinalOrientation[]
 }
 
 export interface WalktourProps {
@@ -26,7 +27,8 @@ export interface WalktourProps {
   disableMaskInteraction?: boolean;
 }
 
-const styles = defaultStyles;
+const styles: DefaultStyles = defaultStyles;
+const tooltipSeparation: number = 10;
 
 export const Walktour = (props: WalktourProps) => {
 
@@ -74,7 +76,7 @@ export const Walktour = (props: WalktourProps) => {
     const targetData = getTargetData(getStep(currentStepIndex, steps).querySelector);
 
     setTargetData(targetData);
-    setTooltipPosition(getTooltipPosition(targetData, tooltipData, maskPadding, 10));
+    setTooltipPosition(getTooltipPosition(targetData, tooltipData, maskPadding, tooltipSeparation, currentStepContent.orientation));
 
     tooltip && tooltip.focus();
 
