@@ -1,22 +1,36 @@
-interface CardinalCoords {
-  east: Coords;
-  south: Coords;
-  west: Coords;
-  north: Coords;
-  center: Coords;
-  eastNorth?: Coords;
-  eastSouth?: Coords;
-  southEast?: Coords;
-  southWest?: Coords;
-  westSouth?: Coords;
-  westNorth?: Coords;
-  northWest?: Coords;
-  northEast?: Coords;
+
+enum CardinalAlignment {
+  EAST = 'east',
+  SOUTH = 'south',
+  WEST = 'west',
+  NORTH = 'north',
+  CENTER = 'center',
+  EASTNORTH = 'eastnorth',
+  EASTSOUTH = 'eastsouth',
+  SOUTHEAST = 'southeast',
+  SOUTHWEST = 'southwest',
+  WESTSOUTH = 'westsouth',
+  WESTNORTH = 'westnorth',
+  NORTHWEST = 'northwest',
+  NORTHEAST = 'northeast'
 }
 
 export interface Coords {
   x: number;
   y: number;
+}
+
+interface CardinalCoords {
+  alignment: CardinalAlignment;
+  coords: Coords;
+}
+
+function getViewportHeight() {
+  return Math.max(document.documentElement.clientHeight, window.innerHeight);
+}
+
+function getViewportWidth() {
+  return Math.max(document.documentElement.clientWidth, window.innerWidth);
 }
 
 function addScrollOffset(coords: Coords): Coords {
@@ -34,19 +48,23 @@ export function getElementCoords(element: ClientRect, adjustForScroll: boolean =
     }
   }
 
-  return addScrollOffset({x: element.left, y: element.top})
+  return addScrollOffset({ x: element.left, y: element.top })
 }
 
-function getCenterPosition(element?: ClientRect): Coords {
+function getCenterCoords(element?: ClientRect): Coords {
   const xOffset: number = element ? element.width / 2 : 0;
   const yOffset: number = element ? element.height / 2 : 0;
   return addScrollOffset({
-    x: (Math.max(document.documentElement.clientWidth, window.innerWidth) / 2) - xOffset,
-    y: (Math.max(document.documentElement.clientHeight, window.innerHeight) / 2) - yOffset
+    x: (getViewportWidth() / 2) - xOffset,
+    y: (getViewportHeight() / 2) - yOffset
   })
 }
 
-function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: ClientRect, padding: number, buffer: number, includeAllPositions?: boolean): CardinalCoords {
+function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: ClientRect, padding: number, buffer: number, includeAllPositions?: boolean): CardinalCoords[] {
+  if (!targetData || !tooltipData) {
+    return;
+  }
+
   const coords: Coords = getElementCoords(targetData);
   const centerX: number = coords.x - (Math.abs(tooltipData.width - targetData.width) / 2);
   const centerY: number = coords.y - (Math.abs(tooltipData.height - targetData.height) / 2);
@@ -59,85 +77,73 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
   const south: Coords = { x: centerX, y: southOffset }
   const west: Coords = { x: westOffset, y: centerY };
   const north: Coords = { x: centerX, y: northOffset };
-  const center: Coords = getCenterPosition(tooltipData);
-  const standardPositions = { east, south, west, north, center };
+  const center: Coords = getCenterCoords(tooltipData);
 
-  let additionalPositions: Partial<CardinalCoords>;
+  const standardPositions = [
+    { alignment: CardinalAlignment.EAST, coords: east },
+    { alignment: CardinalAlignment.SOUTH, coords: south },
+    { alignment: CardinalAlignment.WEST, coords: west },
+    { alignment: CardinalAlignment.NORTH, coords: north },
+  ];
+
+  let additionalPositions: CardinalCoords[];
   if (includeAllPositions) {
     const eastAlign: number = coords.x - (tooltipData.width - targetData.width) + padding;
-    const southAlign: number = coords.y + targetData.height + padding + buffer;
+    const southAlign: number = coords.y - (tooltipData.height - targetData.height) + padding;
     const westAlign: number = coords.x - padding;
     const northAlign: number = coords.y - padding;
 
-    const eastNorth: Coords = {
-      x: eastOffset,
-      y: northAlign
-    }
+    const eastNorth: Coords = { x: eastOffset, y: northAlign }
+    const eastSouth: Coords = { x: eastOffset, y: southAlign }
+    const southEast: Coords = { x: eastAlign, y: southOffset }
+    const southWest: Coords = { x: westAlign, y: southOffset }
+    const westSouth: Coords = { x: westOffset, y: southAlign }
+    const westNorth: Coords = { x: westOffset, y: northAlign }
+    const northWest: Coords = { x: westAlign, y: northOffset }
+    const northEast: Coords = { x: eastAlign, y: northOffset }
 
-    const eastSouth: Coords = {
-      x: eastOffset,
-      y: southAlign
-    }
-
-    const southEast: Coords = {
-      x: eastAlign,
-      y: southOffset
-    }
-
-    const southWest: Coords = {
-      x: westAlign,
-      y: southOffset
-    }
-
-    const westSouth: Coords = {
-      x: westOffset,
-      y: southAlign
-    }
-
-    const westNorth: Coords = {
-      x: westOffset,
-      y: northAlign
-    }
-
-    const northWest: Coords = {
-      x: westAlign,
-      y: northOffset
-    }
-
-    const northEast: Coords = {
-      x: eastAlign,
-      y: northOffset
-    }
-
-    additionalPositions = {
-      eastNorth,
-      eastSouth,
-      southEast,
-      southWest,
-      westSouth,
-      westNorth,
-      northWest,
-      northEast,
-    }
+    additionalPositions = [
+      { alignment: CardinalAlignment.EASTNORTH, coords: eastNorth },
+      { alignment: CardinalAlignment.EASTSOUTH, coords: eastSouth },
+      { alignment: CardinalAlignment.SOUTHEAST, coords: southEast },
+      { alignment: CardinalAlignment.SOUTHWEST, coords: southWest },
+      { alignment: CardinalAlignment.WESTSOUTH, coords: westSouth },
+      { alignment: CardinalAlignment.WESTNORTH, coords: westNorth },
+      { alignment: CardinalAlignment.NORTHWEST, coords: northWest },
+      { alignment: CardinalAlignment.NORTHEAST, coords: northEast }
+    ]
   }
 
-  return {
+  return [
     ...standardPositions,
-    ...additionalPositions
-  }
+    ...additionalPositions,
+    { alignment: CardinalAlignment.CENTER, coords: center }
+  ]
 }
 
-function chooseBestTooltipPosition(candidates: CardinalCoords): Coords {
-  console.log(Object.keys(candidates));
-  
-  return candidates.center; //temporarily we indiscriminately return east, to mirror original functionality
-  
+function isElementInView(elementData: ClientRect, atPosition?: Coords): boolean {
+  const position: Coords = atPosition || getElementCoords(elementData);
+  const scrollOffsets: Coords = addScrollOffset({ x: 0, y: 0 })
+  const xVisibility: boolean = position.x >= scrollOffsets.x && (position.x + elementData.width) <= getViewportWidth();
+  const yVisibility: boolean = position.y >= scrollOffsets.y && (position.y + elementData.height) <= getViewportHeight();
+
+  return xVisibility && yVisibility;
+}
+
+function chooseBestTooltipPosition(tooltip: ClientRect, candidates: CardinalCoords[]): Coords {
+  //iterate through and choose position that's in view
+  for (let i: number = 0; i < candidates.length; i++) {
+    const pos: CardinalCoords = candidates[i];
+    if (isElementInView(tooltip, pos.coords)) {
+      return pos.coords;
+    }
+  }
 }
 
 export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, padding: number = 0, buffer: number = 0): Coords {
-  if (targetData) {
-    return (chooseBestTooltipPosition(getTooltipPositionCandidates(targetData, tooltipData, padding, buffer)));
-  } else {
-    return getCenterPosition(tooltipData);
-  }
+  
+  return chooseBestTooltipPosition(tooltipData, 
+      getTooltipPositionCandidates(targetData, tooltipData, padding, buffer, true)) ||
+    getCenterCoords(tooltipData);
 }
+
