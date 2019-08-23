@@ -60,6 +60,26 @@ function getCenterCoords(element?: ClientRect): Coords {
   })
 }
 
+function scrollToElement(elementData: ClientRect, centerElementInViewport?: boolean, padding?: number): void {
+  const el: Coords = getElementCoords(elementData);
+  let xOffset: number = 0;
+  let yOffset: number = 0;
+
+  if (centerElementInViewport) {
+    xOffset = (getViewportWidth() + elementData.width) / 2;
+    yOffset = (getViewportHeight() + elementData.height) / 2;
+  } else {
+    xOffset = padding;
+    yOffset = padding;
+  }
+
+  window.scrollTo({
+    top: el.y - yOffset,
+    left: el.x - xOffset,
+    behavior: 'smooth'
+  })
+}
+
 function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: ClientRect, padding: number, buffer: number, includeAllPositions?: boolean): CardinalCoords[] {
   if (!targetData || !tooltipData) {
     return;
