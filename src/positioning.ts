@@ -124,8 +124,8 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
 function isElementInView(elementData: ClientRect, atPosition?: Coords): boolean {
   const position: Coords = atPosition || getElementCoords(elementData);
   const scrollOffsets: Coords = addScrollOffset({ x: 0, y: 0 })
-  const xVisibility: boolean = (position.x >= scrollOffsets.x) && ((position.x + elementData.width) <= getViewportWidth());
-  const yVisibility: boolean = (position.y >= scrollOffsets.y) && ((position.y + elementData.height) <= getViewportHeight());
+  const xVisibility: boolean = (position.x >= scrollOffsets.x) && ((position.x + elementData.width) <= (getViewportWidth() + scrollOffsets.x));
+  const yVisibility: boolean = (position.y >= scrollOffsets.y) && ((position.y + elementData.height) <= (getViewportHeight() + scrollOffsets.y));
 
   return xVisibility && yVisibility;
 }
