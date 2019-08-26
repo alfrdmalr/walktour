@@ -69,14 +69,13 @@ function getCenterCoords(element?: ClientRect): Coords {
 }
 
 function scrollToElement(elementData: ClientRect, centerElementInViewport?: boolean, padding?: number): void {
-  const el: Coords = getElementCoords(elementData, true);
+  const el: Coords = getElementCoords(elementData, false);
   let xOffset: number = 0;
   let yOffset: number = 0;
-  const scrollOffset: Coords = getCurrentScrollOffset();
 
   if (centerElementInViewport) {
-    xOffset = (getViewportWidth() + scrollOffset.x + elementData.width) / 2;
-    yOffset = (getViewportHeight() + scrollOffset.y + elementData.height) / 2;
+    xOffset = (getViewportWidth() + elementData.width) / 2;
+    yOffset = (getViewportHeight() + elementData.height) / 2;
   } else if (padding) {
     xOffset = padding;
     yOffset = padding;
