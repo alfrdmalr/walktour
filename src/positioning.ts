@@ -48,7 +48,7 @@ function getCurrentScrollOffset(): Coords {
   }
 }
 
-export function getElementCoords(element: ClientRect, adjustForScroll: boolean = true): Coords {
+export function getElementCoords(element: ClientRect, adjustForScroll: boolean): Coords {
   if (!adjustForScroll) {
     return {
       x: element.left,
@@ -69,7 +69,7 @@ function getCenterCoords(element?: ClientRect): Coords {
 }
 
 function scrollToElement(elementData: ClientRect, centerElementInViewport?: boolean, padding?: number): void {
-  const el: Coords = getElementCoords(elementData);
+  const el: Coords = getElementCoords(elementData, true);
   let xOffset: number = 0;
   let yOffset: number = 0;
   const scrollOffset: Coords = getCurrentScrollOffset();
@@ -94,7 +94,7 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
     return;
   }
 
-  const coords: Coords = getElementCoords(targetData);
+  const coords: Coords = getElementCoords(targetData, true);
   const centerX: number = coords.x - (Math.abs(tooltipData.width - targetData.width) / 2);
   const centerY: number = coords.y - (Math.abs(tooltipData.height - targetData.height) / 2);
   const eastOffset: number = coords.x + targetData.width + padding + tooltipDistance;
@@ -151,7 +151,7 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
 }
 
 function isElementInView(elementData: ClientRect, atPosition?: Coords): boolean {
-  const position: Coords = atPosition || getElementCoords(elementData);
+  const position: Coords = atPosition || getElementCoords(elementData, true);
   const scrollOffsets: Coords = getCurrentScrollOffset();
   const xVisibility: boolean = (position.x >= scrollOffsets.x) && ((position.x + elementData.width) <= (getViewportWidth() + scrollOffsets.x));
   const yVisibility: boolean = (position.y >= scrollOffsets.y) && ((position.y + elementData.height) <= (getViewportHeight() + scrollOffsets.y));
@@ -191,8 +191,8 @@ export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRe
     scrollToElement(targetData);
     return choosePosBasedOnCandidates();
   }
-
 }
+
 
 
 

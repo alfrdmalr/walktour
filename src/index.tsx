@@ -188,7 +188,7 @@ function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: 
   if (!target) {
     return null;
   }
-  const coords: Coords = getElementCoords(target);
+  const coords: Coords = getElementCoords(target, true);
   return (
     <div
       style={{
