@@ -15,7 +15,7 @@ const steps: Step[] = [
   {querySelector: '#six', title: "Cardinal Direction Positioning", description: 'South!', orientation: [CardinalOrientation.SOUTH]},
   {querySelector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientation: [CardinalOrientation.NORTHWEST]},
   {querySelector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientation: [CardinalOrientation.WESTNORTH]},
-  {querySelector: '#seven', title: 'Scrolling', description: 'offscreen elements are automatically scrolled into view'}
+  {querySelector: '#seven', title: 'Scrolling (WIP)', description: 'offscreen elements are automatically scrolled into view'}
 ]
 
 const styleElementOne: React.CSSProperties = {
