@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "parcel build src/index.tsx -o dist/index.js",
-    "start-dev": "parcel App/index.html --open"
+    "start": "parcel App/index.html --open"
   },
   "repository": {
     "type": "git",
@@ -64,5 +64,11 @@
     "prettier": "^1.17.1",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
   }
 }

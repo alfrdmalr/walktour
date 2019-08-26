@@ -2,7 +2,7 @@ import { CSSProperties } from "react";
 
 
 // this file and it's contents are temporary: this logic is moved here to clean up the index.tsx file during refactoring and will be relocated
-interface DefaultStyles {
+export interface DefaultStyles {
   container: CSSProperties;
   footer: CSSProperties;
   title: CSSProperties;
@@ -105,16 +105,15 @@ export const defaultStyles: DefaultStyles = {
   },
   secondaryButton: {
     ...baseButtonStyle,
-    backgroundColor: `transparent`,
-    color: "#025c53",
-    border: "solid 1px #025c53"
-  },
-  tertiaryButton: {
-    ...baseButtonStyle,
     backgroundColor: "#8400ff",
     color: "#fff",
     border: "solid 1px #8400ff"
-
+  },
+  tertiaryButton: {
+    ...baseButtonStyle,
+    backgroundColor: `transparent`,
+    color: "#025c53",
+    border: "solid 1px #025c53"
   },
   disabledButton: {
     ...baseButtonStyle,

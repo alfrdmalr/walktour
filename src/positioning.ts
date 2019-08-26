@@ -1,5 +1,5 @@
 
-enum CardinalOrientation {
+export enum CardinalOrientation {
   EAST = 'east',
   SOUTH = 'south',
   WEST = 'west',
@@ -80,7 +80,7 @@ function scrollToElement(elementData: ClientRect, centerElementInViewport?: bool
   })
 }
 
-function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: ClientRect, padding: number, buffer: number, includeAllPositions?: boolean): CardinalCoords[] {
+function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: ClientRect, padding: number, tooltipDistance: number, includeAllPositions?: boolean): CardinalCoords[] {
   if (!targetData || !tooltipData) {
     return;
   }
@@ -88,10 +88,10 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
   const coords: Coords = getElementCoords(targetData);
   const centerX: number = coords.x - (Math.abs(tooltipData.width - targetData.width) / 2);
   const centerY: number = coords.y - (Math.abs(tooltipData.height - targetData.height) / 2);
-  const eastOffset: number = coords.x + targetData.width + padding + buffer;
-  const southOffset: number = coords.y + targetData.height + padding + buffer;
-  const westOffset: number = coords.x - tooltipData.width - padding - buffer;
-  const northOffset: number = coords.y - tooltipData.height - padding - buffer;
+  const eastOffset: number = coords.x + targetData.width + padding + tooltipDistance;
+  const southOffset: number = coords.y + targetData.height + padding + tooltipDistance;
+  const westOffset: number = coords.x - tooltipData.width - padding - tooltipDistance;
+  const northOffset: number = coords.y - tooltipData.height - padding - tooltipDistance;
 
   const east: Coords = { x: eastOffset, y: centerY }
   const south: Coords = { x: centerX, y: southOffset }
@@ -150,18 +150,27 @@ function isElementInView(elementData: ClientRect, atPosition?: Coords): boolean 
   return xVisibility && yVisibility;
 }
 
-function chooseBestTooltipPosition(tooltip: ClientRect, candidates: CardinalCoords[]): Coords {
+function chooseBestTooltipPosition(tooltip: ClientRect, candidates: CardinalCoords[], defaultToCenter?: boolean): Coords {
   for (let i: number = 0; i < candidates.length; i++) {
     const pos: CardinalCoords = candidates[i];
     if (isElementInView(tooltip, pos.coords)) {
       return pos.coords;
     }
   }
+
+  if (defaultToCenter) {
+    return getCenterCoords(tooltip);
+  }
 }
 
-export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, padding: number = 0, buffer: number = 0): Coords {
-  return chooseBestTooltipPosition(tooltipData, 
-      getTooltipPositionCandidates(targetData, tooltipData, padding, buffer, true)) ||
-    getCenterCoords(tooltipData); //if no position can be determined, default to the center of the screen
+export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, padding: number, tooltipDistance: number, orientationPreferences?: CardinalOrientation[]): Coords {
+  const candidates: CardinalCoords[] = getTooltipPositionCandidates(targetData, tooltipData, padding, tooltipDistance, true);
+
+  if (!orientationPreferences || orientationPreferences.length === 0) {
+    return chooseBestTooltipPosition(tooltipData, candidates, true);
+  } else {
+    const preferenceFilter = (cc: CardinalCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
+    return chooseBestTooltipPosition(tooltipData, candidates.filter(preferenceFilter), true);
+  }
 }
 
