@@ -34,9 +34,17 @@ function getViewportWidth() {
 }
 
 function addScrollOffset(coords: Coords): Coords {
+  const curOffset: Coords = getCurrentScrollOffset();
   return {
-    x: coords.x + (document.documentElement.scrollLeft || window.pageXOffset),
-    y: coords.y + (document.documentElement.scrollTop || window.pageYOffset)
+    x: coords.x + curOffset.x,
+    y: coords.y + curOffset.y
+  }
+}
+
+function getCurrentScrollOffset(): Coords {
+  return {
+    x: document.documentElement.scrollLeft || window.pageXOffset,
+    y: document.documentElement.scrollTop || window.pageYOffset
   }
 }
 
@@ -64,11 +72,12 @@ function scrollToElement(elementData: ClientRect, centerElementInViewport?: bool
   const el: Coords = getElementCoords(elementData);
   let xOffset: number = 0;
   let yOffset: number = 0;
+  const scrollOffset: Coords = getCurrentScrollOffset();
 
   if (centerElementInViewport) {
-    xOffset = (getViewportWidth() + elementData.width) / 2;
-    yOffset = (getViewportHeight() + elementData.height) / 2;
-  } else {
+    xOffset = (getViewportWidth() + scrollOffset.x + elementData.width) / 2;
+    yOffset = (getViewportHeight() + scrollOffset.y + elementData.height) / 2;
+  } else if (padding) {
     xOffset = padding;
     yOffset = padding;
   }
@@ -143,7 +152,7 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
 
 function isElementInView(elementData: ClientRect, atPosition?: Coords): boolean {
   const position: Coords = atPosition || getElementCoords(elementData);
-  const scrollOffsets: Coords = addScrollOffset({ x: 0, y: 0 })
+  const scrollOffsets: Coords = getCurrentScrollOffset();
   const xVisibility: boolean = (position.x >= scrollOffsets.x) && ((position.x + elementData.width) <= (getViewportWidth() + scrollOffsets.x));
   const yVisibility: boolean = (position.y >= scrollOffsets.y) && ((position.y + elementData.height) <= (getViewportHeight() + scrollOffsets.y));
 
