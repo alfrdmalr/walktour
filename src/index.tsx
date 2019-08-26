@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { defaultStyles, DefaultStyles } from './defaultstyles';
-import {Coords, getElementCoords, getTooltipPosition, CardinalOrientation} from '../utils/positioning'
+import {Coords, getElementCoords, getTooltipPosition, CardinalOrientation} from './positioning'
 
 export interface Step {
   querySelector: string,

@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
 import { Walktour, Step } from '../src/index'
-import { CardinalOrientation } from '../utils/positioning';
+import { CardinalOrientation } from '../src/positioning';
 
 const steps: Step[] = [
   { querySelector: '#one', title: 'Title one', description: 'Description one' },
