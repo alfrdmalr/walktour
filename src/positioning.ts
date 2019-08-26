@@ -151,10 +151,9 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
 }
 
 function isElementInView(elementData: ClientRect, atPosition?: Coords): boolean {
-  const position: Coords = atPosition || getElementCoords(elementData, true);
-  const scrollOffsets: Coords = getCurrentScrollOffset();
-  const xVisibility: boolean = (position.x >= scrollOffsets.x) && ((position.x + elementData.width) <= (getViewportWidth() + scrollOffsets.x));
-  const yVisibility: boolean = (position.y >= scrollOffsets.y) && ((position.y + elementData.height) <= (getViewportHeight() + scrollOffsets.y));
+  const position: Coords = atPosition || getElementCoords(elementData, false);
+  const xVisibility: boolean = (position.x >= 0) && (position.x + elementData.width) <= getViewportWidth();
+  const yVisibility: boolean = (position.y >= 0) && (position.y + elementData.height) <= getViewportHeight();
 
   return xVisibility && yVisibility;
 }
@@ -184,11 +183,10 @@ export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRe
     }
   }
 
-
   if (isElementInView(targetData)) {
     return choosePosBasedOnCandidates();
   } else {
-    scrollToElement(targetData);
+    scrollToElement(targetData, true);
     return choosePosBasedOnCandidates();
   }
 }

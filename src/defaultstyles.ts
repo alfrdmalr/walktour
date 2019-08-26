@@ -44,7 +44,7 @@ export const defaultStyles: DefaultStyles = {
     backgroundColor: 'white',
     padding: 10,
     zIndex: 2,
-    position: 'relative',
+    position: 'absolute',
     borderRadius: '5px',
     fontFamily: 'Roboto, sans-serif',
     boxShadow: '0 3px 8px 0 rgba(0,0,0,.25)',
