@@ -157,39 +157,61 @@ function isElementInView(elementData: ClientRect, atPosition?: Coords): boolean 
   return xVisibility && yVisibility;
 }
 
-function chooseBestTooltipPosition(tooltip: ClientRect, candidates: CardinalCoords[], defaultToCenter?: boolean): Coords {
-  for (let i: number = 0; i < candidates.length; i++) {
-    const pos: CardinalCoords = candidates[i];
-    if (isElementInView(tooltip, pos.coords)) {
-      return pos.coords;
-    }
-  }
-
-  if (defaultToCenter) {
-    return getCenterCoords(tooltip);
-  }
-}
-
 export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, padding: number, tooltipDistance: number, orientationPreferences?: CardinalOrientation[]): Coords {
 
-  //TODO refactor out
-  const choosePosBasedOnCandidates = (): Coords => {
+  const choosePosBasedOnPreferences = (): Coords => {
+  const candidates: CardinalCoords[] = getTooltipPositionCandidates(targetData, tooltipData, padding, tooltipDistance, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
-      return chooseBestTooltipPosition(tooltipData, getTooltipPositionCandidates(targetData, tooltipData, padding, tooltipDistance, true), true);
+      return chooseTooltipPositionWithReduce(tooltipData, candidates);
     } else {
       const preferenceFilter = (cc: CardinalCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
-      return chooseBestTooltipPosition(tooltipData, getTooltipPositionCandidates(targetData, tooltipData, padding, tooltipDistance, true).filter(preferenceFilter), true);
+      return chooseTooltipPositionWithReduce(tooltipData, candidates.filter(preferenceFilter));
     }
   }
 
   if (isElementInView(targetData)) {
-    return choosePosBasedOnCandidates();
+    return choosePosBasedOnPreferences();
   } else {
+    // scrollToElement(targetData, false, Math.max(tooltipData.height, tooltipData.width) + tooltipDistance + padding);
     scrollToElement(targetData, true);
-    return choosePosBasedOnCandidates();
+    return choosePosBasedOnPreferences();
   }
 }
 
+
+function chooseTooltipPositionWithReduce(tooltip: ClientRect, candidates: CardinalCoords[], 
+  reducer?: ((acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords)): Coords {
+
+  // provides a default reducer with a heuristic that aims to put the tooltip closest to the center of the screen
+  const centerReducer: ((
+    acc: Coords, 
+    cur: CardinalCoords, 
+    ind: number, 
+    arr: CardinalCoords[]) => Coords) = (acc: Coords, cur: CardinalCoords) => {
+    if (cur.orientation === CardinalOrientation.CENTER) {
+      return acc;
+    }
+    if (acc === undefined) {
+      return cur.coords;
+    } else {
+      const centerPos: Coords = getCenterCoords();
+      const curA: number = Math.abs(centerPos.x - cur.coords.x);
+      const curB: number = Math.abs(centerPos.y - cur.coords.y);
+      const accA: number = Math.abs(centerPos.x - acc.x);
+      const accB: number = Math.abs(centerPos.y - acc.y);
+      const curDistance: number = Math.sqrt((curA * curA) + (curB * curB));
+      const accDistance: number = Math.sqrt((accA * accA) + (accB * accB));
+      if (curDistance > accDistance) {
+        return acc;
+      } else {
+        return cur.coords;
+      }
+    }
+  }
+
+  return candidates.reduce(centerReducer, undefined);
+
+}
 
 
 
