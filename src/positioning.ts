@@ -173,13 +173,26 @@ function chooseBestTooltipPosition(tooltip: ClientRect, candidates: CardinalCoor
 }
 
 export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, padding: number, tooltipDistance: number, orientationPreferences?: CardinalOrientation[]): Coords {
-  const candidates: CardinalCoords[] = getTooltipPositionCandidates(targetData, tooltipData, padding, tooltipDistance, true);
 
-  if (!orientationPreferences || orientationPreferences.length === 0) {
-    return chooseBestTooltipPosition(tooltipData, candidates, true);
-  } else {
-    const preferenceFilter = (cc: CardinalCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
-    return chooseBestTooltipPosition(tooltipData, candidates.filter(preferenceFilter), true);
+  //TODO refactor out
+  const choosePosBasedOnCandidates = (): Coords => {
+    if (!orientationPreferences || orientationPreferences.length === 0) {
+      return chooseBestTooltipPosition(tooltipData, getTooltipPositionCandidates(targetData, tooltipData, padding, tooltipDistance, true), true);
+    } else {
+      const preferenceFilter = (cc: CardinalCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
+      return chooseBestTooltipPosition(tooltipData, getTooltipPositionCandidates(targetData, tooltipData, padding, tooltipDistance, true).filter(preferenceFilter), true);
+    }
   }
+
+
+  if (isElementInView(targetData)) {
+    return choosePosBasedOnCandidates();
+  } else {
+    scrollToElement(targetData);
+    return choosePosBasedOnCandidates();
+  }
+
 }
+
+
 
