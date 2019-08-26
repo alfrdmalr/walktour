@@ -105,16 +105,15 @@ export const defaultStyles: DefaultStyles = {
   },
   secondaryButton: {
     ...baseButtonStyle,
-    backgroundColor: `transparent`,
-    color: "#025c53",
-    border: "solid 1px #025c53"
-  },
-  tertiaryButton: {
-    ...baseButtonStyle,
     backgroundColor: "#8400ff",
     color: "#fff",
     border: "solid 1px #8400ff"
-
+  },
+  tertiaryButton: {
+    ...baseButtonStyle,
+    backgroundColor: `transparent`,
+    color: "#025c53",
+    border: "solid 1px #025c53"
   },
   disabledButton: {
     ...baseButtonStyle,
