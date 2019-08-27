@@ -5,17 +5,16 @@ import { Walktour, Step } from '../src/index'
 import { CardinalOrientation } from '../src/positioning';
 
 const steps: Step[] = [
-  { querySelector: '#one', title: 'Title one', description: 'Description one' },
-  { querySelector: '#two', title: 'Title two', description: 'Description two' },
-  { querySelector: '#one', title: 'Back to the first element we selected: testing long values for the title and such', description: 'description two here I am testing long values for the body as well just to see how it natively handles this type of thing' },
-  { querySelector: '#three', title: 'Three', description: 'another description' },
-  { querySelector: '.four', title: 'CSS Selectors', description: 'now with query selectors for even better element selection!' },
-  { querySelector: '#five', title: 'Interact through the mask cutout', description: 'click the button to see for yourself!' },
-  {querySelector: '#six', title: "Cardinal Direction Positioning", description: 'East!', orientation: [CardinalOrientation.EAST]},
-  {querySelector: '#six', title: "Cardinal Direction Positioning", description: 'South!', orientation: [CardinalOrientation.SOUTH]},
+  { querySelector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!' },
+  { querySelector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button' },
+  { querySelector: '#three', title: 'Step Three', description: 'The tooltip is automatically positioned within view' },
+  { querySelector: '.four', title: 'CSS Selectors', description: 'Any valid query selector works for targeting elements' },
+  { querySelector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
+  {querySelector: '#six', title: "Explicit Positioning", description: 'East!', orientation: [CardinalOrientation.EAST]},
+  {querySelector: '#six', title: "Explicit Positioning", description: 'South!', orientation: [CardinalOrientation.SOUTH]},
   {querySelector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientation: [CardinalOrientation.NORTHWEST]},
   {querySelector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientation: [CardinalOrientation.WESTNORTH]},
-  {querySelector: '#seven', title: 'Scrolling (WIP)', description: 'offscreen elements are automatically scrolled into view'}
+  {querySelector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientation: [CardinalOrientation.NORTHWEST]}
 ]
 
 const styleElementOne: React.CSSProperties = {
@@ -72,7 +71,6 @@ const styleElementSeven: React.CSSProperties = {
 
 const App = () => (
   <div>
-    <h1>Welcome to the Tour Playground</h1>
     <div id={'one'} style={styleElementOne} />
     <div id={'two'} style={styleElementTwo} />
     <div id={'three'} style={styleElementThree} />
@@ -81,7 +79,7 @@ const App = () => (
     <div id='seven' style={styleElementSeven} />
     <button
       style={{ position: 'absolute', top: '350px', left: '650px', cursor: "pointer" }} id="five"
-      onClick={() => alert('you did it!')}
+      onClick={() => alert('Button has been clicked.')}
     >
       Interact with me!
     </button>
