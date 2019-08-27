@@ -2,7 +2,7 @@ import { CSSProperties } from "react";
 
 
 // this file and it's contents are temporary: this logic is moved here to clean up the index.tsx file during refactoring and will be relocated
-interface DefaultStyles {
+export interface DefaultStyles {
   container: CSSProperties;
   footer: CSSProperties;
   title: CSSProperties;
@@ -40,13 +40,11 @@ const baseButtonStyle: React.CSSProperties = {
 
 export const defaultStyles: DefaultStyles = {
   container: {
-    width: 226,
-    minHeight: 100,
+    maxWidth: 500,
     backgroundColor: 'white',
     padding: 10,
-    transform: 'translate(22px, -50px)',
     zIndex: 2,
-    position: 'relative',
+    position: 'absolute',
     borderRadius: '5px',
     fontFamily: 'Roboto, sans-serif',
     boxShadow: '0 3px 8px 0 rgba(0,0,0,.25)',
