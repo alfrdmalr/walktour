@@ -1,66 +1,84 @@
 import * as React from 'react';
 import { defaultStyles, DefaultStyles } from './defaultstyles';
-import {Coords, getElementCoords, getTooltipPosition, CardinalOrientation} from './positioning'
+import { Coords, getElementCoords, getTooltipPosition, CardinalOrientation } from './positioning'
 
-export interface Step {
-  querySelector: string;
-  title: string;
-  description: string | JSX.Element;
-  disableMaskInteraction?: boolean;
-  orientation?: CardinalOrientation[];
+
+export interface WalktourLogic {
+  next: () => void;
+  prev: () => void;
+  close: () => void;
+  goToStep: (stepNumber: number) => void;
+  stepContent: Step;
 }
 
-export interface WalktourProps {
-  steps: Step[];
-  isVisible: boolean;
-  initialStepIndex?: number;
+export interface WalktourOptions {
+  disableMaskInteraction?: boolean;
+  orientationPreferences?: CardinalOrientation[];
+  maskPadding?: number;
+  tooltipSeparation?: number;
+  customTooltipRender?: (tourLogic?: WalktourLogic) => JSX.Element;
+
+  //temp?
   prevLabel?: string;
   nextLabel?: string;
   skipLabel?: string;
-  buttonStyles?: {
-    primary?: React.CSSProperties;
-    secondary?: React.CSSProperties;
-    tertiary?: React.CSSProperties;
-    disabled?: React.CSSProperties;
-  }
-  maskPadding?: number;
-  disableMaskInteraction?: boolean;
+  defaultStyles?: DefaultStyles;
+}
+
+export interface Step extends WalktourOptions {
+  querySelector: string;
+  title: string;
+  description: string;
+  customTitleRender?: (title?: string, tourLogic?: WalktourLogic) => JSX.Element;
+  customDescriptionRender?: (description: string, tourLogic?: WalktourLogic) => JSX.Element;
+  customFooterRender?: (tourLogic?: WalktourLogic) => JSX.Element;
+}
+
+export interface WalktourProps extends WalktourOptions {
+  steps: Step[];
+  isVisible: boolean;
+  initialStepIndex?: number;
 }
 
 const styles: DefaultStyles = defaultStyles;
-const tooltipSeparation: number = 10;
 
 export const Walktour = (props: WalktourProps) => {
 
-  let {
+  const {
     isVisible,
     steps,
-    initialStepIndex,
-    prevLabel,
-    nextLabel,
-    skipLabel,
-    buttonStyles,
-    maskPadding,
-    disableMaskInteraction }: WalktourProps = {
-    initialStepIndex: 0,
-    prevLabel: 'prev',
-    nextLabel: 'next',
-    skipLabel: 'skip',
-    buttonStyles: {
-      primary: styles.primaryButton,
-      secondary: styles.secondaryButton,
-      tertiary: styles.tertiaryButton,
-      disabled: styles.disabledButton
-    },
-    maskPadding: 5,
-    ...props
-  };
+    initialStepIndex
+  } = props;
 
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [targetData, setTargetData] = React.useState<ClientRect>(undefined);
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex);
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent = getStep(currentStepIndex, steps);
+
+  const {
+    prevLabel,
+    nextLabel,
+    skipLabel,
+    defaultStyles,
+    maskPadding,
+    disableMaskInteraction,
+    tooltipSeparation,
+    orientationPreferences,
+    customTooltipRender,
+    customTitleRender, 
+    customDescriptionRender,
+    customFooterRender,
+  } = {
+    prevLabel: 'prev',
+    nextLabel: 'next',
+    skipLabel: 'skip',
+    defaultStyles: styles,
+    maskPadding: 5,
+    tooltipSeparation: 10,
+    ...props,
+    ...currentStepContent
+  };
 
 
   React.useEffect(() => {
@@ -79,9 +97,9 @@ export const Walktour = (props: WalktourProps) => {
     setTooltipPosition(getTooltipPosition({
       target: targetData,
       tooltip: tooltipData,
-      padding: maskPadding,
-      tooltipDistance: tooltipSeparation,
-      orientationPreferences: currentStepContent.orientation
+      padding: currentStepContent.maskPadding || maskPadding,
+      tooltipSeparation: currentStepContent.tooltipSeparation || tooltipSeparation,
+      orientationPreferences: currentStepContent.orientationPreferences || orientationPreferences
     }));
 
     tooltip && tooltip.focus();
@@ -137,39 +155,64 @@ export const Walktour = (props: WalktourProps) => {
     return null
   };
 
+  const tourLogic: WalktourLogic = {
+    next: next,
+    prev: prev,
+    close: skip,
+    goToStep: goToStep,
+    stepContent: currentStepContent
+  };
+
   return (<>
-    {TourMask(targetData, (disableMaskInteraction || currentStepContent.disableMaskInteraction), maskPadding)}
+    {TourMask(targetData, disableMaskInteraction, maskPadding)}
     <div style={wrapperStyle}>
-      <div id="walktour-tooltip" style={styles.container} onKeyDown={keyPressHandler} tabIndex={0}>
+      <div id="walktour-tooltip" style={customTooltipRender ? null : styles.container} onKeyDown={keyPressHandler} tabIndex={0}>
+        {customTooltipRender && customTooltipRender(tourLogic)}
+        {!customTooltipRender &&
+          <>
+            {customTitleRender
+              ? customTitleRender(currentStepContent.title, tourLogic)
+              : (
+                <div style={styles.title}>
+                  {currentStepContent.title}
+                </div>
+              )
+            }
 
-        <div style={styles.title}>
-          {currentStepContent.title}
-        </div>
+            {customDescriptionRender
+              ? customDescriptionRender(currentStepContent.description, tourLogic)
+              : (
+                <div style={styles.description}>
+                  {currentStepContent.description}
+                </div>
+              )
+            }
 
-        <div style={styles.description}>
-          {currentStepContent.description}
-        </div>
-
-        <div style={styles.footer}>
-          <button onClick={skip} style={buttonStyles.tertiary}>
-            {skipLabel}
-          </button>
-          <button
-            onClick={prev}
-            disabled={currentStepIndex === 0}
-            style={currentStepIndex !== 0 ? buttonStyles.secondary : buttonStyles.disabled}
-          >
-            {prevLabel}
-          </button>
-          <button
-            onClick={next}
-            disabled={currentStepIndex + 1 === steps.length}
-            style={currentStepIndex + 1 !== steps.length ? buttonStyles.primary : buttonStyles.disabled}
-          >
-            {nextLabel}
-          </button>
-        </div>
-
+            {customFooterRender
+              ? currentStepContent.customFooterRender(tourLogic)
+              : (
+                <div style={styles.footer}>
+                  <button onClick={skip} style={styles.tertiaryButton}>
+                    {skipLabel}
+                  </button>
+                  <button
+                    onClick={prev}
+                    disabled={currentStepIndex === 0}
+                    style={currentStepIndex !== 0 ? styles.secondaryButton : styles.disabledButton}
+                  >
+                    {prevLabel}
+                  </button>
+                  <button
+                    onClick={next}
+                    disabled={currentStepIndex + 1 === steps.length}
+                    style={currentStepIndex + 1 !== steps.length ? styles.primaryButton : styles.disabledButton}
+                  >
+                    {nextLabel}
+                  </button>
+                </div>
+              )}
+          </>
+        }
       </div>
     </div>
   </>)

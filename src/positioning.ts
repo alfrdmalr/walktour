@@ -28,7 +28,7 @@ interface GetTooltipPositionArgs {
   target: ClientRect;
   tooltip: ClientRect;
   padding: number;
-  tooltipDistance: number;
+  tooltipSeparation: number;
   orientationPreferences?: CardinalOrientation[];
   positionCandidateReducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords;
 }
@@ -198,10 +198,10 @@ function chooseBestPosition(candidates: CardinalCoords[],
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const {target, tooltip, padding, tooltipDistance, orientationPreferences, positionCandidateReducer: reducer} = args;
+  const {target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer: reducer} = args;
 
   const choosePosBasedOnPreferences = (): Coords => {
-  const candidates: CardinalCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipDistance, true);
+  const candidates: CardinalCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipSeparation, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
       return chooseBestPosition(candidates, reducer);
     } else {
