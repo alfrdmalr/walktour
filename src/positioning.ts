@@ -1,4 +1,3 @@
-
 export enum CardinalOrientation {
   EAST = 'east',
   SOUTH = 'south',
@@ -24,6 +23,23 @@ interface CardinalCoords {
   orientation: CardinalOrientation;
   coords: Coords;
 }
+
+interface GetTooltipPositionArgs {
+  target: ClientRect;
+  tooltip: ClientRect;
+  padding: number;
+  tooltipDistance: number;
+  orientationPreferences?: CardinalOrientation[];
+  positionCandidateReducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords;
+}
+
+//helpers
+
+function dist(a: Coords, b: Coords): number {
+  return Math.sqrt(
+    Math.pow((Math.abs(a.x - b.x)), 2) +
+    Math.pow((Math.abs(a.y - b.y)), 2))
+} 
 
 function getViewportHeight() {
   return Math.max(document.documentElement.clientHeight, window.innerHeight);
@@ -96,6 +112,8 @@ function scrollToElement(elementData: ClientRect, centerElementInViewport?: bool
   })
 }
 
+//tooltip positioning logic
+
 function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: ClientRect, padding: number, tooltipDistance: number, includeAllPositions?: boolean): CardinalCoords[] {
   if (!targetData || !tooltipData) {
     return;
@@ -157,12 +175,6 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
   ]
 }
 
-function dist(a: Coords, b: Coords): number {
-  return Math.sqrt(
-    Math.pow((Math.abs(a.x - b.x)), 2) +
-    Math.pow((Math.abs(a.y - b.y)), 2))
-} 
-
 // simple reducer who selects for coordinates closest to the current center of the viewport
 function centerReducer(acc: Coords, cur: CardinalCoords): Coords {
   if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
@@ -179,31 +191,29 @@ function centerReducer(acc: Coords, cur: CardinalCoords): Coords {
   }
 }
 
-function chooseTooltipPositionWithReduce(tooltip: ClientRect, candidates: CardinalCoords[], 
+function chooseBestPosition(candidates: CardinalCoords[], 
   reducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords): Coords {
-    const candidateReducer: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords = reducer || centerReducer;
-
-
+  const candidateReducer = reducer || centerReducer;
   return candidates.reduce(candidateReducer, undefined);
 }
 
-export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRect, padding: number, 
-  tooltipDistance: number, orientationPreferences?: CardinalOrientation[]): Coords {
+export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
+  const {target, tooltip, padding, tooltipDistance, orientationPreferences, positionCandidateReducer: reducer} = args;
 
   const choosePosBasedOnPreferences = (): Coords => {
-  const candidates: CardinalCoords[] = getTooltipPositionCandidates(targetData, tooltipData, padding, tooltipDistance, true);
+  const candidates: CardinalCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipDistance, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
-      return chooseTooltipPositionWithReduce(tooltipData, candidates);
+      return chooseBestPosition(candidates, reducer);
     } else {
       const preferenceFilter = (cc: CardinalCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
-      return chooseTooltipPositionWithReduce(tooltipData, candidates.filter(preferenceFilter));
+      return chooseBestPosition(candidates.filter(preferenceFilter), reducer);
     }
   }
 
-  if (isElementInView(targetData)) {
+  if (isElementInView(target)) {
     return choosePosBasedOnPreferences();
   } else {
-    scrollToElement(targetData, true);
+    scrollToElement(target, true);
     return choosePosBasedOnPreferences();
   }
 }
