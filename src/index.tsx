@@ -71,7 +71,7 @@ export const Walktour = (props: WalktourProps) => {
     if (isVisibleState === false) {
       return;
     }
-    const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
+    const tooltip: HTMLElement = document.getElementById('walktour-tooltip');
     const tooltipData: ClientRect = tooltip && tooltip.getBoundingClientRect();
     const targetData = getTargetData(getStep(currentStepIndex, steps).querySelector);
 
@@ -140,7 +140,7 @@ export const Walktour = (props: WalktourProps) => {
   return (<>
     {TourMask(targetData, (disableMaskInteraction || currentStepContent.disableMaskInteraction), maskPadding)}
     <div style={wrapperStyle}>
-      <div id="walktour-tooltip-container" style={styles.container} onKeyDown={keyPressHandler} tabIndex={0}>
+      <div id="walktour-tooltip" style={styles.container} onKeyDown={keyPressHandler} tabIndex={0}>
 
         <div style={styles.title}>
           {currentStepContent.title}
