@@ -203,7 +203,6 @@ export function getTooltipPosition(targetData: ClientRect, tooltipData: ClientRe
   if (isElementInView(targetData)) {
     return choosePosBasedOnPreferences();
   } else {
-    // scrollToElement(targetData, false, Math.max(tooltipData.height, tooltipData.width) + tooltipDistance + padding);
     scrollToElement(targetData, true);
     return choosePosBasedOnPreferences();
   }
