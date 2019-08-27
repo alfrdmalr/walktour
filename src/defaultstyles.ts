@@ -7,10 +7,6 @@ export interface DefaultStyles {
   footer: CSSProperties;
   title: CSSProperties;
   description: CSSProperties;
-  info: CSSProperties;
-  stepsCount: CSSProperties;
-  pin: CSSProperties;
-  pinLine: CSSProperties;
   wrapper: CSSProperties;
   primaryButton: CSSProperties;
   secondaryButton: CSSProperties;
@@ -66,37 +62,6 @@ export const defaultStyles: DefaultStyles = {
     color: '#4d4d4d',
     fontSize: 12,
     lineHeight: 1.25,
-  },
-  info: {
-    display: 'flex',
-    fontSize: 18,
-    width: '87%',
-    marginBottom: 10,
-    alignItems: 'center',
-
-  },
-  stepsCount: {
-    width: '35%',
-    fontSize: 12,
-  },
-  pin: {
-    position: 'absolute',
-    zIndex: 2,
-    width: 15,
-    height: 15,
-    borderRadius: 50,
-    background: '#1787fc',
-    boxShadow: '0 0 0 2px white',
-    top: '-7px',
-    left: '-7px',
-  },
-  pinLine: {
-    height: 1,
-    width: 25,
-    top: 1,
-    position: 'absolute',
-    zIndex: 1,
-    background: '#1787fc',
   },
   primaryButton: {
     ...baseButtonStyle,
