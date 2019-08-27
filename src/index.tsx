@@ -3,11 +3,11 @@ import { defaultStyles, DefaultStyles } from './defaultstyles';
 import {Coords, getElementCoords, getTooltipPosition, CardinalOrientation} from './positioning'
 
 export interface Step {
-  querySelector: string,
-  title: string,
-  description: string //TODO change to allow custom html content?
+  querySelector: string;
+  title: string;
+  description: string | JSX.Element;
   disableMaskInteraction?: boolean;
-  orientation?: CardinalOrientation[]
+  orientation?: CardinalOrientation[];
 }
 
 export interface WalktourProps {
