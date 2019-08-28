@@ -120,8 +120,8 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
   }
 
   const coords: Coords = getElementCoords(targetData, true);
-  const centerX: number = coords.x - (Math.abs(tooltipData.width - targetData.width) / 2);
-  const centerY: number = coords.y - (Math.abs(tooltipData.height - targetData.height) / 2);
+  const centerX: number = coords.x - ((tooltipData.width - targetData.width) / 2);
+  const centerY: number = coords.y - ((tooltipData.height - targetData.height) / 2);
   const eastOffset: number = coords.x + targetData.width + padding + tooltipDistance;
   const southOffset: number = coords.y + targetData.height + padding + tooltipDistance;
   const westOffset: number = coords.x - tooltipData.width - padding - tooltipDistance;
@@ -180,12 +180,14 @@ function centerReducer(acc: Coords, cur: CardinalCoords): Coords {
   if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
     return acc;
   } else if (acc === undefined) {
+    console.log('using outright', cur.orientation)
     return cur.coords;
   } else {
     const center: Coords = getCenterCoords();
     if (dist(center, cur.coords) > dist(center, acc)) {
       return acc;
     } else {
+      console.log(cur)
       return cur.coords;
     }
   }
