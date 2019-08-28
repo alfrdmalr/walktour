@@ -98,8 +98,8 @@ function scrollToElement(elementData: ClientRect, centerElementInViewport?: bool
   let yOffset: number = 0;
 
   if (centerElementInViewport) {
-    xOffset = (getViewportWidth() + elementData.width) / 2;
-    yOffset = (getViewportHeight() + elementData.height) / 2;
+    xOffset = (getViewportWidth() - elementData.width) / 2;
+    yOffset = (getViewportHeight() - elementData.height) / 2;
   } else if (padding) {
     xOffset = padding;
     yOffset = padding;
@@ -120,8 +120,8 @@ function getTooltipPositionCandidates(targetData: ClientRect, tooltipData: Clien
   }
 
   const coords: Coords = getElementCoords(targetData, true);
-  const centerX: number = coords.x - (Math.abs(tooltipData.width - targetData.width) / 2);
-  const centerY: number = coords.y - (Math.abs(tooltipData.height - targetData.height) / 2);
+  const centerX: number = coords.x - ((tooltipData.width - targetData.width) / 2);
+  const centerY: number = coords.y - ((tooltipData.height - targetData.height) / 2);
   const eastOffset: number = coords.x + targetData.width + padding + tooltipDistance;
   const southOffset: number = coords.y + targetData.height + padding + tooltipDistance;
   const westOffset: number = coords.x - tooltipData.width - padding - tooltipDistance;

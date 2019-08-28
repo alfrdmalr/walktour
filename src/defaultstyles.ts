@@ -7,7 +7,6 @@ export interface DefaultStyles {
   footer: CSSProperties;
   title: CSSProperties;
   description: CSSProperties;
-  wrapper: CSSProperties;
   primaryButton: CSSProperties;
   secondaryButton: CSSProperties;
   tertiaryButton: CSSProperties;
@@ -36,13 +35,14 @@ const baseButtonStyle: React.CSSProperties = {
 
 export const defaultStyles: DefaultStyles = {
   container: {
-    maxWidth: 500,
+    position: 'absolute',
+    zIndex: 99,
+    transition: 'all 100ms ease',
+    fontFamily: 'Roboto, sans-serif',
+    width: 350,
     backgroundColor: 'white',
     padding: 10,
-    zIndex: 2,
-    position: 'absolute',
     borderRadius: '5px',
-    fontFamily: 'Roboto, sans-serif',
     boxShadow: '0 3px 8px 0 rgba(0,0,0,.25)',
   },
   footer: {
@@ -86,9 +86,4 @@ export const defaultStyles: DefaultStyles = {
     color: "#989898",
     cursor: "default"
   },
-  wrapper: {
-    position: 'absolute',
-    zIndex: 99,
-    transition: 'all 100ms ease',
-  }
 }
