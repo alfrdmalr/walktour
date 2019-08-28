@@ -129,7 +129,8 @@ function CustomTooltip(props: CustomTooltipProps) {
     color: 'cornsilk',
     fontFamily: 'Consolas, serif',
     border: '1px solid cornsilk',
-    maxWidth: '300px'
+    maxWidth: 300,
+    padding: 10
   }
   return <div style={style}>
     <p>You can also render your own custom components instead of the default tooltip.</p>
