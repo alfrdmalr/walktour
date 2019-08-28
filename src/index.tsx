@@ -80,7 +80,6 @@ export const Walktour = (props: WalktourProps) => {
     ...currentStepContent
   };
 
-
   React.useEffect(() => {
     goToStep(currentStepIndex)
   }, []);
@@ -143,14 +142,6 @@ export const Walktour = (props: WalktourProps) => {
     }
   }
 
-  const wrapperStyle = {
-    ...styles.wrapper,
-    top: tooltipPosition && tooltipPosition.y,
-    left: tooltipPosition && tooltipPosition.x,
-    visibility: (!tooltipPosition) ? 'hidden' : 'visible'
-  };
-
-
   if (!isVisibleState) {
     return null
   };
@@ -163,10 +154,17 @@ export const Walktour = (props: WalktourProps) => {
     stepContent: currentStepContent
   };
 
+  const tooltipStyle: React.CSSProperties = {
+    ...(customTooltipRender ? null : styles.container),
+    position: 'absolute',
+    top: tooltipPosition && tooltipPosition.y,
+    left: tooltipPosition && tooltipPosition.x,
+    visibility: tooltipPosition ? 'visible' : 'hidden'
+  }
+
   return (<>
     {TourMask(targetData, disableMaskInteraction, maskPadding)}
-    <div style={wrapperStyle}>
-      <div id="walktour-tooltip" style={customTooltipRender ? null : styles.container} onKeyDown={keyPressHandler} tabIndex={0}>
+      <div id="walktour-tooltip" style={tooltipStyle} onKeyDown={keyPressHandler} tabIndex={0}>
         {customTooltipRender && customTooltipRender(tourLogic)}
         {!customTooltipRender &&
           <>
@@ -214,7 +212,6 @@ export const Walktour = (props: WalktourProps) => {
           </>
         }
       </div>
-    </div>
   </>)
 }
 
