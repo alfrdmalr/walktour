@@ -6,7 +6,7 @@ import { CardinalOrientation } from '../src/positioning';
 
 const steps: Step[] = [
   { querySelector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!' },
-  { querySelector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button' },
+  { querySelector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
   { querySelector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements' },
   { querySelector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
   { querySelector: '#eight', title: 'Supply Custom HTML Content', description: null, customDescriptionRender: () => <><h1>H1 Element</h1><p>Paragraph Element</p><input type='text' placeholder={'text input element'} /></> },
@@ -31,8 +31,8 @@ const styleElementOne: React.CSSProperties = {
 
 const styleElementTwo: React.CSSProperties = {
   background: 'cornflowerblue',
-  width: 200,
-  height: 100,
+  width: 100,
+  height: 200,
   left: 300,
   top: 300,
   position: 'absolute'
@@ -40,7 +40,7 @@ const styleElementTwo: React.CSSProperties = {
 
 const styleElementThree: React.CSSProperties = {
   background: 'magenta',
-  width: 200,
+  width: 600,
   height: 100,
   left: 900,
   top: 15,
