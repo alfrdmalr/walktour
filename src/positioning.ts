@@ -98,8 +98,8 @@ function scrollToElement(elementData: ClientRect, centerElementInViewport?: bool
   let yOffset: number = 0;
 
   if (centerElementInViewport) {
-    xOffset = (getViewportWidth() + elementData.width) / 2;
-    yOffset = (getViewportHeight() + elementData.height) / 2;
+    xOffset = (getViewportWidth() - elementData.width) / 2;
+    yOffset = (getViewportHeight() - elementData.height) / 2;
   } else if (padding) {
     xOffset = padding;
     yOffset = padding;
@@ -180,14 +180,12 @@ function centerReducer(acc: Coords, cur: CardinalCoords): Coords {
   if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
     return acc;
   } else if (acc === undefined) {
-    console.log('using outright', cur.orientation)
     return cur.coords;
   } else {
     const center: Coords = getCenterCoords();
     if (dist(center, cur.coords) > dist(center, acc)) {
       return acc;
     } else {
-      console.log(cur)
       return cur.coords;
     }
   }
