@@ -97,9 +97,9 @@ export const Walktour = (props: WalktourProps) => {
     setTooltipPosition(getTooltipPosition({
       target: targetData,
       tooltip: tooltipData,
-      padding: currentStepContent.maskPadding || maskPadding,
-      tooltipSeparation: currentStepContent.tooltipSeparation || tooltipSeparation,
-      orientationPreferences: currentStepContent.orientationPreferences || orientationPreferences
+      padding: maskPadding,
+      tooltipSeparation: tooltipSeparation,
+      orientationPreferences: orientationPreferences
     }));
 
     tooltip && tooltip.focus();
