@@ -212,18 +212,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   }
 
   const bestPosition: Coords = choosePosBasedOnPreferences();
-  // if (isElementInView(target)) {
-  //   const pos: Coords = choosePosBasedOnPreferences();
-  //   if (isElementInView(tooltip, pos)) {
-  //     return pos;
-  //   } else {
-  //     scrollToElement(target, true);
-  //     return pos;
-  //   }
-  // } else {
-  //   scrollToElement(target, true);
-  //   return choosePosBasedOnPreferences();
-  // }
+  
   if (isElementInView(target) && isElementInView(tooltip, bestPosition)) {
     return bestPosition;
   } else {
