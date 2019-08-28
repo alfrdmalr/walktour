@@ -9,9 +9,9 @@ const steps: Step[] = [
   { querySelector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
   { querySelector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements' },
   { querySelector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
-  { querySelector: '#eight', title: 'Supply Custom HTML Content', description: null, customDescriptionRender: () => <><h1>H1 Element</h1><p>Paragraph Element</p><input type='text' placeholder={'text input element'} /></> },
+  { querySelector: '#eight', title: 'Supply Custom HTML Content', description: null, customDescriptionRenderer: () => <><h1>H1 Element</h1><p>Paragraph Element</p><input type='text' placeholder={'text input element'} /></> },
   {
-    querySelector: '#eight', title: 'Access the Tour API...', description: "return the to first step", customDescriptionRender: (description: string, logic: WalktourLogic) =>
+    querySelector: '#eight', title: 'Access the Tour API...', description: "return the to first step", customDescriptionRenderer: (description: string, logic: WalktourLogic) =>
       <div>...from inside your custom content<button onClick={() => logic.goToStep(0)}>{description}</button></div>
   },
   { querySelector: '#three', title: 'Smart Positioning', description: 'The tooltip is automatically positioned within view' },
@@ -20,7 +20,7 @@ const steps: Step[] = [
   { querySelector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { querySelector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
   { querySelector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
-  { querySelector: '#six', title: null, description: null, customTooltipRender: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />}
+  { querySelector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />}
 ]
 
 const styleElementOne: React.CSSProperties = {
