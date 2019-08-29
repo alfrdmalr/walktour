@@ -16,7 +16,7 @@ export interface WalktourOptions {
   orientationPreferences?: CardinalOrientation[];
   maskPadding?: number;
   tooltipSeparation?: number;
-  customTooltipRender?: (tourLogic?: WalktourLogic) => JSX.Element;
+  customTooltipRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
 
   //temp?
   prevLabel?: string;
@@ -29,9 +29,9 @@ export interface Step extends WalktourOptions {
   querySelector: string;
   title: string;
   description: string;
-  customTitleRender?: (title?: string, tourLogic?: WalktourLogic) => JSX.Element;
-  customDescriptionRender?: (description: string, tourLogic?: WalktourLogic) => JSX.Element;
-  customFooterRender?: (tourLogic?: WalktourLogic) => JSX.Element;
+  customTitleRenderer?: (title?: string, tourLogic?: WalktourLogic) => JSX.Element;
+  customDescriptionRenderer?: (description: string, tourLogic?: WalktourLogic) => JSX.Element;
+  customFooterRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
 }
 
 export interface WalktourProps extends WalktourOptions {
@@ -65,10 +65,10 @@ export const Walktour = (props: WalktourProps) => {
     disableMaskInteraction,
     tooltipSeparation,
     orientationPreferences,
-    customTooltipRender,
-    customTitleRender, 
-    customDescriptionRender,
-    customFooterRender,
+    customTooltipRenderer,
+    customTitleRenderer, 
+    customDescriptionRenderer,
+    customFooterRenderer,
   } = {
     prevLabel: 'prev',
     nextLabel: 'next',
@@ -155,7 +155,7 @@ export const Walktour = (props: WalktourProps) => {
   };
 
   const tooltipStyle: React.CSSProperties = {
-    ...(customTooltipRender ? null : styles.container),
+    ...(customTooltipRenderer ? null : styles.container),
     position: 'absolute',
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
@@ -165,11 +165,11 @@ export const Walktour = (props: WalktourProps) => {
   return (<>
     {TourMask(targetData, disableMaskInteraction, maskPadding)}
       <div id="walktour-tooltip" style={tooltipStyle} onKeyDown={keyPressHandler} tabIndex={0}>
-        {customTooltipRender && customTooltipRender(tourLogic)}
-        {!customTooltipRender &&
+        {customTooltipRenderer && customTooltipRenderer(tourLogic)}
+        {!customTooltipRenderer &&
           <>
-            {customTitleRender
-              ? customTitleRender(currentStepContent.title, tourLogic)
+            {customTitleRenderer
+              ? customTitleRenderer(currentStepContent.title, tourLogic)
               : (
                 <div style={styles.title}>
                   {currentStepContent.title}
@@ -177,8 +177,8 @@ export const Walktour = (props: WalktourProps) => {
               )
             }
 
-            {customDescriptionRender
-              ? customDescriptionRender(currentStepContent.description, tourLogic)
+            {customDescriptionRenderer
+              ? customDescriptionRenderer(currentStepContent.description, tourLogic)
               : (
                 <div style={styles.description}>
                   {currentStepContent.description}
@@ -186,8 +186,8 @@ export const Walktour = (props: WalktourProps) => {
               )
             }
 
-            {customFooterRender
-              ? currentStepContent.customFooterRender(tourLogic)
+            {customFooterRenderer
+              ? currentStepContent.customFooterRenderer(tourLogic)
               : (
                 <div style={styles.footer}>
                   <button onClick={skip} style={styles.tertiaryButton}>
