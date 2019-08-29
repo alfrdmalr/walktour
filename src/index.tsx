@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { defaultStyles, DefaultStyles } from './defaultstyles';
+import { defaultStyles, WalktourStyles } from './defaultstyles';
 import { Coords, getElementCoords, getTooltipPosition, CardinalOrientation } from './positioning'
 
 
@@ -16,13 +16,13 @@ export interface WalktourOptions {
   orientationPreferences?: CardinalOrientation[];
   maskPadding?: number;
   tooltipSeparation?: number;
+  tooltipWidth?: number;
+  transition?: string;
   customTooltipRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
-
-  //temp?
   prevLabel?: string;
   nextLabel?: string;
   skipLabel?: string;
-  defaultStyles?: DefaultStyles;
+  styles?: WalktourStyles;
 }
 
 export interface Step extends WalktourOptions {
@@ -40,7 +40,17 @@ export interface WalktourProps extends WalktourOptions {
   initialStepIndex?: number;
 }
 
-const styles: DefaultStyles = defaultStyles;
+const walktourDefaultProps: Partial<WalktourProps> = {
+  prevLabel: 'prev',
+  nextLabel: 'next',
+  skipLabel: 'skip',
+  styles: defaultStyles,
+  tooltipWidth: 250,
+  maskPadding: 5,
+  tooltipSeparation: 10,
+  transition: 'top 200ms ease, left 200ms ease',
+  disableMaskInteraction: true
+}
 
 export const Walktour = (props: WalktourProps) => {
 
@@ -60,22 +70,19 @@ export const Walktour = (props: WalktourProps) => {
     prevLabel,
     nextLabel,
     skipLabel,
-    defaultStyles,
+    styles,
     maskPadding,
     disableMaskInteraction,
     tooltipSeparation,
+    tooltipWidth,
+    transition,
     orientationPreferences,
     customTooltipRenderer,
     customTitleRenderer, 
     customDescriptionRenderer,
     customFooterRenderer,
   } = {
-    prevLabel: 'prev',
-    nextLabel: 'next',
-    skipLabel: 'skip',
-    defaultStyles: styles,
-    maskPadding: 5,
-    tooltipSeparation: 10,
+    ...walktourDefaultProps,
     ...props,
     ...currentStepContent
   };
@@ -154,11 +161,14 @@ export const Walktour = (props: WalktourProps) => {
     stepContent: currentStepContent
   };
 
+  //style attributes for positioning
   const tooltipStyle: React.CSSProperties = {
     ...(customTooltipRenderer ? null : styles.container),
     position: 'absolute',
+    width: tooltipWidth,
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
+    transition: transition,
     visibility: tooltipPosition ? 'visible' : 'hidden'
   }
 

@@ -1,8 +1,7 @@
 import { CSSProperties } from "react";
 
 
-// this file and it's contents are temporary: this logic is moved here to clean up the index.tsx file during refactoring and will be relocated
-export interface DefaultStyles {
+export interface WalktourStyles {
   container: CSSProperties;
   footer: CSSProperties;
   title: CSSProperties;
@@ -12,56 +11,44 @@ export interface DefaultStyles {
   tertiaryButton: CSSProperties;
   disabledButton: CSSProperties;
 }
+
+const contentMargin: number = 4;
 const baseButtonStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontWeight: 300,
   cursor: 'pointer',
-  height: 32,
-  lineHeight: '32px',
-  padding: '0 16px',
+  padding: '4px 16px', 
   textAlign: 'center',
-  whiteSpace: 'nowrap',
-  userSelect: 'none',
   border: 0,
   borderRadius: 3,
-  outline: 'none',
   backgroundColor: '#0084ff',
   color: '#fff',
   fontSize: 14,
-  marginLeft: 10,
+  margin: contentMargin
 };
 
-export const defaultStyles: DefaultStyles = {
+export const defaultStyles: WalktourStyles = {
   container: {
-    position: 'absolute',
-    zIndex: 99,
-    transition: 'all 100ms ease',
+    display: 'flex', 
+    flexDirection: 'column', 
+    zIndex: 9999,
     fontFamily: 'Roboto, sans-serif',
-    width: 350,
+    fontSize: 14,
     backgroundColor: 'white',
-    padding: 10,
+    padding: '10px 10px 5px 10px',
     borderRadius: '5px',
     boxShadow: '0 3px 8px 0 rgba(0,0,0,.25)',
   },
   footer: {
-    padding: '10px 0 0',
-    textAlign: 'right',
     display: 'flex',
+    justifyContent: 'center',
+    marginTop: contentMargin
   },
   title: {
-    marginBottom: 8,
-    letterSpacing: 'normal',
-    color: '#000000',
+    margin: contentMargin,
     fontSize: 24,
-    fontStyle: 'normal',
   },
   description: {
-    marginBottom: 15,
+    margin: contentMargin,
     color: '#4d4d4d',
-    fontSize: 12,
-    lineHeight: 1.25,
   },
   primaryButton: {
     ...baseButtonStyle,
@@ -76,6 +63,7 @@ export const defaultStyles: DefaultStyles = {
   },
   tertiaryButton: {
     ...baseButtonStyle,
+    marginRight: 'auto',
     backgroundColor: `transparent`,
     color: "#025c53",
     border: "solid 1px #025c53"
