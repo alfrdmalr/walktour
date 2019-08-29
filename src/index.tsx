@@ -49,7 +49,7 @@ const walktourDefaultProps: Partial<WalktourProps> = {
   maskPadding: 5,
   tooltipSeparation: 10,
   transition: 'top 200ms ease, left 200ms ease',
-  disableMaskInteraction: true
+  disableMaskInteraction: false
 }
 
 export const Walktour = (props: WalktourProps) => {
