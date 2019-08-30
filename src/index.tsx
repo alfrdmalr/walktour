@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { defaultStyles, WalktourStyles } from './defaultstyles';
 import { Coords, getElementCoords, getTooltipPosition, CardinalOrientation } from './positioning'
+import { Mask } from './Mask';
+import { Tooltip } from './Tooltip';
 
 
 export interface WalktourLogic {
@@ -9,6 +11,8 @@ export interface WalktourLogic {
   close: () => void;
   goToStep: (stepNumber: number) => void;
   stepContent: Step;
+  stepIndex: number;
+  allSteps: Step[];
 }
 
 export interface WalktourOptions {
@@ -158,7 +162,9 @@ export const Walktour = (props: WalktourProps) => {
     prev: prev,
     close: skip,
     goToStep: goToStep,
-    stepContent: currentStepContent
+    stepContent: currentStepContent,
+    stepIndex: currentStepIndex,
+    allSteps: steps
   };
 
   //style attributes for positioning
@@ -173,53 +179,21 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   return (<>
-    {TourMask(targetData, disableMaskInteraction, maskPadding)}
+    <Mask
+      target={targetData}
+      disableMaskInteraction={disableMaskInteraction}
+      padding={maskPadding}
+    />
       <div id="walktour-tooltip" style={tooltipStyle} onKeyDown={keyPressHandler} tabIndex={0}>
         {customTooltipRenderer && customTooltipRenderer(tourLogic)}
         {!customTooltipRenderer &&
-          <>
-            {customTitleRenderer
-              ? customTitleRenderer(currentStepContent.title, tourLogic)
-              : (
-                <div style={styles.title}>
-                  {currentStepContent.title}
-                </div>
-              )
-            }
-
-            {customDescriptionRenderer
-              ? customDescriptionRenderer(currentStepContent.description, tourLogic)
-              : (
-                <div style={styles.description}>
-                  {currentStepContent.description}
-                </div>
-              )
-            }
-
-            {customFooterRenderer
-              ? currentStepContent.customFooterRenderer(tourLogic)
-              : (
-                <div style={styles.footer}>
-                  <button onClick={skip} style={styles.tertiaryButton}>
-                    {skipLabel}
-                  </button>
-                  <button
-                    onClick={prev}
-                    disabled={currentStepIndex === 0}
-                    style={currentStepIndex !== 0 ? styles.secondaryButton : styles.disabledButton}
-                  >
-                    {prevLabel}
-                  </button>
-                  <button
-                    onClick={next}
-                    disabled={currentStepIndex + 1 === steps.length}
-                    style={currentStepIndex + 1 !== steps.length ? styles.primaryButton : styles.disabledButton}
-                  >
-                    {nextLabel}
-                  </button>
-                </div>
-              )}
-          </>
+          <Tooltip 
+            {...tourLogic}
+            nextLabel={nextLabel}
+            prevLabel={prevLabel}
+            skipLabel={skipLabel}
+            styles={styles}
+          />
         }
       </div>
   </>)
@@ -240,26 +214,5 @@ function getTargetData(selector: string): ClientRect {
   }
 }
 
-function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 0, roundedCutout: boolean = true): JSX.Element {
-  if (!target) {
-    return null;
-  }
-  const coords: Coords = getElementCoords(target, true);
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: coords.y - padding,
-        left: coords.x - padding,
-        height: target.height + (padding * 2),
-        width: target.width + (padding * 2),
-        boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
-        borderRadius: roundedCutout ? '5px' : 0,
-        pointerEvents: disableMaskInteraction ? 'auto' : 'none'
-      }}
-    >
-    </div>
-  );
-}
 
 
