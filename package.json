@@ -4,8 +4,7 @@
   "description": "Guided tour/walkthrough component for react",
   "main": "dist/index.js",
   "scripts": {
-    "build": "parcel build src/index.tsx -o dist/index.js",
-    "start": "parcel App/index.html --open"
+    "start": "parcel demo/index.html --open"
   },
   "repository": {
     "type": "git",
