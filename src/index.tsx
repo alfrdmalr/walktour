@@ -67,7 +67,7 @@ export const Walktour = (props: WalktourProps) => {
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [target, setTarget] = React.useState<Element>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
-  const currentStepContent = getStep(currentStepIndex, steps);
+  const currentStepContent: Step = steps[currentStepIndex];
 
   const {
     prevLabel,
@@ -81,9 +81,6 @@ export const Walktour = (props: WalktourProps) => {
     transition,
     orientationPreferences,
     customTooltipRenderer,
-    customTitleRenderer,
-    customDescriptionRenderer,
-    customFooterRenderer,
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -100,7 +97,7 @@ export const Walktour = (props: WalktourProps) => {
     }
     
     const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
-    const target = document.querySelector(getStep(currentStepIndex, steps).querySelector);
+    const target = document.querySelector(steps[currentStepIndex].querySelector);
 
     setTarget(target);
     setTooltipPosition(getTooltipPosition({
@@ -152,7 +149,7 @@ export const Walktour = (props: WalktourProps) => {
     }
   }
 
-  if (!isVisibleState) {
+  if (!isVisibleState || !currentStepContent) {
     return null
   };
 
@@ -196,9 +193,3 @@ export const Walktour = (props: WalktourProps) => {
     </div>
   </>)
 }
-
-function getStep(stepIndex: number, steps: Step[]) {
-  return steps[stepIndex]
-}
-
-
