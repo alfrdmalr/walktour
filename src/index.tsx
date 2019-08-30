@@ -2,7 +2,6 @@ import * as React from 'react';
 import { defaultStyles, WalktourStyles } from './defaultstyles';
 import { Coords, getElementCoords, getTooltipPosition, CardinalOrientation } from './positioning'
 
-
 export interface WalktourLogic {
   next: () => void;
   prev: () => void;
@@ -62,7 +61,7 @@ export const Walktour = (props: WalktourProps) => {
 
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
-  const [targetData, setTargetData] = React.useState<ClientRect>(undefined);
+  const [target, setTarget] = React.useState<Element>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent = getStep(currentStepIndex, steps);
 
@@ -95,14 +94,14 @@ export const Walktour = (props: WalktourProps) => {
     if (isVisibleState === false) {
       return;
     }
+    
     const tooltip: HTMLElement = document.getElementById('walktour-tooltip');
-    const tooltipData: ClientRect = tooltip && tooltip.getBoundingClientRect();
-    const targetData = getTargetData(getStep(currentStepIndex, steps).querySelector);
+    const target = document.querySelector(getStep(currentStepIndex, steps).querySelector);
 
-    setTargetData(targetData);
+    setTarget(target);
     setTooltipPosition(getTooltipPosition({
-      target: targetData,
-      tooltip: tooltipData,
+      target: target,
+      tooltip: tooltip,
       padding: maskPadding,
       tooltipSeparation: tooltipSeparation,
       orientationPreferences: orientationPreferences
@@ -173,7 +172,7 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   return (<>
-    {TourMask(targetData, disableMaskInteraction, maskPadding)}
+    {TourMask(target, disableMaskInteraction, maskPadding)}
       <div id="walktour-tooltip" style={tooltipStyle} onKeyDown={keyPressHandler} tabIndex={0}>
         {customTooltipRenderer && customTooltipRenderer(tourLogic)}
         {!customTooltipRenderer &&
@@ -229,30 +228,22 @@ function getStep(stepIndex: number, steps: Step[]) {
   return steps[stepIndex]
 }
 
-function getTargetData(selector: string): ClientRect {
-  const element = document.querySelector(selector)
-  const targetData = element && element.getBoundingClientRect();
-
-  if (targetData) {
-    return targetData
-  } else {
-    throw new Error(`element specified by  "${selector}" could not be found`);
-  }
-}
-
-function TourMask(target: ClientRect, disableMaskInteraction: boolean, padding: number = 0, roundedCutout: boolean = true): JSX.Element {
+function TourMask(target: Element, disableMaskInteraction: boolean, padding: number = 0, roundedCutout: boolean = true): JSX.Element {
   if (!target) {
     return null;
   }
-  const coords: Coords = getElementCoords(target, true);
+
+  const targetData: ClientRect = target.getBoundingClientRect();
+  
+  const coords: Coords = getElementCoords(targetData, true);
   return (
     <div
       style={{
         position: 'absolute',
         top: coords.y - padding,
         left: coords.x - padding,
-        height: target.height + (padding * 2),
-        width: target.width + (padding * 2),
+        height: targetData.height + (padding * 2),
+        width: targetData.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
         borderRadius: roundedCutout ? '5px' : 0,
         pointerEvents: disableMaskInteraction ? 'auto' : 'none'

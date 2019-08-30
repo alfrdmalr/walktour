@@ -25,8 +25,8 @@ interface CardinalCoords {
 }
 
 interface GetTooltipPositionArgs {
-  target: ClientRect;
-  tooltip: ClientRect;
+  target: Element;
+  tooltip: Element;
   padding: number;
   tooltipSeparation: number;
   orientationPreferences?: CardinalOrientation[];
@@ -39,7 +39,7 @@ function dist(a: Coords, b: Coords): number {
   return Math.sqrt(
     Math.pow((Math.abs(a.x - b.x)), 2) +
     Math.pow((Math.abs(a.y - b.y)), 2))
-} 
+}
 
 function getViewportHeight() {
   return Math.max(document.documentElement.clientHeight, window.innerHeight);
@@ -192,17 +192,26 @@ function centerReducer(acc: Coords, cur: CardinalCoords): Coords {
   }
 }
 
-function chooseBestPosition(candidates: CardinalCoords[], 
+function chooseBestPosition(candidates: CardinalCoords[],
   reducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords): Coords {
   const candidateReducer = reducer || centerReducer;
   return candidates.reduce(candidateReducer, undefined);
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const {target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer: reducer} = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer: reducer } = args;
+
+  const tooltipData: ClientRect = tooltip && tooltip.getBoundingClientRect();
+  const targetData: ClientRect = target && target.getBoundingClientRect();
+
+  if (!tooltipData) {
+    return;
+  } else if (!targetData) {
+    return getCenterCoords(tooltipData);
+  }
 
   const choosePosBasedOnPreferences = (): Coords => {
-  const candidates: CardinalCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipSeparation, true);
+    const candidates: CardinalCoords[] = getTooltipPositionCandidates(targetData, tooltipData, padding, tooltipSeparation, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
       return chooseBestPosition(candidates, reducer);
     } else {
@@ -212,12 +221,11 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   }
 
   const bestPosition: Coords = choosePosBasedOnPreferences();
-  
-  if (isElementInView(target) && isElementInView(tooltip, bestPosition)) {
+
+  if (isElementInView(targetData) && isElementInView(tooltipData, bestPosition)) {
     return bestPosition;
   } else {
-    scrollToElement(target, true);
+    scrollToElement(targetData, true);
     return bestPosition;
   }
-
 }
