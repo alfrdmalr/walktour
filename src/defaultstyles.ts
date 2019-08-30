@@ -2,7 +2,7 @@ import { CSSProperties } from "react";
 
 
 export interface WalktourStyles {
-  container: CSSProperties;
+  tooltip: CSSProperties;
   footer: CSSProperties;
   title: CSSProperties;
   description: CSSProperties;
@@ -26,7 +26,7 @@ const baseButtonStyle: React.CSSProperties = {
 };
 
 export const defaultStyles: WalktourStyles = {
-  container: {
+  tooltip: {
     display: 'flex', 
     flexDirection: 'column', 
     zIndex: 9999,

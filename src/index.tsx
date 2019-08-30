@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { defaultStyles, WalktourStyles } from './defaultstyles';
 import { Coords, getElementCoords, getTooltipPosition, CardinalOrientation } from './positioning'
+import { Mask } from './Mask';
+import { Tooltip } from './Tooltip';
 
 export interface WalktourLogic {
   next: () => void;
@@ -8,6 +10,8 @@ export interface WalktourLogic {
   close: () => void;
   goToStep: (stepNumber: number) => void;
   stepContent: Step;
+  stepIndex: number;
+  allSteps: Step[];
 }
 
 export interface WalktourOptions {
@@ -63,7 +67,7 @@ export const Walktour = (props: WalktourProps) => {
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [target, setTarget] = React.useState<Element>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
-  const currentStepContent = getStep(currentStepIndex, steps);
+  const currentStepContent: Step = steps[currentStepIndex];
 
   const {
     prevLabel,
@@ -77,9 +81,6 @@ export const Walktour = (props: WalktourProps) => {
     transition,
     orientationPreferences,
     customTooltipRenderer,
-    customTitleRenderer, 
-    customDescriptionRenderer,
-    customFooterRenderer,
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -95,8 +96,8 @@ export const Walktour = (props: WalktourProps) => {
       return;
     }
     
-    const tooltip: HTMLElement = document.getElementById('walktour-tooltip');
-    const target = document.querySelector(getStep(currentStepIndex, steps).querySelector);
+    const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
+    const target = document.querySelector(steps[currentStepIndex].querySelector);
 
     setTarget(target);
     setTooltipPosition(getTooltipPosition({
@@ -148,7 +149,7 @@ export const Walktour = (props: WalktourProps) => {
     }
   }
 
-  if (!isVisibleState) {
+  if (!isVisibleState || !currentStepContent) {
     return null
   };
 
@@ -157,14 +158,13 @@ export const Walktour = (props: WalktourProps) => {
     prev: prev,
     close: skip,
     goToStep: goToStep,
-    stepContent: currentStepContent
+    stepContent: currentStepContent,
+    stepIndex: currentStepIndex,
+    allSteps: steps
   };
 
-  //style attributes for positioning
-  const tooltipStyle: React.CSSProperties = {
-    ...(customTooltipRenderer ? null : styles.container),
+  const containerStyle: React.CSSProperties = {
     position: 'absolute',
-    width: tooltipWidth,
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
@@ -172,85 +172,24 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   return (<>
-    {TourMask(target, disableMaskInteraction, maskPadding)}
-      <div id="walktour-tooltip" style={tooltipStyle} onKeyDown={keyPressHandler} tabIndex={0}>
-        {customTooltipRenderer && customTooltipRenderer(tourLogic)}
-        {!customTooltipRenderer &&
-          <>
-            {customTitleRenderer
-              ? customTitleRenderer(currentStepContent.title, tourLogic)
-              : (
-                <div style={styles.title}>
-                  {currentStepContent.title}
-                </div>
-              )
-            }
+    <Mask
+      target={target}
+      disableMaskInteraction={disableMaskInteraction}
+      padding={maskPadding}
+    />
 
-            {customDescriptionRenderer
-              ? customDescriptionRenderer(currentStepContent.description, tourLogic)
-              : (
-                <div style={styles.description}>
-                  {currentStepContent.description}
-                </div>
-              )
-            }
-
-            {customFooterRenderer
-              ? currentStepContent.customFooterRenderer(tourLogic)
-              : (
-                <div style={styles.footer}>
-                  <button onClick={skip} style={styles.tertiaryButton}>
-                    {skipLabel}
-                  </button>
-                  <button
-                    onClick={prev}
-                    disabled={currentStepIndex === 0}
-                    style={currentStepIndex !== 0 ? styles.secondaryButton : styles.disabledButton}
-                  >
-                    {prevLabel}
-                  </button>
-                  <button
-                    onClick={next}
-                    disabled={currentStepIndex + 1 === steps.length}
-                    style={currentStepIndex + 1 !== steps.length ? styles.primaryButton : styles.disabledButton}
-                  >
-                    {nextLabel}
-                  </button>
-                </div>
-              )}
-          </>
-        }
-      </div>
+    <div id="walktour-tooltip-container" style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
+      {customTooltipRenderer
+        ? customTooltipRenderer(tourLogic)
+        : <Tooltip
+          {...tourLogic}
+          nextLabel={nextLabel}
+          prevLabel={prevLabel}
+          skipLabel={skipLabel}
+          styles={styles}
+          width={tooltipWidth}
+        />
+      }
+    </div>
   </>)
 }
-
-function getStep(stepIndex: number, steps: Step[]) {
-  return steps[stepIndex]
-}
-
-function TourMask(target: Element, disableMaskInteraction: boolean, padding: number = 0, roundedCutout: boolean = true): JSX.Element {
-  if (!target) {
-    return null;
-  }
-
-  const targetData: ClientRect = target.getBoundingClientRect();
-  
-  const coords: Coords = getElementCoords(targetData, true);
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: coords.y - padding,
-        left: coords.x - padding,
-        height: targetData.height + (padding * 2),
-        width: targetData.width + (padding * 2),
-        boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
-        borderRadius: roundedCutout ? '5px' : 0,
-        pointerEvents: disableMaskInteraction ? 'auto' : 'none'
-      }}
-    >
-    </div>
-  );
-}
-
-
