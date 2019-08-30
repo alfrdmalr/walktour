@@ -65,7 +65,7 @@ export const Walktour = (props: WalktourProps) => {
 
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
-  const [targetData, setTargetData] = React.useState<ClientRect>(undefined);
+  const [target, setTarget] = React.useState<Element>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent = getStep(currentStepIndex, steps);
 
@@ -98,14 +98,14 @@ export const Walktour = (props: WalktourProps) => {
     if (isVisibleState === false) {
       return;
     }
+    
     const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
-    const tooltipData: ClientRect = tooltip && tooltip.getBoundingClientRect();
-    const targetData = getTargetData(getStep(currentStepIndex, steps).querySelector);
+    const target = document.querySelector(getStep(currentStepIndex, steps).querySelector);
 
-    setTargetData(targetData);
+    setTarget(target);
     setTooltipPosition(getTooltipPosition({
-      target: targetData,
-      tooltip: tooltipData,
+      target: target,
+      tooltip: tooltip,
       padding: maskPadding,
       tooltipSeparation: tooltipSeparation,
       orientationPreferences: orientationPreferences
@@ -176,7 +176,7 @@ export const Walktour = (props: WalktourProps) => {
 
   return (<>
     <Mask
-      target={targetData}
+      target={target}
       disableMaskInteraction={disableMaskInteraction}
       padding={maskPadding}
     />
@@ -201,13 +201,4 @@ function getStep(stepIndex: number, steps: Step[]) {
   return steps[stepIndex]
 }
 
-function getTargetData(selector: string): ClientRect {
-  const element = document.querySelector(selector)
-  const targetData = element && element.getBoundingClientRect();
 
-  if (targetData) {
-    return targetData
-  } else {
-    throw new Error(`element specified by  "${selector}" could not be found`);
-  }
-}
