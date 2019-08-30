@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { defaultStyles, WalktourStyles } from './defaultstyles';
-import { Coords, getElementCoords, getTooltipPosition, CardinalOrientation } from './positioning'
+import { defaultStyles, WalktourStyles } from '../defaultstyles';
+import { Coords, getTooltipPosition, CardinalOrientation } from '../positioning'
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 

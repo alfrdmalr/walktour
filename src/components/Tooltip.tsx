@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { WalktourLogic } from './index';
-import { WalktourStyles } from './defaultstyles';
+import { WalktourLogic } from './Walktour';
+import { WalktourStyles } from '../defaultstyles';
 
 interface TooltipProps extends WalktourLogic {
   nextLabel: string;

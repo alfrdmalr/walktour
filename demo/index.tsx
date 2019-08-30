@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
-import { Walktour, Step, WalktourLogic } from '../src/index'
+import { Walktour, Step, WalktourLogic } from '../src/components/Walktour'
 import { CardinalOrientation } from '../src/positioning';
 
 const steps: Step[] = [
