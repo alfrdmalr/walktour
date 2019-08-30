@@ -4,7 +4,6 @@ import { Coords, getElementCoords, getTooltipPosition, CardinalOrientation } fro
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 
-
 export interface WalktourLogic {
   next: () => void;
   prev: () => void;
@@ -82,7 +81,7 @@ export const Walktour = (props: WalktourProps) => {
     transition,
     orientationPreferences,
     customTooltipRenderer,
-    customTitleRenderer, 
+    customTitleRenderer,
     customDescriptionRenderer,
     customFooterRenderer,
   } = {
@@ -99,7 +98,7 @@ export const Walktour = (props: WalktourProps) => {
     if (isVisibleState === false) {
       return;
     }
-    const tooltip: HTMLElement = document.getElementById('walktour-tooltip');
+    const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
     const tooltipData: ClientRect = tooltip && tooltip.getBoundingClientRect();
     const targetData = getTargetData(getStep(currentStepIndex, steps).querySelector);
 
@@ -167,11 +166,8 @@ export const Walktour = (props: WalktourProps) => {
     allSteps: steps
   };
 
-  //style attributes for positioning
-  const tooltipStyle: React.CSSProperties = {
-    ...(customTooltipRenderer ? null : styles.container),
+  const containerStyle: React.CSSProperties = {
     position: 'absolute',
-    width: tooltipWidth,
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
@@ -184,18 +180,20 @@ export const Walktour = (props: WalktourProps) => {
       disableMaskInteraction={disableMaskInteraction}
       padding={maskPadding}
     />
-      <div id="walktour-tooltip" style={tooltipStyle} onKeyDown={keyPressHandler} tabIndex={0}>
-        {customTooltipRenderer && customTooltipRenderer(tourLogic)}
-        {!customTooltipRenderer &&
-          <Tooltip 
-            {...tourLogic}
-            nextLabel={nextLabel}
-            prevLabel={prevLabel}
-            skipLabel={skipLabel}
-            styles={styles}
-          />
-        }
-      </div>
+
+    <div id="walktour-tooltip-container" style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
+      {customTooltipRenderer
+        ? customTooltipRenderer(tourLogic)
+        : <Tooltip
+          {...tourLogic}
+          nextLabel={nextLabel}
+          prevLabel={prevLabel}
+          skipLabel={skipLabel}
+          styles={styles}
+          width={tooltipWidth}
+        />
+      }
+    </div>
   </>)
 }
 
@@ -213,6 +211,3 @@ function getTargetData(selector: string): ClientRect {
     throw new Error(`element specified by  "${selector}" could not be found`);
   }
 }
-
-
-

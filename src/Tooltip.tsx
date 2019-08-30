@@ -7,6 +7,7 @@ interface TooltipProps extends WalktourLogic {
   prevLabel: string;
   skipLabel: string;
   styles: WalktourStyles;
+  width?: number;
 }
 
 export function Tooltip(props: TooltipProps) {
@@ -26,12 +27,16 @@ export function Tooltip(props: TooltipProps) {
     styles,
     nextLabel,
     prevLabel,
-    skipLabel
+    skipLabel,
+    width
   } = props;
 
-
+  const tooltipStyle: React.CSSProperties = {
+    ...styles.tooltip,
+    width: width
+  }
   return (
-    <>
+    <div style={tooltipStyle}>
       {customTitleRenderer
         ? customTitleRenderer(title, props)
         : (
@@ -73,6 +78,6 @@ export function Tooltip(props: TooltipProps) {
             </button>
           </div>
         )}
-    </>
+    </div>
   )
 }
