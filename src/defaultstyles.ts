@@ -36,6 +36,7 @@ export const defaultStyles: WalktourStyles = {
     padding: '10px 10px 5px 10px',
     borderRadius: '5px',
     boxShadow: '0 3px 8px 0 rgba(0,0,0,.25)',
+    color: '#4d4d4d',
   },
   footer: {
     display: 'flex',
@@ -48,7 +49,6 @@ export const defaultStyles: WalktourStyles = {
   },
   description: {
     margin: contentMargin,
-    color: '#4d4d4d',
   },
   primaryButton: {
     ...baseButtonStyle,

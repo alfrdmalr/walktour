@@ -12,7 +12,7 @@
     "strict": true,
     "moduleResolution": "node",
     "declaration": true,
-    "declarationDir": "dist"
+    "declarationDir": "./dist"
   },
   "include": [
     "src/**/*"
