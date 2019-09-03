@@ -97,7 +97,7 @@ export const Walktour = (props: WalktourProps) => {
     }
     
     const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
-    const target = document.querySelector(steps[currentStepIndex].querySelector);
+    const target: HTMLElement = document.querySelector(steps[currentStepIndex].querySelector);
 
     setTarget(target);
     setTooltipPosition(getTooltipPosition({
