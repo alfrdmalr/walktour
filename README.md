@@ -1,67 +1,57 @@
-# react-onboarding [![](https://img.shields.io/twitter/url/http/shields.io.svg?style=social?style=social)](https://github.com/ilyapasyuk/react-onboarding)
+# walktour
  
-Simple wizard component for React.js
+Guided tour/walkthrough component for react projects.
 
-![size](https://img.shields.io/bundlephobia/min/react-onboarding.svg)
-![](https://img.shields.io/npm/v/react-onboarding.svg?style=flat-square)
+[npm](https://www.npmjs.com/package/walktour) |
+[GitHub](https://github.com/alfrdmalr/walktour)
 
-[NPM](https://www.npmjs.com/package/react-onboarding) |
-[Github](https://github.com/ilyapasyuk/react-onboarding) |
-[Feature request](https://github.com/ilyapasyuk/react-onboarding/issues/new)
-
-### Preview
+### Demo
 ![](https://user-images.githubusercontent.com/5953765/50577446-28168500-0e39-11e9-9dfd-0a44a42d3268.gif)
 
 ### Installation
-
-* `npm install --save react-onboarding`
-* `yarn add react-onboarding`
+* `npm install --save walktour`
+* `yarn add walktour`
 
 ### How To Use
 
-First import this component where you want to use it
+Import the Walktour component:
 
-`import Wizard from "react-onboarding"`
+`import { Walktour } from 'walktour'`
 
-Then just renders it
+And then include it somewhere in your render function:
 
-`<Wizard />`
+`<Walktour 
+   isVisible
+   steps={mySteps}
+/>`
+
+### Step Shape
+Each step of the tour is defined by a `Step` object.
+
+
+_Additionally, any of the optional `WalktourOptions` attributes can be included in a `Step` object._
 
 ### Props
 
-|      _Prop_     |       _Description_       | _Default value_ |
-| --------------- |   :-------------------:   | :-------------: |
-| rule            |   array rules for wizard  |      none       |
-| isShow          |    Sets view mode         |      true       |
-| prevButtonTitle | title for previous button |      Prev       |
-| nextButtonTitle | title for next button     |      Next       |
+_Additionally, any of the optional `WalktourOptions` attributes can be included as props._
+
+
+ | **Attribute** | **Type** | **Description** |
+ | ------------- | -------- | --------------- |
+ | steps | _Array<`Step`>_ | All the `Step` objects defining stops along the tour. |
+ | isVisible | _boolean_ | Determines whether the tour is shown. |
+ | _initialStepIndex_ | _number_ | Start the tour on a particular step when opened. Default is 0. |
+ | ... | [`WalktourOptions`](#options) | Any of the optional [`WalktourOptions`](#options) attributes can be included as props, at the same level as any other prop. No need for an options object. | 
+
+### Options
+These options can be provided at a tour level or applied to a single step along the tour. 
+
+
+Step-level options will take precedence over global options.
+
 
 ### Example
 
 ```
-import React, { Component } from "react";
-import Wizard from "react-onboarding";
 
-const rule = [
-    {
-        elementId: 'elementIdOne',
-        title: 'Title 1',
-        description: 'description 1',
-    },
-    {
-        elementId: 'elementIdTwo',
-        title: 'Title 2',
-        description: 'description 2',
-    },
-]
-
-class App extends Component {
-  render() {
-    return (
-        <Wizard rule={rule} nextButtonTitle="Next click" prevButtonTitle="Prev click"  />
-    );
-  }
-}
-
-export default App;
 ```
