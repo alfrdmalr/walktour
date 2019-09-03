@@ -1,47 +1,23 @@
 {
   "name": "walktour",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Guided tour/walkthrough component for react",
   "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "parcel build src/index.tsx -o dist/index.js",
-    "start": "parcel App/index.html --open"
+    "start": "parcel demo/index.html --open",
+    "build": "rollup -c",
+    "watch": "rollup -w"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/alfrdmalr/walktour"
   },
-  "keywords": [
-    "react",
-    "component",
-    "onboarding",
-    "guide",
-    "tour",
-    "usertour",
-    "tourguide",
-    "guide",
-    "walkthrough",
-    "walk",
-    "through",
-    "contextual",
-    "help"
-  ],
-  "author": {
-    "name": "Alfred Maler",
-    "email": "alfrdmalr@gmail.com"
-  },
-  "contributors": [
-    {
-      "name": "Ilya Pasyuk",
-      "email": "pasyuk.com@gmail.com"
-    },
-    {
-      "name": "Alfred Maler",
-      "email": "alfrdmalr@gmail.com"
-    }
-  ],
   "license": "MIT",
-  "bugs": "https://github.com/alfrdmalr/walktour/issues",
   "peerDependencies": {
     "@types/react": "^16.9.1",
     "@types/react-dom": "^16.8.5",
@@ -57,18 +33,18 @@
     "@babel/plugin-transform-react-jsx": "^7.0.0",
     "@babel/preset-env": "7.4.4",
     "@babel/preset-react": "7.0.0",
+    "@types/react": "^16.9.1",
+    "@types/react-dom": "^16.8.5",
     "awesome-typescript-loader": "^5.2.1",
-    "babel-loader": "8.0.6",
     "cssnano": "^4.1.10",
     "html-loader": "^0.5.5",
+    "parcel": "^1.12.3",
     "prettier": "^1.17.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "rollup": "^1.20.3",
+    "rollup-plugin-typescript2": "^0.24.0",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.5.3"
-  },
-  "dependencies": {
-    "@types/react": "^16.9.2",
-    "@types/react-dom": "^16.9.0",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0"
   }
 }

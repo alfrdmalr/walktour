@@ -1,18 +1,21 @@
 {
   "compilerOptions": {
     "sourceMap": true,
+    "noImplicitAny": true,
     "strictNullChecks": false,
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "rootDir": "src",
+    "outDir": "dist",
     "module": "es6",
     "jsx": "react",
     "target": "es5",
     "lib": ["es2018", "dom"],
-    "allowJs": true,
-    "checkJs": true,
-    "strict": true
+    "strict": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationDir": "./dist"
   },
   "include": [
-    "./src/"
-  ]
+    "src/**/*"
+  ],
+  "exclude": ["node_modules"]
 }
