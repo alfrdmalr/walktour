@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Coords, getElementCoords } from "../positioning";
 
 interface MaskProps {
-  target: Element;
+  target: HTMLElement;
   disableMaskInteraction?: boolean;
   padding?: number;
   roundedCutout?: boolean;
@@ -15,7 +15,7 @@ export function Mask(props: MaskProps): JSX.Element {
   }
   
   const targetData: ClientRect = target.getBoundingClientRect();
-  const coords: Coords = getElementCoords(targetData, true);
+  const coords: Coords = getElementCoords(target, true);
   
   return (
     <div
