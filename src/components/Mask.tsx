@@ -1,21 +1,22 @@
 import * as React from 'react';
-import { Coords, getElementCoords } from "../positioning";
+import { Coords, getElementCoords, addParentOffset } from "../positioning";
 
 interface MaskProps {
   target: HTMLElement;
   disableMaskInteraction?: boolean;
   padding?: number;
   roundedCutout?: boolean;
+  offsetParent?: Element;
 }
 
 export function Mask(props: MaskProps): JSX.Element {
-  const {target, disableMaskInteraction, padding, roundedCutout} = {roundedCutout: true, ...props};
+  const {target, disableMaskInteraction, padding, roundedCutout, offsetParent} = {roundedCutout: true, ...props};
   if (!target) {
     return null;
   }
   
   const targetData: ClientRect = target.getBoundingClientRect();
-  const coords: Coords = getElementCoords(target, true);
+  const coords: Coords = addParentOffset(getElementCoords(target, true), offsetParent);
   
   return (
     <div

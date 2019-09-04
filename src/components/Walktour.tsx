@@ -66,6 +66,7 @@ export const Walktour = (props: WalktourProps) => {
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
+  const [offsetParent, setOffsetParent] = React.useState<Element>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent: Step = steps[currentStepIndex];
 
@@ -95,17 +96,20 @@ export const Walktour = (props: WalktourProps) => {
     if (isVisibleState === false) {
       return;
     }
-    
+
+    const target: HTMLElement = document.querySelector(steps[currentStepIndex].querySelector);    
     const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
-    const target: HTMLElement = document.querySelector(steps[currentStepIndex].querySelector);
+    const offsetParent: Element = tooltip.offsetParent;
 
     setTarget(target);
+    setOffsetParent(offsetParent);
     setTooltipPosition(getTooltipPosition({
-      target: target,
-      tooltip: tooltip,
+      target,
+      tooltip,
       padding: maskPadding,
-      tooltipSeparation: tooltipSeparation,
-      orientationPreferences: orientationPreferences
+      tooltipSeparation,
+      orientationPreferences,
+      offsetParent
     }));
 
     tooltip && tooltip.focus();
@@ -176,6 +180,7 @@ export const Walktour = (props: WalktourProps) => {
       target={target}
       disableMaskInteraction={disableMaskInteraction}
       padding={maskPadding}
+      offsetParent={offsetParent}
     />
 
     <div id="walktour-tooltip-container" style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>

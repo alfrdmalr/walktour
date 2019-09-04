@@ -31,6 +31,7 @@ interface GetTooltipPositionArgs {
   tooltipSeparation: number;
   orientationPreferences?: CardinalOrientation[];
   positionCandidateReducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords;
+  offsetParent?: Element;
 }
 
 //helpers
@@ -57,6 +58,20 @@ function addScrollOffset(coords: Coords): Coords {
   }
 }
 
+export function addParentOffset(coords: Coords, offsetParent: Element) {
+  if (offsetParent && offsetParent !== document.body) {
+    console.log('custom offset parent')
+    //substract element coords from offsetparent coords to get 'absolute-relative' posn
+    const parentData: ClientRect = offsetParent.getBoundingClientRect();
+    return {
+      x: coords.x - parentData.left,
+      y: coords.y - parentData.left
+    }
+  } else {
+    return coords;
+  }
+}
+
 function getCurrentScrollOffset(): Coords {
   return {
     x: document.documentElement.scrollLeft || window.pageXOffset,
@@ -65,20 +80,14 @@ function getCurrentScrollOffset(): Coords {
 }
 
 export function getElementCoords(element: HTMLElement, adjustForScroll: boolean): Coords {
-  if (element.offsetParent) {
-    //substract element coords from offsetparent coords to get 'absolute-relative' posn
-  }
-
   const elementData: ClientRect = element.getBoundingClientRect();
+  let coords: Coords = {x: elementData.left, y: elementData.top}
 
   if (!adjustForScroll) {
-    return {
-      x: elementData.left,
-      y: elementData.top
-    }
+    return coords
   }
 
-  return addScrollOffset({ x: elementData.left, y: elementData.top })
+  return addScrollOffset(coords)
 }
 
 function isElementInView(element: HTMLElement, atPosition?: Coords): boolean {
@@ -210,7 +219,7 @@ function chooseBestPosition(candidates: CardinalCoords[],
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer: reducer } = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer: reducer, offsetParent } = args;
 
   if (!tooltip) {
     return;
@@ -228,7 +237,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     }
   }
 
-  const bestPosition: Coords = choosePosBasedOnPreferences();
+  const bestPosition: Coords = addParentOffset(choosePosBasedOnPreferences(), offsetParent);
 
   if (isElementInView(target) && isElementInView(tooltip, bestPosition)) {
     return bestPosition;
