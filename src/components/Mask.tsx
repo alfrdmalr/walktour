@@ -3,14 +3,15 @@ import { Coords, getElementCoords, addParentOffset } from "../positioning";
 
 interface MaskProps {
   target: HTMLElement;
+  padding: number;
+  zIndex: number;
   disableMaskInteraction?: boolean;
-  padding?: number;
   roundedCutout?: boolean;
   offsetParent?: Element;
 }
 
 export function Mask(props: MaskProps): JSX.Element {
-  const {target, disableMaskInteraction, padding, roundedCutout, offsetParent} = {roundedCutout: true, ...props};
+  const {target, disableMaskInteraction, padding, roundedCutout, offsetParent, zIndex} = {roundedCutout: true, ...props};
   if (!target) {
     return null;
   }
@@ -28,7 +29,8 @@ export function Mask(props: MaskProps): JSX.Element {
         width: targetData.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
         borderRadius: roundedCutout ? '5px' : 0,
-        pointerEvents: disableMaskInteraction ? 'auto' : 'none'
+        pointerEvents: disableMaskInteraction ? 'auto' : 'none',
+        zIndex: zIndex
       }}
     >
     </div>

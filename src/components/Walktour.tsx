@@ -41,6 +41,7 @@ export interface WalktourProps extends WalktourOptions {
   steps: Step[];
   isVisible: boolean;
   initialStepIndex?: number;
+  zIndex?: number;
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
@@ -52,7 +53,8 @@ const walktourDefaultProps: Partial<WalktourProps> = {
   maskPadding: 5,
   tooltipSeparation: 10,
   transition: 'top 200ms ease, left 200ms ease',
-  disableMaskInteraction: false
+  disableMaskInteraction: false,
+  zIndex: 9999
 }
 
 export const Walktour = (props: WalktourProps) => {
@@ -82,6 +84,7 @@ export const Walktour = (props: WalktourProps) => {
     transition,
     orientationPreferences,
     customTooltipRenderer,
+    zIndex
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -172,7 +175,8 @@ export const Walktour = (props: WalktourProps) => {
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
-    visibility: tooltipPosition ? 'visible' : 'hidden'
+    visibility: tooltipPosition ? 'visible' : 'hidden',
+    zIndex: zIndex
   }
 
   return (<>
@@ -181,6 +185,7 @@ export const Walktour = (props: WalktourProps) => {
       disableMaskInteraction={disableMaskInteraction}
       padding={maskPadding}
       offsetParent={offsetParent}
+      zIndex={zIndex}
     />
 
     <div id="walktour-tooltip-container" style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
