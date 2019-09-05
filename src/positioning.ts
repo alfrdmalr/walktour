@@ -60,8 +60,6 @@ function addScrollOffset(coords: Coords): Coords {
 
 export function addParentOffset(coords: Coords, offsetParent: Element) {
   if (offsetParent && offsetParent !== document.body) {
-    console.log('custom offset parent')
-    //substract element coords from offsetparent coords to get 'absolute-relative' posn
     const parentData: ClientRect = offsetParent.getBoundingClientRect();
     return {
       x: coords.x - parentData.left,
