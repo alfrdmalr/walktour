@@ -50,47 +50,36 @@ function getViewportWidth() {
   return Math.max(document.documentElement.clientWidth, window.innerWidth);
 }
 
-// function addScrollOffset(coords: Coords): Coords {
-//   const curOffset: Coords = getCurrentScrollOffset();
-//   return {
-//     x: coords.x + curOffset.x,
-//     y: coords.y + curOffset.y
-//   }
-// }
 
-export function addParentOffset(coords: Coords, offsetParent: Element) {
-  if (offsetParent && offsetParent ) {
+function getCurrentScrollOffset(): Coords {
+  return {
+    x: document.documentElement.scrollLeft || window.pageXOffset,
+    y: document.documentElement.scrollTop || window.pageYOffset
+  }
+}
+
+export function addAppropriateOffset(coords: Coords, offsetParent: Element) {
+  if (offsetParent && offsetParent !== document.body ) { 
     const parentData: ClientRect = offsetParent.getBoundingClientRect();
     return {
       x: coords.x - parentData.left,
       y: coords.y - parentData.top
     }
   } else {
-    return coords;
+    const curOffset = getCurrentScrollOffset();
+
+    return{
+      x: coords.x + curOffset.x,
+      y: coords.y + curOffset.y
+    };
   }
 }
 
-// function getCurrentScrollOffset(): Coords {
-//   return {
-//     x: document.documentElement.scrollLeft || window.pageXOffset,
-//     y: document.documentElement.scrollTop || window.pageYOffset
-//   }
-// }
 
-export function getElementCoords(element: HTMLElement, adjustForScroll: boolean): Coords {
+
+export function getElementCoords(element: HTMLElement): Coords {
   const elementData: ClientRect = element.getBoundingClientRect();
   let coords: Coords = {x: elementData.left, y: elementData.top}
-
-  if (!adjustForScroll) {
-    return coords
-  }
-
-  //if has parent
-  // subtract parent from coords
-  // if no offset parent but scroll
-  // subtract scroll
-  // else 
-  // return coords
 
   return coords;
 }
@@ -98,7 +87,7 @@ export function getElementCoords(element: HTMLElement, adjustForScroll: boolean)
 
 // the (optionally) specified position may already be adjusted for scroll, so just to be safe we adjust everything else
 function isElementInView(element: HTMLElement, atPosition?: Coords): boolean {
-  const position: Coords = atPosition || getElementCoords(element, true);
+  const position: Coords = atPosition || getElementCoords(element);
   const elementData: ClientRect = element.getBoundingClientRect();
   // const scrollOffsets: Coords = getCurrentScrollOffset();
   const xVisibility: boolean = (position.x >= 0) && (position.x + elementData.width) <= getViewportWidth();
@@ -118,7 +107,7 @@ function getCenterCoords(element?: HTMLElement): Coords {
 }
 
 function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean, padding?: number): void {
-  const el: Coords = getElementCoords(element, false);
+  const el: Coords = getElementCoords(element);
   const elementData: ClientRect = element.getBoundingClientRect();
   let xOffset: number = 0;
   let yOffset: number = 0;
@@ -147,7 +136,7 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
     return;
   }
 
-  const coords: Coords = getElementCoords(target, true);
+  const coords: Coords = getElementCoords(target);
   const centerX: number = coords.x - ((tooltipData.width - targetData.width) / 2);
   const centerY: number = coords.y - ((tooltipData.height - targetData.height) / 2);
   const eastOffset: number = coords.x + targetData.width + padding + tooltipDistance;
@@ -244,7 +233,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     }
   }
 
-  const bestPosition: Coords = addParentOffset(choosePosBasedOnPreferences(), offsetParent);
+  const bestPosition: Coords = addAppropriateOffset(choosePosBasedOnPreferences(), offsetParent);
 
   if (isElementInView(target) && isElementInView(tooltip, bestPosition)) {
     return bestPosition;
