@@ -50,16 +50,16 @@ function getViewportWidth() {
   return Math.max(document.documentElement.clientWidth, window.innerWidth);
 }
 
-function addScrollOffset(coords: Coords): Coords {
-  const curOffset: Coords = getCurrentScrollOffset();
-  return {
-    x: coords.x + curOffset.x,
-    y: coords.y + curOffset.y
-  }
-}
+// function addScrollOffset(coords: Coords): Coords {
+//   const curOffset: Coords = getCurrentScrollOffset();
+//   return {
+//     x: coords.x + curOffset.x,
+//     y: coords.y + curOffset.y
+//   }
+// }
 
 export function addParentOffset(coords: Coords, offsetParent: Element) {
-  if (offsetParent && offsetParent !== document.body) {
+  if (offsetParent && offsetParent ) {
     const parentData: ClientRect = offsetParent.getBoundingClientRect();
     return {
       x: coords.x - parentData.left,
@@ -70,12 +70,12 @@ export function addParentOffset(coords: Coords, offsetParent: Element) {
   }
 }
 
-function getCurrentScrollOffset(): Coords {
-  return {
-    x: document.documentElement.scrollLeft || window.pageXOffset,
-    y: document.documentElement.scrollTop || window.pageYOffset
-  }
-}
+// function getCurrentScrollOffset(): Coords {
+//   return {
+//     x: document.documentElement.scrollLeft || window.pageXOffset,
+//     y: document.documentElement.scrollTop || window.pageYOffset
+//   }
+// }
 
 export function getElementCoords(element: HTMLElement, adjustForScroll: boolean): Coords {
   const elementData: ClientRect = element.getBoundingClientRect();
@@ -85,15 +85,24 @@ export function getElementCoords(element: HTMLElement, adjustForScroll: boolean)
     return coords
   }
 
-  return addScrollOffset(coords)
+  //if has parent
+  // subtract parent from coords
+  // if no offset parent but scroll
+  // subtract scroll
+  // else 
+  // return coords
+
+  return coords;
 }
 
+
+// the (optionally) specified position may already be adjusted for scroll, so just to be safe we adjust everything else
 function isElementInView(element: HTMLElement, atPosition?: Coords): boolean {
   const position: Coords = atPosition || getElementCoords(element, true);
   const elementData: ClientRect = element.getBoundingClientRect();
-  const scrollOffsets: Coords = getCurrentScrollOffset();
-  const xVisibility: boolean = (position.x >= scrollOffsets.x) && (position.x + elementData.width) <= getViewportWidth() + scrollOffsets.x;
-  const yVisibility: boolean = (position.y >= scrollOffsets.y) && (position.y + elementData.height) <= getViewportHeight() + scrollOffsets.y;
+  // const scrollOffsets: Coords = getCurrentScrollOffset();
+  const xVisibility: boolean = (position.x >= 0) && (position.x + elementData.width) <= getViewportWidth();
+  const yVisibility: boolean = (position.y >= 0) && (position.y + elementData.height) <= getViewportHeight();
 
   return xVisibility && yVisibility;
 }
@@ -102,10 +111,10 @@ function getCenterCoords(element?: HTMLElement): Coords {
   const elementData: ClientRect = element && element.getBoundingClientRect();
   const xOffset: number = element && elementData ? elementData.width / 2 : 0;
   const yOffset: number = element && elementData ? elementData.height / 2 : 0;
-  return addScrollOffset({
+  return{
     x: (getViewportWidth() / 2) - xOffset,
     y: (getViewportHeight() / 2) - yOffset
-  })
+  }
 }
 
 function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean, padding?: number): void {
