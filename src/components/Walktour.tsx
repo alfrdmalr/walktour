@@ -103,7 +103,6 @@ export const Walktour = (props: WalktourProps) => {
     const target: HTMLElement = document.querySelector(steps[currentStepIndex].querySelector);    
     const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
     const offsetParent: Element = tooltip.offsetParent;
-    console.log('offset parent:', offsetParent)
 
     setTarget(target);
     setOffsetParent(offsetParent);

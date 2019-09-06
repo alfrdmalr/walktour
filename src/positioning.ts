@@ -63,7 +63,7 @@ export function addParentOffset(coords: Coords, offsetParent: Element) {
     const parentData: ClientRect = offsetParent.getBoundingClientRect();
     return {
       x: coords.x - parentData.left,
-      y: coords.y - parentData.left
+      y: coords.y - parentData.top
     }
   } else {
     return coords;
