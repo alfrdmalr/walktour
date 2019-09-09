@@ -1,21 +1,23 @@
 import * as React from 'react';
-import { Coords, getElementCoords } from "../positioning";
+import { Coords, getElementCoords, addAppropriateOffset } from "../positioning";
 
 interface MaskProps {
-  target: Element;
+  target: HTMLElement;
+  padding: number;
+  zIndex: number;
   disableMaskInteraction?: boolean;
-  padding?: number;
   roundedCutout?: boolean;
+  offsetParent?: Element;
 }
 
 export function Mask(props: MaskProps): JSX.Element {
-  const {target, disableMaskInteraction, padding, roundedCutout} = {roundedCutout: true, ...props};
+  const {target, disableMaskInteraction, padding, roundedCutout, offsetParent, zIndex} = {roundedCutout: true, ...props};
   if (!target) {
     return null;
   }
   
   const targetData: ClientRect = target.getBoundingClientRect();
-  const coords: Coords = getElementCoords(targetData, true);
+  const coords: Coords = addAppropriateOffset(getElementCoords(target), offsetParent);
   
   return (
     <div
@@ -27,7 +29,8 @@ export function Mask(props: MaskProps): JSX.Element {
         width: targetData.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
         borderRadius: roundedCutout ? '5px' : 0,
-        pointerEvents: disableMaskInteraction ? 'auto' : 'none'
+        pointerEvents: disableMaskInteraction ? 'auto' : 'none',
+        zIndex: zIndex
       }}
     >
     </div>

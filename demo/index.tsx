@@ -23,6 +23,15 @@ const steps: Step[] = [
   { querySelector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />}
 ]
 
+const containerStyle: React.CSSProperties = {
+  position: 'absolute',
+  left: 50,
+  top: 50,
+  width: '100%',
+  height: 2000,
+  margin: '40px'
+}
+
 const styleElementOne: React.CSSProperties = {
   background: 'grey',
   width: 200,
@@ -94,7 +103,7 @@ const styleElementEight: React.CSSProperties = {
 
 
 const App = () => (
-  <div>
+  <div style={containerStyle}>
     <div id={'one'} style={styleElementOne} />
     <div id={'two'} style={styleElementTwo} />
     <div id={'three'} style={styleElementThree} />
