@@ -64,7 +64,7 @@ export function Mask(props: MaskProps): JSX.Element {
         }}
       />
 
-      <div onClick={e => e.stopPropagation()}
+      <div
         style={{
           cursor: 'default',
           position: 'absolute',
