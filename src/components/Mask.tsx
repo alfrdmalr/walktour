@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coords, getElementCoords, addParentOffset } from "../positioning";
+import { Coords, getElementCoords, addAppropriateOffset } from "../positioning";
 
 interface MaskProps {
   target: HTMLElement;
@@ -17,7 +17,7 @@ export function Mask(props: MaskProps): JSX.Element {
   }
   
   const targetData: ClientRect = target.getBoundingClientRect();
-  const coords: Coords = addParentOffset(getElementCoords(target, true), offsetParent);
+  const coords: Coords = addAppropriateOffset(getElementCoords(target), offsetParent);
   
   return (
     <div

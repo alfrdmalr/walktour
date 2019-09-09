@@ -50,25 +50,6 @@ function getViewportWidth() {
   return Math.max(document.documentElement.clientWidth, window.innerWidth);
 }
 
-function addScrollOffset(coords: Coords): Coords {
-  const curOffset: Coords = getCurrentScrollOffset();
-  return {
-    x: coords.x + curOffset.x,
-    y: coords.y + curOffset.y
-  }
-}
-
-export function addParentOffset(coords: Coords, offsetParent: Element) {
-  if (offsetParent && offsetParent !== document.body) {
-    const parentData: ClientRect = offsetParent.getBoundingClientRect();
-    return {
-      x: coords.x - parentData.left,
-      y: coords.y - parentData.left
-    }
-  } else {
-    return coords;
-  }
-}
 
 function getCurrentScrollOffset(): Coords {
   return {
@@ -77,23 +58,40 @@ function getCurrentScrollOffset(): Coords {
   }
 }
 
-export function getElementCoords(element: HTMLElement, adjustForScroll: boolean): Coords {
+export function addAppropriateOffset(coords: Coords, offsetParent: Element) {
+  if (offsetParent && offsetParent !== document.body ) { 
+    const parentData: ClientRect = offsetParent.getBoundingClientRect();
+    return {
+      x: coords.x - parentData.left,
+      y: coords.y - parentData.top
+    }
+  } else {
+    const curOffset = getCurrentScrollOffset();
+
+    return{
+      x: coords.x + curOffset.x,
+      y: coords.y + curOffset.y
+    };
+  }
+}
+
+
+
+export function getElementCoords(element: HTMLElement): Coords {
   const elementData: ClientRect = element.getBoundingClientRect();
   let coords: Coords = {x: elementData.left, y: elementData.top}
 
-  if (!adjustForScroll) {
-    return coords
-  }
-
-  return addScrollOffset(coords)
+  return coords;
 }
 
+
+// the (optionally) specified position may already be adjusted for scroll, so just to be safe we adjust everything else
 function isElementInView(element: HTMLElement, atPosition?: Coords): boolean {
-  const position: Coords = atPosition || getElementCoords(element, true);
+  const position: Coords = atPosition || getElementCoords(element);
   const elementData: ClientRect = element.getBoundingClientRect();
-  const scrollOffsets: Coords = getCurrentScrollOffset();
-  const xVisibility: boolean = (position.x >= scrollOffsets.x) && (position.x + elementData.width) <= getViewportWidth() + scrollOffsets.x;
-  const yVisibility: boolean = (position.y >= scrollOffsets.y) && (position.y + elementData.height) <= getViewportHeight() + scrollOffsets.y;
+  // const scrollOffsets: Coords = getCurrentScrollOffset();
+  const xVisibility: boolean = (position.x >= 0) && (position.x + elementData.width) <= getViewportWidth();
+  const yVisibility: boolean = (position.y >= 0) && (position.y + elementData.height) <= getViewportHeight();
 
   return xVisibility && yVisibility;
 }
@@ -102,14 +100,14 @@ function getCenterCoords(element?: HTMLElement): Coords {
   const elementData: ClientRect = element && element.getBoundingClientRect();
   const xOffset: number = element && elementData ? elementData.width / 2 : 0;
   const yOffset: number = element && elementData ? elementData.height / 2 : 0;
-  return addScrollOffset({
+  return{
     x: (getViewportWidth() / 2) - xOffset,
     y: (getViewportHeight() / 2) - yOffset
-  })
+  }
 }
 
 function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean, padding?: number): void {
-  const el: Coords = getElementCoords(element, false);
+  const el: Coords = getElementCoords(element);
   const elementData: ClientRect = element.getBoundingClientRect();
   let xOffset: number = 0;
   let yOffset: number = 0;
@@ -138,7 +136,7 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
     return;
   }
 
-  const coords: Coords = getElementCoords(target, true);
+  const coords: Coords = getElementCoords(target);
   const centerX: number = coords.x - ((tooltipData.width - targetData.width) / 2);
   const centerY: number = coords.y - ((tooltipData.height - targetData.height) / 2);
   const eastOffset: number = coords.x + targetData.width + padding + tooltipDistance;
@@ -235,7 +233,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     }
   }
 
-  const bestPosition: Coords = addParentOffset(choosePosBasedOnPreferences(), offsetParent);
+  const bestPosition: Coords = addAppropriateOffset(choosePosBasedOnPreferences(), offsetParent);
 
   if (isElementInView(target) && isElementInView(tooltip, bestPosition)) {
     return bestPosition;
