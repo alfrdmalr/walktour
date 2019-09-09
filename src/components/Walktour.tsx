@@ -3,6 +3,7 @@ import { defaultStyles, WalktourStyles } from '../defaultstyles';
 import { Coords, getTooltipPosition, CardinalOrientation } from '../positioning'
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
+import * as ReactDOM from 'react-dom';
 
 export interface WalktourLogic {
   next: () => void;
@@ -179,7 +180,7 @@ export const Walktour = (props: WalktourProps) => {
     zIndex: zIndex
   }
 
-  return (<>
+  return ReactDOM.createPortal(<>
     <Mask
       target={target}
       disableMaskInteraction={disableMaskInteraction}
@@ -201,5 +202,6 @@ export const Walktour = (props: WalktourProps) => {
         />
       }
     </div>
-  </>)
+  </>, 
+  document.body)
 }
