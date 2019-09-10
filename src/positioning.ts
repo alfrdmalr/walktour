@@ -58,6 +58,14 @@ function getCurrentScrollOffset(): Coords {
   }
 }
 
+function addScrollOffset(coords: Coords): Coords {
+  const curOffset: Coords = getCurrentScrollOffset();
+  return {
+    x: coords.x + curOffset.x,
+    y: coords.y + curOffset.y
+  }
+}
+
 export function addAppropriateOffset(coords: Coords, offsetParent: Element) {
   if (offsetParent && offsetParent !== document.body ) { 
     const parentData: ClientRect = offsetParent.getBoundingClientRect();
@@ -66,16 +74,9 @@ export function addAppropriateOffset(coords: Coords, offsetParent: Element) {
       y: coords.y - parentData.top
     }
   } else {
-    const curOffset = getCurrentScrollOffset();
-
-    return{
-      x: coords.x + curOffset.x,
-      y: coords.y + curOffset.y
-    };
+    return addScrollOffset(coords);
   }
 }
-
-
 
 export function getElementCoords(element: HTMLElement): Coords {
   const elementData: ClientRect = element.getBoundingClientRect();
@@ -89,7 +90,6 @@ export function getElementCoords(element: HTMLElement): Coords {
 function isElementInView(element: HTMLElement, atPosition?: Coords): boolean {
   const position: Coords = atPosition || getElementCoords(element);
   const elementData: ClientRect = element.getBoundingClientRect();
-  // const scrollOffsets: Coords = getCurrentScrollOffset();
   const xVisibility: boolean = (position.x >= 0) && (position.x + elementData.width) <= getViewportWidth();
   const yVisibility: boolean = (position.y >= 0) && (position.y + elementData.height) <= getViewportHeight();
 
@@ -107,7 +107,7 @@ function getCenterCoords(element?: HTMLElement): Coords {
 }
 
 function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean, padding?: number): void {
-  const el: Coords = getElementCoords(element);
+  const coords: Coords = getElementCoords(element);
   const elementData: ClientRect = element.getBoundingClientRect();
   let xOffset: number = 0;
   let yOffset: number = 0;
@@ -120,9 +120,10 @@ function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean
     yOffset = padding;
   }
 
-  window.scrollTo({
-    top: el.y - yOffset,
-    left: el.x - xOffset,
+
+  window.scrollBy({
+    top: coords.y - yOffset,
+    left: coords.x - xOffset,
     behavior: 'smooth'
   })
 }
@@ -233,12 +234,13 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     }
   }
 
-  const bestPosition: Coords = addAppropriateOffset(choosePosBasedOnPreferences(), offsetParent);
+  const rawPosition: Coords = choosePosBasedOnPreferences(); //position relative to current viewport
+  const adjustedPosition: Coords = addAppropriateOffset(rawPosition, offsetParent);
 
-  if (isElementInView(target) && isElementInView(tooltip, bestPosition)) {
-    return bestPosition;
+  if (isElementInView(target) && isElementInView(tooltip, rawPosition)) {
+    return adjustedPosition;
   } else {
     scrollToElement(target, true);
-    return bestPosition;
+    return adjustedPosition;
   }
 }
