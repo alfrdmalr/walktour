@@ -109,7 +109,7 @@ export const Walktour = (props: WalktourProps) => {
     setOffsetParent(offsetParent);
     setTooltipPosition(getTooltipPosition({
       target,
-      tooltip,
+      tooltip: tooltip.firstElementChild as HTMLElement || tooltip,
       padding: maskPadding,
       tooltipSeparation,
       orientationPreferences,
