@@ -37,60 +37,7 @@ export function Mask(props: MaskProps): JSX.Element {
         pointerEvents: disableMaskInteraction ? 'auto' : 'none',
         zIndex: zIndex
       }}
-    >
-
-      <div 
-        style={{
-          cursor: 'default',
-          position: 'absolute',
-          right: targetData.width + (padding * 2),
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto'
-        }}
-      />
-
-      <div 
-        style={{
-          cursor: 'default',
-          position: 'absolute',
-          left: targetData.width + (padding * 2),
-          bottom: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto'
-        }}
-      />
-
-      <div
-        style={{
-          cursor: 'default',
-          position: 'absolute',
-          top: targetData.height + (padding * 2),
-          width: '100vw',
-          height: '100vh',
-          margin: '0 auto',
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto'
-        }}
-      />
-
-      <div 
-        style={{
-          cursor: 'default',
-          position: 'absolute',
-          bottom: targetData.height + (padding * 2),
-          right: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto'
-        }}
-      />
-
-    </div>
+    />
   </>
   );
 }
