@@ -27,7 +27,7 @@ export function Mask(props: MaskProps): JSX.Element {
         left: coords.x - padding,
         height: targetData.height + (padding * 2),
         width: targetData.width + (padding * 2),
-        boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
+        boxShadow: '0 0 0 9999px rgb(0,0,0,0.3)',
         borderRadius: roundedCutout ? '5px' : 0,
         pointerEvents: disableMaskInteraction ? 'auto' : 'none',
         zIndex: zIndex
