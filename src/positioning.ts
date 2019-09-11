@@ -120,13 +120,12 @@ function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean
     yOffset = padding;
   }
 
-  console.log(`scrolling to ${coords.x - xOffset}, ${coords.y - yOffset}`)
+  console.log(`scrolling by ${coords.x - xOffset}, ${coords.y - yOffset}`)
   window.scrollBy({
     top: coords.y - yOffset,
     left: coords.x - xOffset,
     behavior: 'smooth'
   })
-  // window.scrollBy(coords.x - xOffset, coords.y - yOffset)
   console.log('scrolled')
 }
 
