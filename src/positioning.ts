@@ -223,7 +223,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     return getCenterCoords(tooltip);
   }
 
-  const choosePosBasedOnPreferences = (): Coords => {
+  const choosePositionFromPreferences = (): Coords => {
     const candidates: CardinalCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipSeparation, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
       return chooseBestPosition(candidates, reducer);
@@ -233,7 +233,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     }
   }
 
-  const bestPosition: Coords = addAppropriateOffset(choosePosBasedOnPreferences(), offsetParent);
+  const bestPosition: Coords = addAppropriateOffset(choosePositionFromPreferences(), offsetParent);
 
   if (isElementInView(target) && isElementInView(tooltip, bestPosition)) {
     return bestPosition;
