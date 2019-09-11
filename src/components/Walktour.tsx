@@ -202,6 +202,5 @@ export const Walktour = (props: WalktourProps) => {
         />
       }
     </div>
-  </>, 
-  document.body)
+  </>, document.body)
 }

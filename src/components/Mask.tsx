@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Coords, getElementCoords, addAppropriateOffset } from "../positioning";
+import * as ReactDOM from 'react-dom';
 
 interface MaskProps {
   target: HTMLElement;
@@ -32,65 +33,22 @@ export function Mask(props: MaskProps): JSX.Element {
         left: left,
         height: targetData.height + (padding * 2),
         width: targetData.width + (padding * 2),
-        boxShadow: '0 0 0 9999px rgb(0,0,0,0.6)',
+        boxShadow: '0 0 0 9999px rgb(0,0,0,0.3)',
         borderRadius: roundedCutout ? '5px' : 0,
         pointerEvents: disableMaskInteraction ? 'auto' : 'none',
         zIndex: zIndex
       }}
-    >
-
-      <div 
-        style={{
-          cursor: 'default',
-          position: 'absolute',
-          right: targetData.width + (padding * 2),
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto'
-        }}
-      />
-
-      <div 
-        style={{
-          cursor: 'default',
-          position: 'absolute',
-          left: targetData.width + (padding * 2),
-          bottom: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto'
-        }}
-      />
-
-      <div
-        style={{
-          cursor: 'default',
-          position: 'absolute',
-          top: targetData.height + (padding * 2),
-          width: '100vw',
-          height: '100vh',
-          margin: '0 auto',
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto'
-        }}
-      />
-
-      <div 
-        style={{
-          cursor: 'default',
-          position: 'absolute',
-          bottom: targetData.height + (padding * 2),
-          right: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto'
-        }}
-      />
-
-    </div>
-  </>
+    />
+    <div style={{
+      position: 'absolute',
+      backgroundColor: 'rgba(0, 0, 255, 0.3)',
+      top: 0,
+      left: 0,
+      height: '100%',
+      width: '100%',
+      clipPath: `polygon(0% 0%, 0% 100%, ${left}px 100%, ${left}px ${top}px, ${right}px ${top}px, ${right}px ${bottom}px, ${left}px ${bottom}px, ${left}px 100%, 100% 100%, 100% 0%)`,
+    }}
+    />
+    </>
   );
 }
