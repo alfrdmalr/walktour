@@ -27,9 +27,6 @@ const containerStyle: React.CSSProperties = {
   position: 'absolute',
   left: 50,
   top: 50,
-  width: '100%',
-  height: 2000,
-  margin: '40px'
 }
 
 const styleElementOne: React.CSSProperties = {
@@ -125,13 +122,11 @@ const App = () => (
 
 ReactDOM.render(<App />, document.getElementById('app'))
 
-
-
 interface CustomTooltipProps {
   close: () => void;
   description: string;
-  title: string;
 }
+
 function CustomTooltip(props: CustomTooltipProps) {
   const style: React.CSSProperties ={
     backgroundColor: 'darkslategrey',
