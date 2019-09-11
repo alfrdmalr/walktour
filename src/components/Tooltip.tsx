@@ -39,7 +39,7 @@ export function Tooltip(props: TooltipProps) {
     <div style={tooltipStyle}>
       {customTitleRenderer
         ? customTitleRenderer(title, props)
-        : (
+        : (title &&
           <div style={styles.title}>
             {title}
           </div>

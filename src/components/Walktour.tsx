@@ -31,7 +31,7 @@ export interface WalktourOptions {
 
 export interface Step extends WalktourOptions {
   querySelector: string;
-  title: string;
+  title?: string;
   description: string;
   customTitleRenderer?: (title?: string, tourLogic?: WalktourLogic) => JSX.Element;
   customDescriptionRenderer?: (description: string, tourLogic?: WalktourLogic) => JSX.Element;
