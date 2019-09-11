@@ -107,7 +107,7 @@ function getCenterCoords(element?: HTMLElement): Coords {
 }
 
 function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean, padding?: number): void {
-  const coords: Coords = getElementCoords(element);
+  const coords: Coords = addScrollOffset(getElementCoords(element));
   const elementData: ClientRect = element.getBoundingClientRect();
   let xOffset: number = 0;
   let yOffset: number = 0;
@@ -121,7 +121,7 @@ function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean
   }
 
 
-  window.scrollBy({
+  window.scrollTo({
     top: coords.y - yOffset,
     left: coords.x - xOffset,
     behavior: 'smooth'
