@@ -28,8 +28,6 @@ const containerStyle: React.CSSProperties = {
   left: 50,
   top: 50,
   width: '100%',
-  height: 2000,
-  margin: '40px'
 }
 
 const styleElementOne: React.CSSProperties = {
@@ -112,7 +110,7 @@ const App = () => (
       style={styleElementFive} id="five"
       onClick={() => alert('Button has been clicked.')}
     >
-      Interact with me!
+      Try Clicking Me!
     </button>
     <div id='six' style={styleElementSix} />
     <div id='seven' style={styleElementSeven} />
