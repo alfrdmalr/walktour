@@ -46,25 +46,14 @@ function dist(a: Coords, b: Coords): number {
 
 function getViewportHeight() {
   return tourRoot.clientHeight;
-  // if (tourRoot.isSameNode(document.body)) {
-  //   return document.documentElement.clientHeight;
-  // } else {
-  //   return tourRoot.clientHeight;
-  // }
-  // return Math.max(document.documentElement.clientHeight, window.innerHeight);
 }
 
 function getViewportWidth() {
-  // return Math.max(document.documentElement.clientWidth, window.innerWidth);
   return tourRoot.clientWidth;
 }
 
 
 function getCurrentScrollOffset(): Coords {
-  // return {
-  //   x: document.documentElement.scrollLeft || window.pageXOffset,
-  //   y: document.documentElement.scrollTop || window.pageYOffset
-  // }
   //use documentElement instead of body for scroll-related purposes 
   if (document.body.isSameNode(tourRoot)) {
     return {
@@ -105,7 +94,6 @@ export function getElementCoords(element: Element): Coords {
 
   return coords;
 }
-
 
 function isElementInView(element: HTMLElement, atPosition?: Coords): boolean {
   const position: Coords = atPosition || getElementCoords(element);
@@ -261,13 +249,14 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     }
   }
 
-  const bestPosition: Coords = addAppropriateOffset(choosePositionFromPreferences());
+  const rawPosition: Coords = choosePositionFromPreferences(); //position relative to current viewport
+  const adjustedPosition: Coords = addAppropriateOffset(rawPosition);
 
-  if (isElementInView(target) && isElementInView(tooltip, bestPosition)) {
-    return bestPosition;
+  if (isElementInView(target) && isElementInView(tooltip, rawPosition)) {
+    return adjustedPosition;
   } else {
     scrollToElement(target, true);
-    return bestPosition;
+    return adjustedPosition;
   }
 }
 

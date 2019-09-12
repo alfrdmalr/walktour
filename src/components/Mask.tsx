@@ -11,20 +11,25 @@ interface MaskProps {
 }
 
 export function Mask(props: MaskProps): JSX.Element {
-  const {target, disableMaskInteraction, padding, roundedCutout, offsetParent, zIndex} = {roundedCutout: true, ...props};
+  const { target, disableMaskInteraction, padding, roundedCutout, offsetParent, zIndex } = { roundedCutout: true, ...props };
   if (!target) {
     return null;
   }
-  
+
   const targetData: ClientRect = target.getBoundingClientRect();
   const coords: Coords = addAppropriateOffset(getElementCoords(target), offsetParent);
-  
-  return (
+
+  const top: number = coords.y - padding;
+  const left: number = coords.x - padding;
+  const right: number = coords.x + targetData.width + padding;
+  const bottom: number = coords.y + targetData.height + padding;
+
+  return (<>
     <div
       style={{
         position: 'absolute',
-        top: coords.y - padding,
-        left: coords.x - padding,
+        top: top,
+        left: left,
         height: targetData.height + (padding * 2),
         width: targetData.width + (padding * 2),
         boxShadow: '0 0 0 9999px rgb(0,0,0,0.3)',
@@ -32,7 +37,7 @@ export function Mask(props: MaskProps): JSX.Element {
         pointerEvents: disableMaskInteraction ? 'auto' : 'none',
         zIndex: zIndex
       }}
-    >
-    </div>
+    />
+  </>
   );
 }

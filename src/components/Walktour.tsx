@@ -113,7 +113,7 @@ export const Walktour = (props: WalktourProps) => {
     setTooltipPosition(
       getTooltipPosition({
         target,
-        tooltip,
+        tooltip: tooltip.firstElementChild as HTMLElement || tooltip,
         padding: maskPadding,
         tooltipSeparation,
         orientationPreferences,
