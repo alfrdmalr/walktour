@@ -58,6 +58,8 @@ const walktourDefaultProps: Partial<WalktourProps> = {
   zIndex: 9999
 }
 
+export let globalTourRoot: Element = document.body;
+
 export const Walktour = (props: WalktourProps) => {
 
   const {
@@ -69,7 +71,7 @@ export const Walktour = (props: WalktourProps) => {
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
-  const [tourRoot, setTourRoot] = React.useState<Element>(document.body)
+  const [tourRoot, setTourRoot] = React.useState<Element>(undefined)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent: Step = steps[currentStepIndex];
 
@@ -96,9 +98,12 @@ export const Walktour = (props: WalktourProps) => {
     goToStep(currentStepIndex)
 
     //TODO from props
-    //zowe flag? ref?
-    const tourRoot: Element = document.getElementById('demo-container');
-    // tourRoot && setTourRoot(tourRoot);
+    const portal: Element = document.getElementById('walktour-portal');
+    if (portal) {
+     const root: Element = getNearestScrollAncestor(portal);
+      globalTourRoot = root; 
+    }
+    setTourRoot(globalTourRoot); 
   }, []);
 
   React.useEffect(() => {
@@ -117,7 +122,6 @@ export const Walktour = (props: WalktourProps) => {
         padding: maskPadding,
         tooltipSeparation,
         orientationPreferences,
-        rootElement: tourRoot
       })
     );
 
@@ -181,17 +185,16 @@ export const Walktour = (props: WalktourProps) => {
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
     visibility: tooltipPosition ? 'visible' : 'hidden',
-    zIndex: zIndex
   }
 
-  return ReactDOM.createPortal(<div id="walktour-portal" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-    {/* <Mask
+  const render = () => (<div id="walktour-portal" style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
+    <Mask
       target={target}
       disableMaskInteraction={disableMaskInteraction}
       padding={maskPadding}
-      offsetParent={tourRoot}
+      tourRoot={tourRoot}
       zIndex={zIndex}
-    /> */}
+    />
 
     <div id="walktour-tooltip-container" style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
       {customTooltipRenderer
@@ -206,5 +209,36 @@ export const Walktour = (props: WalktourProps) => {
         />
       }
     </div>
-  </div>, tourRoot)
+  </div>)
+
+  if (tourRoot) {
+    return ReactDOM.createPortal(render(), tourRoot);
+  } else {
+    return render();
+  }
+}
+
+//https://gist.github.com/gre/296291b8ce0d8fe6e1c3ea4f1d1c5c3b
+function getNearestScrollAncestor(element: Element): Element {
+  const regex = /(auto|scroll)/;
+
+  const style = (el: Element, prop: string) =>
+    getComputedStyle(el, null).getPropertyValue(prop);
+
+  const scroll = (el: Element) =>
+    regex.test(
+      style(el, "overflow") +
+      style(el, "overflow-y") +
+      style(el, "overflow-x"));
+
+
+  if (!element || element.isSameNode(document.body)) {
+    return document.body;
+  } else {
+    if (scroll(element)) {
+      return element;
+    } else {
+      return getNearestScrollAncestor(element.parentElement)
+    }
+  }
 }

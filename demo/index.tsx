@@ -24,14 +24,13 @@ const steps: Step[] = [
 ]
 
 const containerStyle: React.CSSProperties = {
-  // position: 'absolute',
-  // left: 50,
-  // top: 50,
-  // height: 600,
-  // width: 600,
-  // overflow: 'scroll',
-  // padding: '2rem'
-
+  position: 'absolute',
+  left: 50,
+  top: 50,
+  height: 600,
+  width: 600,
+  overflow: 'scroll',
+  padding: '2rem'
 }
 
 const styleElementOne: React.CSSProperties = {
