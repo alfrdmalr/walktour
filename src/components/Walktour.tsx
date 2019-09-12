@@ -3,6 +3,7 @@ import { defaultStyles, WalktourStyles } from '../defaultstyles';
 import { Coords, getTooltipPosition, CardinalOrientation } from '../positioning'
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
+import * as ReactDOM from 'react-dom';
 
 export interface WalktourLogic {
   next: () => void;
@@ -68,7 +69,7 @@ export const Walktour = (props: WalktourProps) => {
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
-  const [offsetParent, setOffsetParent] = React.useState<Element>(undefined);
+  const [tourRoot, setTourRoot] = React.useState<Element>(document.body)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent: Step = steps[currentStepIndex];
 
@@ -93,6 +94,11 @@ export const Walktour = (props: WalktourProps) => {
 
   React.useEffect(() => {
     goToStep(currentStepIndex)
+
+    //TODO from props
+    //zowe flag? ref?
+    const tourRoot: Element = document.getElementById('demo-container');
+    // tourRoot && setTourRoot(tourRoot);
   }, []);
 
   React.useEffect(() => {
@@ -100,24 +106,23 @@ export const Walktour = (props: WalktourProps) => {
       return;
     }
 
-    const target: HTMLElement = document.querySelector(steps[currentStepIndex].querySelector);    
+    const target: HTMLElement = document.querySelector(steps[currentStepIndex].querySelector);
     const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
-    const offsetParent: Element = tooltip.offsetParent;
 
     setTarget(target);
-    setOffsetParent(offsetParent);
-    setTooltipPosition(getTooltipPosition({
-      target,
-      tooltip,
-      padding: maskPadding,
-      tooltipSeparation,
-      orientationPreferences,
-      offsetParent
-    }));
+    setTooltipPosition(
+      getTooltipPosition({
+        target,
+        tooltip,
+        padding: maskPadding,
+        tooltipSeparation,
+        orientationPreferences,
+        rootElement: tourRoot
+      })
+    );
 
     tooltip && tooltip.focus();
-
-  }, [currentStepIndex])
+  }, [currentStepIndex, tourRoot])
 
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= steps.length || stepIndex < 0) {
@@ -179,14 +184,14 @@ export const Walktour = (props: WalktourProps) => {
     zIndex: zIndex
   }
 
-  return (<>
-    <Mask
+  return ReactDOM.createPortal(<div id="walktour-portal" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+    {/* <Mask
       target={target}
       disableMaskInteraction={disableMaskInteraction}
       padding={maskPadding}
-      offsetParent={offsetParent}
+      offsetParent={tourRoot}
       zIndex={zIndex}
-    />
+    /> */}
 
     <div id="walktour-tooltip-container" style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
       {customTooltipRenderer
@@ -201,5 +206,5 @@ export const Walktour = (props: WalktourProps) => {
         />
       }
     </div>
-  </>)
+  </div>, tourRoot)
 }

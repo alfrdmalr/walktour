@@ -24,9 +24,14 @@ const steps: Step[] = [
 ]
 
 const containerStyle: React.CSSProperties = {
-  position: 'absolute',
-  left: 50,
-  top: 50,
+  // position: 'absolute',
+  // left: 50,
+  // top: 50,
+  // height: 600,
+  // width: 600,
+  // overflow: 'scroll',
+  // padding: '2rem'
+
 }
 
 const styleElementOne: React.CSSProperties = {
@@ -100,7 +105,7 @@ const styleElementEight: React.CSSProperties = {
 
 
 const App = () => (
-  <div style={containerStyle}>
+  <div style={containerStyle} id="demo-container">
     <div id={'one'} style={styleElementOne} />
     <div id={'two'} style={styleElementTwo} />
     <div id={'three'} style={styleElementThree} />

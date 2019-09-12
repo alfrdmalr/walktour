@@ -31,8 +31,10 @@ interface GetTooltipPositionArgs {
   tooltipSeparation: number;
   orientationPreferences?: CardinalOrientation[];
   positionCandidateReducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords;
-  offsetParent?: Element;
+  rootElement?: Element;
 }
+
+let tourRoot: Element = document.body;
 
 //helpers
 
@@ -43,53 +45,71 @@ function dist(a: Coords, b: Coords): number {
 }
 
 function getViewportHeight() {
-  return Math.max(document.documentElement.clientHeight, window.innerHeight);
+  return tourRoot.clientHeight;
+  // if (tourRoot.isSameNode(document.body)) {
+  //   return document.documentElement.clientHeight;
+  // } else {
+  //   return tourRoot.clientHeight;
+  // }
+  // return Math.max(document.documentElement.clientHeight, window.innerHeight);
 }
 
 function getViewportWidth() {
-  return Math.max(document.documentElement.clientWidth, window.innerWidth);
+  // return Math.max(document.documentElement.clientWidth, window.innerWidth);
+  return tourRoot.clientWidth;
 }
 
 
 function getCurrentScrollOffset(): Coords {
-  return {
-    x: document.documentElement.scrollLeft || window.pageXOffset,
-    y: document.documentElement.scrollTop || window.pageYOffset
-  }
-}
-
-export function addAppropriateOffset(coords: Coords, offsetParent: Element) {
-  if (offsetParent && offsetParent !== document.body ) { 
-    const parentData: ClientRect = offsetParent.getBoundingClientRect();
+  // return {
+  //   x: document.documentElement.scrollLeft || window.pageXOffset,
+  //   y: document.documentElement.scrollTop || window.pageYOffset
+  // }
+  //use documentElement instead of body for scroll-related purposes 
+  if (document.body.isSameNode(tourRoot)) {
     return {
-      x: coords.x - parentData.left,
-      y: coords.y - parentData.top
+      x: document.documentElement.scrollLeft,
+      y: document.documentElement.scrollTop
     }
   } else {
-    const curOffset = getCurrentScrollOffset();
-
-    return{
-      x: coords.x + curOffset.x,
-      y: coords.y + curOffset.y
-    };
+    return {
+      x: tourRoot.scrollLeft,
+      y: tourRoot.scrollTop
+    }
   }
 }
 
+function addScrollOffset(coords: Coords) {
+  const curOffset: Coords = getCurrentScrollOffset();
+  return {
+    x: coords.x + curOffset.x,
+    y: coords.y + curOffset.y
+  }
+}
 
+export function addAppropriateOffset(coords: Coords) {
+  if (!document.body.isSameNode(tourRoot)) {
+    const rootCoords: Coords = getElementCoords(tourRoot);
+    return addScrollOffset({
+      x: coords.x - rootCoords.x,
+      y: coords.y - rootCoords.y
+    })
+  } else {
+    return addScrollOffset(coords);
+  }
+}
 
-export function getElementCoords(element: HTMLElement): Coords {
+export function getElementCoords(element: Element): Coords {
   const elementData: ClientRect = element.getBoundingClientRect();
-  let coords: Coords = {x: elementData.left, y: elementData.top}
+  let coords: Coords = { x: elementData.left, y: elementData.top }
 
   return coords;
 }
 
 
-// the (optionally) specified position may already be adjusted for scroll, so just to be safe we adjust everything else
 function isElementInView(element: HTMLElement, atPosition?: Coords): boolean {
   const position: Coords = atPosition || getElementCoords(element);
   const elementData: ClientRect = element.getBoundingClientRect();
-  // const scrollOffsets: Coords = getCurrentScrollOffset();
   const xVisibility: boolean = (position.x >= 0) && (position.x + elementData.width) <= getViewportWidth();
   const yVisibility: boolean = (position.y >= 0) && (position.y + elementData.height) <= getViewportHeight();
 
@@ -100,14 +120,14 @@ function getCenterCoords(element?: HTMLElement): Coords {
   const elementData: ClientRect = element && element.getBoundingClientRect();
   const xOffset: number = element && elementData ? elementData.width / 2 : 0;
   const yOffset: number = element && elementData ? elementData.height / 2 : 0;
-  return{
+  return {
     x: (getViewportWidth() / 2) - xOffset,
     y: (getViewportHeight() / 2) - yOffset
   }
 }
 
 function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean, padding?: number): void {
-  const el: Coords = getElementCoords(element);
+  const el: Coords = addAppropriateOffset(getElementCoords(element));
   const elementData: ClientRect = element.getBoundingClientRect();
   let xOffset: number = 0;
   let yOffset: number = 0;
@@ -120,11 +140,19 @@ function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean
     yOffset = padding;
   }
 
-  window.scrollTo({
-    top: el.y - yOffset,
+  const scrollOptions: ScrollToOptions = {
+    top: el.y - yOffset, 
     left: el.x - xOffset,
     behavior: 'smooth'
-  })
+  }
+
+  //use documentElement instead of body for scrolling related calls
+  if (document.body.isSameNode(tourRoot)) {
+    document.documentElement.scrollTo(scrollOptions)
+  } else {
+    tourRoot.scrollTo(scrollOptions);
+  }
+
 }
 
 //tooltip positioning logic
@@ -215,8 +243,8 @@ function chooseBestPosition(candidates: CardinalCoords[],
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer: reducer, offsetParent } = args;
-
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer: reducer, rootElement } = args;
+  tourRoot = rootElement;
   if (!tooltip) {
     return;
   } else if (!target) {
@@ -233,7 +261,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     }
   }
 
-  const bestPosition: Coords = addAppropriateOffset(choosePositionFromPreferences(), offsetParent);
+  const bestPosition: Coords = addAppropriateOffset(choosePositionFromPreferences());
 
   if (isElementInView(target) && isElementInView(tooltip, bestPosition)) {
     return bestPosition;
@@ -241,4 +269,8 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     scrollToElement(target, true);
     return bestPosition;
   }
+}
+
+export function getMaskPosition(args: any) {
+
 }
