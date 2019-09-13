@@ -17,6 +17,7 @@ export interface WalktourLogic {
 
 export interface WalktourOptions {
   disableMaskInteraction?: boolean;
+  disableCloseOnClick?: boolean;
   orientationPreferences?: CardinalOrientation[];
   maskPadding?: number;
   tooltipSeparation?: number;
@@ -56,6 +57,7 @@ const walktourDefaultProps: Partial<WalktourProps> = {
   tooltipSeparation: 10,
   transition: 'top 200ms ease, left 200ms ease',
   disableMaskInteraction: false,
+  disableCloseOnClick: false,
   zIndex: 9999
 }
 
@@ -86,6 +88,7 @@ export const Walktour = (props: WalktourProps) => {
     styles,
     maskPadding,
     disableMaskInteraction,
+    disableCloseOnClick,
     tooltipSeparation,
     tooltipWidth,
     transition,
@@ -201,9 +204,10 @@ export const Walktour = (props: WalktourProps) => {
     <Mask
       target={target}
       disableMaskInteraction={disableMaskInteraction}
+      disableCloseOnClick={disableCloseOnClick}
       padding={maskPadding}
       tourRoot={tourRoot}
-      zIndex={zIndex}
+      close={tourLogic.close}
     />
 
     <div id={`${baseTooltipString}`} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>

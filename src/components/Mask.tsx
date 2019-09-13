@@ -4,16 +4,18 @@ import { Coords, getMaskPosition } from "../positioning";
 interface MaskProps {
   target: HTMLElement;
   padding: number;
+  close: () => void;
+  tourRoot: Element;
   disableMaskInteraction?: boolean;
   disableCloseOnClick?: boolean;
-  tourRoot: Element;
 }
 
 export function Mask(props: MaskProps): JSX.Element {
-  const { target, disableMaskInteraction, padding, tourRoot } = props;
+  const { target, disableMaskInteraction, padding, tourRoot, close, disableCloseOnClick } = props;
 
   const containerBottom: number = (tourRoot && !document.body.isSameNode(tourRoot)) ? tourRoot.scrollHeight : document.documentElement.scrollHeight;
   const containerRight: number = (tourRoot && !document.body.isSameNode(tourRoot)) ? tourRoot.scrollWidth : document.documentElement.scrollWidth;
+
   let maskStyle: React.CSSProperties = {
     position: 'absolute',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
@@ -40,7 +42,7 @@ export function Mask(props: MaskProps): JSX.Element {
     clipPath: `polygon(0px 0px, 0px ${containerBottom}px, ${cutoutLeft}px ${containerBottom}px, ${cutoutLeft}px ${cutoutTop}px, ${cutoutRight}px ${cutoutTop}px, ${cutoutRight}px ${cutoutBottom}px, ${cutoutLeft}px ${cutoutBottom}px, ${cutoutLeft}px ${containerBottom}px, ${containerRight}px ${containerBottom}px, ${containerRight}px 0px)`,
   }
 
-  //cover the cutout to prevent interaction
+  //cover the cutout to prevent interaction. we keep cutout to retain highlight appearance
   const blockInteractionStyle: React.CSSProperties = {
     position: 'absolute',
     pointerEvents: 'auto',
@@ -51,8 +53,7 @@ export function Mask(props: MaskProps): JSX.Element {
   }
 
   return (<>
-
-    <div style={{ ...maskStyle, ...cutoutStyle }}>
+    <div style={{ ...maskStyle, ...cutoutStyle }} onClick={disableCloseOnClick ? null : close}>
       {disableMaskInteraction &&
         <div style={blockInteractionStyle} />}
     </div>
