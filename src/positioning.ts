@@ -151,7 +151,30 @@ function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean
   } else {
     globalTourRoot.scrollTo(scrollOptions);
   }
+}
 
+//https://gist.github.com/gre/296291b8ce0d8fe6e1c3ea4f1d1c5c3b
+export function getNearestScrollAncestor(element: Element): Element {
+  const regex = /(auto|scroll)/;
+
+  const style = (el: Element, prop: string) =>
+    getComputedStyle(el, null).getPropertyValue(prop);
+
+  const scroll = (el: Element) =>
+    regex.test(
+      style(el, "overflow") +
+      style(el, "overflow-y") +
+      style(el, "overflow-x"));
+
+  if (!element || element.isSameNode(document.body)) {
+    return document.body;
+  } else {
+    if (scroll(element)) {
+      return element;
+    } else {
+      return getNearestScrollAncestor(element.parentElement)
+    }
+  }
 }
 
 //tooltip positioning logic

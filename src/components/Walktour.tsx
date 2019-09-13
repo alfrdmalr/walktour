@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { defaultStyles, WalktourStyles } from '../defaultstyles';
-import { Coords, getTooltipPosition, CardinalOrientation } from '../positioning'
+import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor } from '../positioning'
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import * as ReactDOM from 'react-dom';
@@ -185,6 +185,7 @@ export const Walktour = (props: WalktourProps) => {
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
     visibility: tooltipPosition ? 'visible' : 'hidden',
+    width: tooltipWidth
   }
 
   const render = () => (<div id="walktour-portal" style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
@@ -205,7 +206,6 @@ export const Walktour = (props: WalktourProps) => {
           prevLabel={prevLabel}
           skipLabel={skipLabel}
           styles={styles}
-          width={tooltipWidth}
         />
       }
     </div>
@@ -215,30 +215,5 @@ export const Walktour = (props: WalktourProps) => {
     return ReactDOM.createPortal(render(), tourRoot);
   } else {
     return render();
-  }
-}
-
-//https://gist.github.com/gre/296291b8ce0d8fe6e1c3ea4f1d1c5c3b
-function getNearestScrollAncestor(element: Element): Element {
-  const regex = /(auto|scroll)/;
-
-  const style = (el: Element, prop: string) =>
-    getComputedStyle(el, null).getPropertyValue(prop);
-
-  const scroll = (el: Element) =>
-    regex.test(
-      style(el, "overflow") +
-      style(el, "overflow-y") +
-      style(el, "overflow-x"));
-
-
-  if (!element || element.isSameNode(document.body)) {
-    return document.body;
-  } else {
-    if (scroll(element)) {
-      return element;
-    } else {
-      return getNearestScrollAncestor(element.parentElement)
-    }
   }
 }
