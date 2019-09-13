@@ -86,7 +86,7 @@ function addScrollOffset(coords: Coords) {
   }
 }
 
-export function addAppropriateOffset(coords: Coords) {
+function addAppropriateOffset(coords: Coords) {
   if (!document.body.isSameNode(globalTourRoot)) {
     const rootCoords: Coords = getElementCoords(globalTourRoot);
     return addScrollOffset({
@@ -98,7 +98,7 @@ export function addAppropriateOffset(coords: Coords) {
   }
 }
 
-export function getElementCoords(element: Element): Coords {
+function getElementCoords(element: Element): Coords {
   const elementData: ClientRect = element.getBoundingClientRect();
   let coords: Coords = { x: elementData.left, y: elementData.top }
 
@@ -151,7 +151,30 @@ function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean
   } else {
     globalTourRoot.scrollTo(scrollOptions);
   }
+}
 
+//https://gist.github.com/gre/296291b8ce0d8fe6e1c3ea4f1d1c5c3b
+export function getNearestScrollAncestor(element: Element): Element {
+  const regex = /(auto|scroll)/;
+
+  const style = (el: Element, prop: string) =>
+    getComputedStyle(el, null).getPropertyValue(prop);
+
+  const scroll = (el: Element) =>
+    regex.test(
+      style(el, "overflow") +
+      style(el, "overflow-y") +
+      style(el, "overflow-x"));
+
+  if (!element || element.isSameNode(document.body)) {
+    return document.body;
+  } else {
+    if (scroll(element)) {
+      return element;
+    } else {
+      return getNearestScrollAncestor(element.parentElement)
+    }
+  }
 }
 
 //tooltip positioning logic
@@ -271,6 +294,6 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   }
 }
 
-export function getMaskPosition(args: any) {
-
+export function getMaskPosition(target: HTMLElement): Coords {
+  return addAppropriateOffset(getElementCoords(target));
 }

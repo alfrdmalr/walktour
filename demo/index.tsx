@@ -20,7 +20,7 @@ const steps: Step[] = [
   { querySelector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { querySelector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
   { querySelector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
-  { querySelector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />}
+  { querySelector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, orientationPreferences: [CardinalOrientation.EASTSOUTH] }
 ]
 
 const containerStyle: React.CSSProperties = {
@@ -136,7 +136,7 @@ interface CustomTooltipProps {
 }
 
 function CustomTooltip(props: CustomTooltipProps) {
-  const style: React.CSSProperties ={
+  const style: React.CSSProperties = {
     backgroundColor: 'darkslategrey',
     color: 'cornsilk',
     fontFamily: 'Consolas, serif',
@@ -149,7 +149,7 @@ function CustomTooltip(props: CustomTooltipProps) {
 
     <p>They'll have access to the same control functions as the normal tooltip.</p>
 
-    <p>More info about customizability and usage <a style={{color: 'cyan'}}href="http://www.github.com/alfrdmalr/walktour">on Github.</a></p>
+    <p>More info about customizability and usage <a style={{ color: 'cyan' }} href="http://www.github.com/alfrdmalr/walktour">on Github.</a></p>
     <button onClick={props.close}>close</button>
   </div>
 
