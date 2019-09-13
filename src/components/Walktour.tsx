@@ -43,6 +43,7 @@ export interface WalktourProps extends WalktourOptions {
   isVisible: boolean;
   initialStepIndex?: number;
   zIndex?: number;
+  rootSelector?: string;
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
@@ -87,7 +88,8 @@ export const Walktour = (props: WalktourProps) => {
     transition,
     orientationPreferences,
     customTooltipRenderer,
-    zIndex
+    zIndex,
+    rootSelector
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -95,15 +97,19 @@ export const Walktour = (props: WalktourProps) => {
   };
 
   React.useEffect(() => {
-    goToStep(currentStepIndex)
+    goToStep(currentStepIndex);
 
-    //TODO from props
-    const portal: Element = document.getElementById('walktour-portal');
-    if (portal) {
-     const root: Element = getNearestScrollAncestor(portal);
-      globalTourRoot = root; 
+    let root: Element;
+    if (rootSelector) {
+      root = document.querySelector(rootSelector);
     }
-    setTourRoot(globalTourRoot); 
+
+    if (!root) {
+      root = getNearestScrollAncestor(document.getElementById('walktour-portal'));
+    }
+
+    globalTourRoot = root;  
+    setTourRoot(globalTourRoot);
   }, []);
 
   React.useEffect(() => {
@@ -209,7 +215,7 @@ export const Walktour = (props: WalktourProps) => {
         />
       }
     </div>
-  </div>)
+  </div>);
 
   if (tourRoot) {
     return ReactDOM.createPortal(render(), tourRoot);
