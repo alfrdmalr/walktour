@@ -59,7 +59,7 @@ const walktourDefaultProps: Partial<WalktourProps> = {
 }
 
 const basePortalString: string = 'walktour-portal';
-const baseTooltipString: string = 'walktour-tooltip-container';
+const baseTooltipContainerString: string = 'walktour-tooltip-container';
 
 export let globalTourRoot: Element = document.body;
 
@@ -72,8 +72,8 @@ export const Walktour = (props: WalktourProps) => {
   } = props;
 
   const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
-  const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
+  const [tooltip, setTooltip] = React.useState<HTMLElement>(undefined);
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent: Step = steps[currentStepIndex];
@@ -110,7 +110,7 @@ export const Walktour = (props: WalktourProps) => {
       root = getNearestScrollAncestor(document.getElementById(basePortalString));
     }
 
-    globalTourRoot = root;  
+    globalTourRoot = root;
     setTourRoot(globalTourRoot);
   }, []);
 
@@ -120,20 +120,16 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     const target: HTMLElement = document.querySelector(steps[currentStepIndex].querySelector);
-    const tooltip: HTMLElement = document.getElementById(baseTooltipString);
+    const tooltipContainer: HTMLElement = document.getElementById(baseTooltipContainerString);
 
     setTarget(target);
-    setTooltipPosition(
-      getTooltipPosition({
-        target,
-        tooltip: tooltip.firstElementChild as HTMLElement || tooltip, //todo refactor function
-        padding: maskPadding,
-        tooltipSeparation,
-        orientationPreferences,
-      })
-    );
 
-    tooltip && tooltip.focus();
+    if (!tooltipContainer) {
+      return;
+    }
+
+    setTooltip(tooltipContainer.firstElementChild as HTMLElement || tooltip);
+    tooltipContainer.focus();
   }, [currentStepIndex, tourRoot])
 
   const goToStep = (stepIndex: number) => {
@@ -187,6 +183,14 @@ export const Walktour = (props: WalktourProps) => {
     allSteps: steps
   };
 
+  const tooltipPosition: Coords = getTooltipPosition({
+    target, 
+    tooltip, 
+    padding: maskPadding,
+    tooltipSeparation,
+    orientationPreferences,
+  });
+
   const containerStyle: React.CSSProperties = {
     position: 'absolute',
     top: tooltipPosition && tooltipPosition.y,
@@ -206,7 +210,7 @@ export const Walktour = (props: WalktourProps) => {
       close={tourLogic.close}
     />
 
-    <div id={`${baseTooltipString}`} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
+    <div id={`${baseTooltipContainerString}`} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
       {customTooltipRenderer
         ? customTooltipRenderer(tourLogic)
         : <Tooltip
