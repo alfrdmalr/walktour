@@ -86,7 +86,7 @@ function addScrollOffset(coords: Coords) {
   }
 }
 
-export function addAppropriateOffset(coords: Coords) {
+function addAppropriateOffset(coords: Coords) {
   if (!document.body.isSameNode(globalTourRoot)) {
     const rootCoords: Coords = getElementCoords(globalTourRoot);
     return addScrollOffset({
@@ -98,7 +98,7 @@ export function addAppropriateOffset(coords: Coords) {
   }
 }
 
-export function getElementCoords(element: Element): Coords {
+function getElementCoords(element: Element): Coords {
   const elementData: ClientRect = element.getBoundingClientRect();
   let coords: Coords = { x: elementData.left, y: elementData.top }
 
@@ -294,6 +294,6 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   }
 }
 
-export function getMaskPosition(args: any) {
-
+export function getMaskPosition(target: HTMLElement): Coords {
+  return addAppropriateOffset(getElementCoords(target));
 }
