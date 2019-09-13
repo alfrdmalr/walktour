@@ -158,7 +158,7 @@ class App extends Component<> {
 }
 ```
 
-#### Advanced
+#### Toggle
 ```
 import * as React from 'react';
 import { Walktour } from 'walktour';
@@ -199,8 +199,4 @@ class App extends Component<any, {showTour: boolean}> {
       </div>)
   }
 }
-
-#### Custom
-```
-
 ```
