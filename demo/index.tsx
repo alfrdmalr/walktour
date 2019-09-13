@@ -27,10 +27,14 @@ const containerStyle: React.CSSProperties = {
   position: 'absolute',
   left: 50,
   top: 50,
+<<<<<<< HEAD
   height: 600,
   width: 600,
   overflow: 'scroll',
   padding: '2rem'
+=======
+  width: '100%',
+>>>>>>> refactor/mask-rework
 }
 
 const styleElementOne: React.CSSProperties = {
@@ -113,7 +117,7 @@ const App = () => (
       style={styleElementFive} id="five"
       onClick={() => alert('Button has been clicked.')}
     >
-      Interact with me!
+      Try Clicking Me!
     </button>
     <div id='six' style={styleElementSix} />
     <div id='seven' style={styleElementSeven} />

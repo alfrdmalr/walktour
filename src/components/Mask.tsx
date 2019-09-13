@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Coords, getElementCoords, addAppropriateOffset } from "../positioning";
+import * as ReactDOM from 'react-dom';
 
 interface MaskProps {
   target: HTMLElement;
@@ -37,22 +38,7 @@ export function Mask(props: MaskProps): JSX.Element {
       height: containerBottom,
       width: containerRight,
       clipPath: `polygon(0px 0px, 0px ${containerBottom}px, ${cutoutLeft}px ${containerBottom}px, ${cutoutLeft}px ${cutoutTop}px, ${cutoutRight}px ${cutoutTop}px, ${cutoutRight}px ${cutoutBottom}px, ${cutoutLeft}px ${cutoutBottom}px, ${cutoutLeft}px ${containerBottom}px, ${containerRight}px ${containerBottom}px, ${containerRight}px 0px)`,
-    }}
-    />
-      {/* <div
-        style={{
-          position: 'absolute',
-          top: cutoutTop,
-          left: cutoutLeft,
-          height: targetData.height + (padding * 2),
-          width: targetData.width + (padding * 2),
-          boxShadow: '0 0 0 9999px rgb(0,0,0,0.3)',
-          borderRadius: roundedCutout ? '5px' : 0,
-          pointerEvents: disableMaskInteraction ? 'auto' : 'none',
-          zIndex: zIndex
-        }}
-      />
-    </div> */}
+    }} />
   </>
   );
 }
