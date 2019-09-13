@@ -5,7 +5,7 @@ import { Walktour, Step, WalktourLogic } from '../src/components/Walktour'
 import { CardinalOrientation } from '../src/positioning';
 
 const steps: Step[] = [
-  { querySelector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!' },
+  { querySelector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
   { querySelector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
   { querySelector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements' },
   { querySelector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
@@ -20,8 +20,18 @@ const steps: Step[] = [
   { querySelector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { querySelector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
   { querySelector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
-  { querySelector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />}
+  { querySelector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, orientationPreferences: [CardinalOrientation.EASTSOUTH] }
 ]
+
+const containerStyle: React.CSSProperties = {
+  position: 'absolute',
+  left: 50,
+  top: 50,
+  height: 600,
+  width: 600,
+  overflow: 'scroll',
+  padding: '2rem'
+}
 
 const styleElementOne: React.CSSProperties = {
   background: 'grey',
@@ -94,7 +104,7 @@ const styleElementEight: React.CSSProperties = {
 
 
 const App = () => (
-  <div>
+  <div style={containerStyle} id="demo-container">
     <div id={'one'} style={styleElementOne} />
     <div id={'two'} style={styleElementTwo} />
     <div id={'three'} style={styleElementThree} />
@@ -103,7 +113,7 @@ const App = () => (
       style={styleElementFive} id="five"
       onClick={() => alert('Button has been clicked.')}
     >
-      Interact with me!
+      Try Clicking Me!
     </button>
     <div id='six' style={styleElementSix} />
     <div id='seven' style={styleElementSeven} />
@@ -116,15 +126,13 @@ const App = () => (
 
 ReactDOM.render(<App />, document.getElementById('app'))
 
-
-
 interface CustomTooltipProps {
   close: () => void;
   description: string;
-  title: string;
 }
+
 function CustomTooltip(props: CustomTooltipProps) {
-  const style: React.CSSProperties ={
+  const style: React.CSSProperties = {
     backgroundColor: 'darkslategrey',
     color: 'cornsilk',
     fontFamily: 'Consolas, serif',
@@ -137,7 +145,7 @@ function CustomTooltip(props: CustomTooltipProps) {
 
     <p>They'll have access to the same control functions as the normal tooltip.</p>
 
-    <p>More info about customizability and usage <a style={{color: 'cyan'}}href="http://www.github.com/alfrdmalr/walktour">on Github.</a></p>
+    <p>More info about customizability and usage <a style={{ color: 'cyan' }} href="http://www.github.com/alfrdmalr/walktour">on Github.</a></p>
     <button onClick={props.close}>close</button>
   </div>
 

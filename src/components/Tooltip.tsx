@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { WalktourLogic } from './Walktour';
-import { WalktourStyles } from '../defaultstyles';
+import { WalktourStyles, defaultStyles } from '../defaultstyles';
 
 interface TooltipProps extends WalktourLogic {
   nextLabel: string;
   prevLabel: string;
   skipLabel: string;
-  styles: WalktourStyles;
-  width?: number;
+  styles?: WalktourStyles;
 }
 
 export function Tooltip(props: TooltipProps) {
@@ -28,18 +27,20 @@ export function Tooltip(props: TooltipProps) {
     nextLabel,
     prevLabel,
     skipLabel,
-    width
-  } = props;
+  } = {
+    styles: defaultStyles,
+    ...props
+  };
 
   const tooltipStyle: React.CSSProperties = {
     ...styles.tooltip,
-    width: width
   }
+  
   return (
     <div style={tooltipStyle}>
       {customTitleRenderer
         ? customTitleRenderer(title, props)
-        : (
+        : (title &&
           <div style={styles.title}>
             {title}
           </div>
