@@ -28,9 +28,10 @@ And then include it somewhere in your render function:
  | steps | Array<`Step`> | All the `Step` objects defining stops along the tour. |
  | isVisible | boolean | Determines whether the tour is shown. |
  | _initialStepIndex_ | number | Start the tour on a particular step when opened. Default is 0. |
- | ... | [`WalktourOptions`](#options) | Any of the optional [`WalktourOptions`](#options) attributes can be included as props. | 
  | _zIndex_ | number | z-index value to give the tour components. |
  | _rootSelector_ | string | CSS selector string specifying the container element that the tour should be injected into. Only necessary if you want to constrain the scope of the tour and it's masking/scrolling to a particular element which is distinct from where the tour is instantiated. |
+ | ... | [`WalktourOptions`](#options) | Any of the optional [`WalktourOptions`](#options) attributes can be included as props. | 
+ 
 
 ### Step Shape
 Each step of the tour is defined by a `Step` object.
@@ -157,7 +158,7 @@ class App extends Component<> {
 }
 ```
 
-#### Advanced
+#### Toggle
 ```
 import * as React from 'react';
 import { Walktour } from 'walktour';
@@ -198,8 +199,4 @@ class App extends Component<any, {showTour: boolean}> {
       </div>)
   }
 }
-
-#### Custom
-```
-
 ```
