@@ -59,6 +59,9 @@ const walktourDefaultProps: Partial<WalktourProps> = {
   zIndex: 9999
 }
 
+const basePortalString: string = 'walktour-portal';
+const baseTooltipString: string = 'walktour-tooltip-container';
+
 export let globalTourRoot: Element = document.body;
 
 export const Walktour = (props: WalktourProps) => {
@@ -105,7 +108,7 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     if (!root) {
-      root = getNearestScrollAncestor(document.getElementById('walktour-portal'));
+      root = getNearestScrollAncestor(document.getElementById(basePortalString));
     }
 
     globalTourRoot = root;  
@@ -118,7 +121,7 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     const target: HTMLElement = document.querySelector(steps[currentStepIndex].querySelector);
-    const tooltip: HTMLElement = document.getElementById('walktour-tooltip-container');
+    const tooltip: HTMLElement = document.getElementById(baseTooltipString);
 
     setTarget(target);
     setTooltipPosition(
@@ -194,7 +197,7 @@ export const Walktour = (props: WalktourProps) => {
     width: tooltipWidth
   }
 
-  const render = () => (<div id="walktour-portal" style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
+  const render = () => (<div id={`${basePortalString}`} style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
     <Mask
       target={target}
       disableMaskInteraction={disableMaskInteraction}
@@ -203,7 +206,7 @@ export const Walktour = (props: WalktourProps) => {
       zIndex={zIndex}
     />
 
-    <div id="walktour-tooltip-container" style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
+    <div id={`${baseTooltipString}`} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
       {customTooltipRenderer
         ? customTooltipRenderer(tourLogic)
         : <Tooltip
