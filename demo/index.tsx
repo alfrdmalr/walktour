@@ -20,13 +20,20 @@ const steps: Step[] = [
   { querySelector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { querySelector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
   { querySelector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
-  { querySelector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />}
+  { querySelector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} /> },
+  { querySelector: '#demo-container', title: "Encapsulated Tours", description: 'Not only can you have multiple tours on a page...' }
+]
+
+const stepsPartTwo: Step[] = [
+  { querySelector: '#oneTwo', description: '...you can also have scoped tours' },
+  { querySelector: '#twoTwo', description: 'The tour component will automatically find the nearest suitable ancestor to hold it' },
+  { querySelector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component' },
 ]
 
 const containerStyle: React.CSSProperties = {
   position: 'absolute',
-  left: 50,
-  top: 50,
+  left: 1800,
+  top: 1800,
   height: 600,
   width: 600,
   overflow: 'scroll',
@@ -104,7 +111,7 @@ const styleElementEight: React.CSSProperties = {
 
 
 const App = () => (
-  <div style={containerStyle} id="demo-container">
+  <>
     <div id={'one'} style={styleElementOne} />
     <div id={'two'} style={styleElementTwo} />
     <div id={'three'} style={styleElementThree} />
@@ -119,9 +126,16 @@ const App = () => (
     <div id='seven' style={styleElementSeven} />
     <div id='eight' style={styleElementEight} />
 
+    <div style={containerStyle} id="demo-container">
+      <div id='oneTwo' style={styleElementOne} />
+      <div id='twoTwo' style={styleElementTwo} />
+      <div id='threeTwo' style={styleElementThree} />
+
+      <Walktour steps={stepsPartTwo} isVisible />
+    </div>
 
     <Walktour steps={steps} isVisible />
-  </div>
+  </>
 )
 
 ReactDOM.render(<App />, document.getElementById('app'))
@@ -132,7 +146,7 @@ interface CustomTooltipProps {
 }
 
 function CustomTooltip(props: CustomTooltipProps) {
-  const style: React.CSSProperties ={
+  const style: React.CSSProperties = {
     backgroundColor: 'darkslategrey',
     color: 'cornsilk',
     fontFamily: 'Consolas, serif',
@@ -145,7 +159,7 @@ function CustomTooltip(props: CustomTooltipProps) {
 
     <p>They'll have access to the same control functions as the normal tooltip.</p>
 
-    <p>More info about customizability and usage <a style={{color: 'cyan'}}href="http://www.github.com/alfrdmalr/walktour">on Github.</a></p>
+    <p>More info about customizability and usage <a style={{ color: 'cyan' }} href="http://www.github.com/alfrdmalr/walktour">on Github.</a></p>
     <button onClick={props.close}>close</button>
   </div>
 
