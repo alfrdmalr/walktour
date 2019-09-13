@@ -53,7 +53,7 @@ export function Mask(props: MaskProps): JSX.Element {
   }
 
   return (<>
-    <div style={{ ...maskStyle, ...cutoutStyle }} onClick={disableCloseOnClick ? null : close}>
+    <div style={{ ...maskStyle, ...cutoutStyle }} onClick={!disableCloseOnClick && close}>
       {disableMaskInteraction &&
         <div style={blockInteractionStyle} />}
     </div>
