@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { defaultStyles, WalktourStyles } from '../defaultstyles';
 import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor } from '../positioning'
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
@@ -27,7 +26,6 @@ export interface WalktourOptions {
   prevLabel?: string;
   nextLabel?: string;
   skipLabel?: string;
-  styles?: WalktourStyles;
 }
 
 export interface Step extends WalktourOptions {
@@ -51,7 +49,6 @@ const walktourDefaultProps: Partial<WalktourProps> = {
   prevLabel: 'prev',
   nextLabel: 'next',
   skipLabel: 'skip',
-  styles: defaultStyles,
   tooltipWidth: 250,
   maskPadding: 5,
   tooltipSeparation: 10,
@@ -85,7 +82,6 @@ export const Walktour = (props: WalktourProps) => {
     prevLabel,
     nextLabel,
     skipLabel,
-    styles,
     maskPadding,
     disableMaskInteraction,
     disableCloseOnClick,
@@ -130,7 +126,7 @@ export const Walktour = (props: WalktourProps) => {
     setTooltipPosition(
       getTooltipPosition({
         target,
-        tooltip: tooltip.firstElementChild as HTMLElement || tooltip,
+        tooltip: tooltip.firstElementChild as HTMLElement || tooltip, //todo refactor function
         padding: maskPadding,
         tooltipSeparation,
         orientationPreferences,
@@ -218,7 +214,6 @@ export const Walktour = (props: WalktourProps) => {
           nextLabel={nextLabel}
           prevLabel={prevLabel}
           skipLabel={skipLabel}
-          styles={styles}
         />
       }
     </div>
