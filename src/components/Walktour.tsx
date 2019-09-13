@@ -23,6 +23,8 @@ export interface WalktourOptions {
   tooltipWidth?: number;
   transition?: string;
   customTooltipRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
+  customNextFunc?: (tourLogic: WalktourLogic) => void;
+  customPrevFunc?: (tourLogic: WalktourLogic) => void;
   prevLabel?: string;
   nextLabel?: string;
   skipLabel?: string;
@@ -91,7 +93,9 @@ export const Walktour = (props: WalktourProps) => {
     orientationPreferences,
     customTooltipRenderer,
     zIndex,
-    rootSelector
+    rootSelector,
+    customNextFunc,
+    customPrevFunc
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -152,6 +156,16 @@ export const Walktour = (props: WalktourProps) => {
     setVisible(false);
   }
 
+  const baseLogic: WalktourLogic = {
+    next: next,
+    prev: prev,
+    close: skip,
+    goToStep: goToStep,
+    stepContent: currentStepContent,
+    stepIndex: currentStepIndex,
+    allSteps: steps
+  };
+
   const keyPressHandler = (event: React.KeyboardEvent) => {
     switch (event.key) {
       case "Escape":
@@ -159,11 +173,19 @@ export const Walktour = (props: WalktourProps) => {
         event.preventDefault();
         break;
       case "ArrowRight":
-        next();
+        if (customNextFunc) {
+          customNextFunc(baseLogic);
+        } else {
+          next();
+        }
         event.preventDefault();
         break;
       case "ArrowLeft":
-        prev();
+        if (customPrevFunc) {
+          customPrevFunc(baseLogic);
+        } else {
+          prev();
+        }
         event.preventDefault();
         break;
     }
@@ -174,18 +196,14 @@ export const Walktour = (props: WalktourProps) => {
   };
 
   const tourLogic: WalktourLogic = {
-    next: next,
-    prev: prev,
-    close: skip,
-    goToStep: goToStep,
-    stepContent: currentStepContent,
-    stepIndex: currentStepIndex,
-    allSteps: steps
+   ...baseLogic,
+   ...customNextFunc && {next: () => customNextFunc(baseLogic)},
+   ...customPrevFunc && {prev: () => customPrevFunc(baseLogic)}
   };
 
   const tooltipPosition: Coords = getTooltipPosition({
-    target, 
-    tooltip, 
+    target,
+    tooltip,
     padding: maskPadding,
     tooltipSeparation,
     orientationPreferences,

@@ -35,6 +35,7 @@ export function Tooltip(props: TooltipProps) {
   const tooltipStyle: React.CSSProperties = {
     ...styles.tooltip,
   }
+  
   return (
     <div style={tooltipStyle}>
       {customTitleRenderer

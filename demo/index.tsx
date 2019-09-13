@@ -5,7 +5,7 @@ import { Walktour, Step, WalktourLogic } from '../src/components/Walktour'
 import { CardinalOrientation } from '../src/positioning';
 
 const steps: Step[] = [
-  { querySelector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!' },
+  { querySelector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
   { querySelector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
   { querySelector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements' },
   { querySelector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
@@ -27,14 +27,10 @@ const containerStyle: React.CSSProperties = {
   position: 'absolute',
   left: 50,
   top: 50,
-<<<<<<< HEAD
   height: 600,
   width: 600,
   overflow: 'scroll',
   padding: '2rem'
-=======
-  width: '100%',
->>>>>>> refactor/mask-rework
 }
 
 const styleElementOne: React.CSSProperties = {
