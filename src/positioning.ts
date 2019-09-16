@@ -259,13 +259,12 @@ function centerReducer(acc: Coords, cur: CardinalCoords): Coords {
 }
 
 function chooseBestPosition(candidates: CardinalCoords[],
-  reducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords): Coords {
-  const candidateReducer = reducer || centerReducer;
-  return candidates.reduce(candidateReducer, undefined);
+  reducer: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords): Coords {
+  return candidates.reduce(reducer, undefined);
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer: reducer} = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer} = args;
 
   if (!tooltip) {
     return;
@@ -274,6 +273,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   }
 
   const choosePositionFromPreferences = (): Coords => {
+    const reducer = positionCandidateReducer || centerReducer;
     const candidates: CardinalCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipSeparation, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
       return chooseBestPosition(candidates, reducer);
