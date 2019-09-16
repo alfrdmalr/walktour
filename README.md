@@ -83,7 +83,7 @@ function myCustomNext(logic: WalktourLogic): void {
   //do something when user presses 'next'
   ...
   //advance tour by one step
-  next();
+  logic.next();
 }
 ```
 
