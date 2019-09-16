@@ -37,8 +37,8 @@ Each step of the tour is defined by a `Step` object.
 | **Attribute** | **Type** | **Description** |
 | ------------- | -------- | --------------- |
 | selector | string | CSS selector string used to identify a particular element on the page. |
-| title | string | Tooltip heading text. |
 | description | string | Tooltip body text. |
+| _title_ | string | Tooltip heading text. |
 | _customTitleRenderer_ | (_title_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom title content. The function is passed the specified title string, as well as some [exposed tour logic](#walktourlogic). |
 | _customDescriptionRenderer_ | (_description_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom description content. The function is passed the specified description string, as well as some [exposed tour logic](#walktourlogic). |
 | _customFooterRenderer_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom footer content. The function is passed some [exposed tour logic](#walktourlogic) to allow for navigation control.|
@@ -83,7 +83,7 @@ function myCustomNext(logic: WalktourLogic): void {
   //do something when user presses 'next'
   ...
   //advance tour by one step
-  next();
+  logic.next();
 }
 ```
 
