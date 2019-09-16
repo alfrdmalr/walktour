@@ -11,7 +11,7 @@
   "scripts": {
     "start": "parcel demo/index.html --open",
     "build": "rollup -c",
-    "watch": "rollup -w"
+    "watch": "rollup -cw"
   },
   "repository": {
     "type": "git",
