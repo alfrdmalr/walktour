@@ -38,7 +38,7 @@ Each step of the tour is defined by a `Step` object.
 
 | **Attribute** | **Type** | **Description** |
 | ------------- | -------- | --------------- |
-| querySelector | string | CSS selector string used to identify a particular element on the page. |
+| selector | string | CSS selector string used to identify a particular element on the page. |
 | title | string | Tooltip heading text. |
 | description | string | Tooltip body text. |
 | _customTitleRenderer_ | (_title_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom title content. The function is passed the specified title string, as well as some [exposed tour logic](#walktourlogic). |
@@ -150,52 +150,9 @@ class App extends Component<> {
         <Walktour
           isVisible
           steps={[
-            {querySelector: "#step-one", title: "First Steps", description: "One foot in front of the other"}
+            {selector: "#step-one", title: "First Steps", description: "One foot in front of the other"}
           ]}
         />
-      </div>)
-  }
-}
-```
-
-#### Toggle
-```
-import * as React from 'react';
-import { Walktour } from 'walktour';
-
-class App extends Component<any, {showTour: boolean}> {
-  constructor(props: any) {
-    super(props);
-
-    this.state = {
-      showTour: false
-    }
-  }
-
-  toggleTour = () => {
-    this.setState({
-      showTour: !this.state.showTour
-    })
-  }
-
-  steps = [
-    {querySelector: "#step-one", title: "First Steps", description: "One foot in front of the other", 
-      orientationPreferences: [CardinalOrientation: NORTH, CardinalOrientation: EAST]},
-    {querySelector: ".step-two", title: "Second Step", description: "doing great", 
-    customDescriptionRenderer: (desc) => <span>wow, you're {desc}!</span>}
-  ];
-
-  render() {
-    return (
-      <div>
-        <Walktour
-           isVisible={this.state.showTour}
-           steps={steps}
-        />
-        <button onClick={this.toggleTour}>Toggle Tour</button>
-        
-        <div id="step-one">First Step.</div>
-        <div className="step-two">Second Step! </div>
       </div>)
   }
 }

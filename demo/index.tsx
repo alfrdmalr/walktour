@@ -5,22 +5,22 @@ import { Walktour, Step, WalktourLogic } from '../src/components/Walktour'
 import { CardinalOrientation } from '../src/positioning';
 
 const steps: Step[] = [
-  { querySelector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
-  { querySelector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
-  { querySelector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements' },
-  { querySelector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
-  { querySelector: '#eight', title: 'Supply Custom HTML Content', description: null, customDescriptionRenderer: () => <><h1>H1 Element</h1><p>Paragraph Element</p><input type='text' placeholder={'text input element'} /></> },
+  { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
+  { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
+  { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements' },
+  { selector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
+  { selector: '#eight', title: 'Supply Custom HTML Content', description: null, customDescriptionRenderer: () => <><h1>H1 Element</h1><p>Paragraph Element</p><input type='text' placeholder={'text input element'} /></> },
   {
-    querySelector: '#eight', title: 'Access the Tour API...', description: "return the to first step", customDescriptionRenderer: (description: string, logic: WalktourLogic) =>
+    selector: '#eight', title: 'Access the Tour API...', description: "return the to first step", customDescriptionRenderer: (description: string, logic: WalktourLogic) =>
       <div>...from inside your custom content<button onClick={() => logic.goToStep(0)}>{description}</button></div>
   },
-  { querySelector: '#three', title: 'Smart Positioning', description: 'The tooltip is automatically positioned within view' },
-  { querySelector: '#six', title: "Explicit Positioning", description: 'East!', orientationPreferences: [CardinalOrientation.EAST] },
-  { querySelector: '#six', title: "Explicit Positioning", description: 'South!', orientationPreferences: [CardinalOrientation.SOUTH] },
-  { querySelector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
-  { querySelector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
-  { querySelector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
-  { querySelector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, orientationPreferences: [CardinalOrientation.EASTSOUTH] }
+  { selector: '#three', title: 'Smart Positioning', description: 'The tooltip is automatically positioned within view' },
+  { selector: '#six', title: "Explicit Positioning", description: 'East!', orientationPreferences: [CardinalOrientation.EAST] },
+  { selector: '#six', title: "Explicit Positioning", description: 'South!', orientationPreferences: [CardinalOrientation.SOUTH] },
+  { selector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
+  { selector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
+  { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
+  { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, orientationPreferences: [CardinalOrientation.EASTSOUTH] }
 ]
 
 const containerStyle: React.CSSProperties = {

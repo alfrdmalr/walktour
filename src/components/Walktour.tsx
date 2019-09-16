@@ -31,7 +31,7 @@ export interface WalktourOptions {
 }
 
 export interface Step extends WalktourOptions {
-  querySelector: string;
+  selector: string;
   title?: string;
   description: string;
   customTitleRenderer?: (title?: string, tourLogic?: WalktourLogic) => JSX.Element;
@@ -123,7 +123,7 @@ export const Walktour = (props: WalktourProps) => {
       return;
     }
 
-    const target: HTMLElement = document.querySelector(steps[currentStepIndex].querySelector);
+    const target: HTMLElement = document.querySelector(steps[currentStepIndex].selector);
     const tooltipContainer: HTMLElement = document.getElementById(baseTooltipContainerString);
 
     setTarget(target);
