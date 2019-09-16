@@ -17,7 +17,6 @@ Import the Walktour component:
 And then include it somewhere in your render function:
 
 `<Walktour 
-   isVisible
    steps={mySteps}
 />`
 
@@ -26,7 +25,6 @@ And then include it somewhere in your render function:
  | **Attribute** | **Type** | **Description** |
  | ------------- | -------- | --------------- |
  | steps | Array<`Step`> | All the `Step` objects defining stops along the tour. |
- | isVisible | boolean | Determines whether the tour is shown. |
  | _initialStepIndex_ | number | Start the tour on a particular step when opened. Default is 0. |
  | _zIndex_ | number | z-index value to give the tour components. |
  | _rootSelector_ | string | CSS selector string specifying the container element that the tour should be injected into. Only necessary if you want to constrain the scope of the tour and it's masking/scrolling to a particular element which is distinct from where the tour is instantiated. |
@@ -148,54 +146,10 @@ class App extends Component<> {
       <div>
         <div id="step-one">My first step</div>
         <Walktour
-          isVisible
           steps={[
             {querySelector: "#step-one", title: "First Steps", description: "One foot in front of the other"}
           ]}
         />
-      </div>)
-  }
-}
-```
-
-#### Toggle
-```
-import * as React from 'react';
-import { Walktour } from 'walktour';
-
-class App extends Component<any, {showTour: boolean}> {
-  constructor(props: any) {
-    super(props);
-
-    this.state = {
-      showTour: false
-    }
-  }
-
-  toggleTour = () => {
-    this.setState({
-      showTour: !this.state.showTour
-    })
-  }
-
-  steps = [
-    {querySelector: "#step-one", title: "First Steps", description: "One foot in front of the other", 
-      orientationPreferences: [CardinalOrientation: NORTH, CardinalOrientation: EAST]},
-    {querySelector: ".step-two", title: "Second Step", description: "doing great", 
-    customDescriptionRenderer: (desc) => <span>wow, you're {desc}!</span>}
-  ];
-
-  render() {
-    return (
-      <div>
-        <Walktour
-           isVisible={this.state.showTour}
-           steps={steps}
-        />
-        <button onClick={this.toggleTour}>Toggle Tour</button>
-        
-        <div id="step-one">First Step.</div>
-        <div className="step-two">Second Step! </div>
       </div>)
   }
 }

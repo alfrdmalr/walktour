@@ -120,7 +120,7 @@ const App = () => (
     <div id='eight' style={styleElementEight} />
 
 
-    <Walktour steps={steps} isVisible />
+    <Walktour steps={steps} />
   </div>
 )
 

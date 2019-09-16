@@ -41,7 +41,6 @@ export interface Step extends WalktourOptions {
 
 export interface WalktourProps extends WalktourOptions {
   steps: Step[];
-  isVisible: boolean;
   initialStepIndex?: number;
   zIndex?: number;
   rootSelector?: string;
@@ -68,12 +67,11 @@ export let globalTourRoot: Element = document.body;
 export const Walktour = (props: WalktourProps) => {
 
   const {
-    isVisible,
     steps,
     initialStepIndex
   } = props;
 
-  const [isVisibleState, setVisible] = React.useState<boolean>(isVisible);
+  const [isVisibleState, setVisible] = React.useState<boolean>(true);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
   const [tooltip, setTooltip] = React.useState<HTMLElement>(undefined);
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined)
