@@ -1,5 +1,3 @@
-import { globalTourRoot } from "./components/Walktour";
-
 export enum CardinalOrientation {
   EAST = 'east',
   SOUTH = 'south',
@@ -31,6 +29,7 @@ interface GetTooltipPositionArgs {
   tooltip: HTMLElement;
   padding: number;
   tooltipSeparation: number;
+  tourRoot: Element;
   orientationPreferences?: CardinalOrientation[];
   positionCandidateReducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords;
 }
@@ -43,58 +42,57 @@ function dist(a: Coords, b: Coords): number {
     Math.pow((Math.abs(a.y - b.y)), 2))
 }
 
-function getViewportHeight(): number {
-  return globalTourRoot.clientHeight;
+function getViewportHeight(root: Element): number {
+  return root.clientHeight;
 }
 
-function getViewportWidth(): number {
-  return globalTourRoot.clientWidth;
+function getViewportWidth(root: Element): number {
+  return root.clientWidth;
 }
 
-function getViewportStart(): Coords {
-  if (document.body.isSameNode(globalTourRoot)) {
+function getViewportStart(root: Element): Coords {
+  if (document.body.isSameNode(root)) {
     return {
       x: 0,
       y: 0
     }
   } else {
-    return getElementCoords(globalTourRoot);
+    return getElementCoords(root);
   }
 }
 
-
-function getCurrentScrollOffset(): Coords {
+function getCurrentScrollOffset(root: Element): Coords {
   //use documentElement instead of body for scroll-related purposes 
-  if (document.body.isSameNode(globalTourRoot)) {
+  if (document.body.isSameNode(root)) {
     return {
       x: document.documentElement.scrollLeft,
       y: document.documentElement.scrollTop
     }
   } else {
     return {
-      x: globalTourRoot.scrollLeft,
-      y: globalTourRoot.scrollTop
+      x: root.scrollLeft,
+      y: root.scrollTop
     }
   }
 }
 
-function addScrollOffset(coords: Coords) {
-  const curOffset: Coords = getCurrentScrollOffset();
+function addScrollOffset(coords: Coords, root: Element) {
+  const curOffset: Coords = getCurrentScrollOffset(root);
   return {
     x: coords.x + curOffset.x,
     y: coords.y + curOffset.y
   }
 }
 
-function addAppropriateOffset(coords: Coords) {
-  if (!document.body.isSameNode(globalTourRoot)) {
-    const rootCoords: Coords = getElementCoords(globalTourRoot);
+function addAppropriateOffset(coords: Coords, root: Element) {
+  if (!document.body.isSameNode(root)) {
+    const rootCoords: Coords = getElementCoords(root);
     return addScrollOffset({
       x: coords.x - rootCoords.x,
       y: coords.y - rootCoords.y
-    })
+    }, root)
   } else {
-    return addScrollOffset(coords);
+    return addScrollOffset(coords, root);
   }
 }
 
@@ -105,51 +103,51 @@ function getElementCoords(element: Element): Coords {
   return coords;
 }
 
-function isElementInView(element: HTMLElement, atPosition?: Coords): boolean {
+function isElementInView(element: HTMLElement, root: Element, atPosition?: Coords): boolean {
   const position: Coords = atPosition || getElementCoords(element);
   const elementData: ClientRect = element.getBoundingClientRect();
-  const startCoords: Coords = getViewportStart();
-  const xVisibility: boolean = (position.x >= startCoords.x) && (position.x + elementData.width) <= getViewportWidth();
-  const yVisibility: boolean = (position.y >= startCoords.y) && (position.y + elementData.height) <= getViewportHeight();
+  const startCoords: Coords = getViewportStart(root);
+  const xVisibility: boolean = (position.x >= startCoords.x) && (position.x + elementData.width) <= getViewportWidth(root);
+  const yVisibility: boolean = (position.y >= startCoords.y) && (position.y + elementData.height) <= getViewportHeight(root);
 
   return xVisibility && yVisibility;
 }
 
-function getCenterCoords(element?: HTMLElement): Coords {
+function getCenterCoords(root: Element, element?: HTMLElement): Coords {
   const elementData: ClientRect = element && element.getBoundingClientRect();
   const xOffset: number = element && elementData ? elementData.width / 2 : 0;
   const yOffset: number = element && elementData ? elementData.height / 2 : 0;
   return {
-    x: (getViewportWidth() / 2) - xOffset,
-    y: (getViewportHeight() / 2) - yOffset
+    x: (getViewportWidth(root) / 2) - xOffset,
+    y: (getViewportHeight(root) / 2) - yOffset
   }
 }
 
-function scrollToElement(element: HTMLElement, centerElementInViewport?: boolean, padding?: number): void {
-  const el: Coords = addAppropriateOffset(getElementCoords(element));
+function scrollToElement(element: HTMLElement, root: Element, centerElementInViewport?: boolean, padding?: number): void {
+  const el: Coords = addAppropriateOffset(getElementCoords(element), root);
   const elementData: ClientRect = element.getBoundingClientRect();
   let xOffset: number = 0;
   let yOffset: number = 0;
 
   if (centerElementInViewport) {
-    xOffset = (getViewportWidth() - elementData.width) / 2;
-    yOffset = (getViewportHeight() - elementData.height) / 2;
+    xOffset = (getViewportWidth(root) - elementData.width) / 2;
+    yOffset = (getViewportHeight(root) - elementData.height) / 2;
   } else if (padding) {
     xOffset = padding;
     yOffset = padding;
   }
 
   const scrollOptions: ScrollToOptions = {
-    top: el.y - yOffset, 
+    top: el.y - yOffset,
     left: el.x - xOffset,
     behavior: 'smooth'
   }
 
   //use documentElement instead of body for scrolling related calls
-  if (document.body.isSameNode(globalTourRoot)) {
+  if (document.body.isSameNode(root)) {
     document.documentElement.scrollTo(scrollOptions)
   } else {
-    globalTourRoot.scrollTo(scrollOptions);
+    root.scrollTo(scrollOptions);
   }
 }
 
@@ -179,7 +177,7 @@ export function getNearestScrollAncestor(element: Element): Element {
 
 //tooltip positioning logic
 
-function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement, padding: number, tooltipDistance: number, includeAllPositions?: boolean): CardinalCoords[] {
+function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement, root: Element, padding: number, tooltipDistance: number, includeAllPositions?: boolean): CardinalCoords[] {
   const targetData: ClientRect = target.getBoundingClientRect();
   const tooltipData: ClientRect = tooltip.getBoundingClientRect();
   if (!targetData || !tooltipData) {
@@ -198,7 +196,7 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
   const south: Coords = { x: centerX, y: southOffset }
   const west: Coords = { x: westOffset, y: centerY };
   const north: Coords = { x: centerX, y: northOffset };
-  const center: Coords = getCenterCoords(tooltip);
+  const center: Coords = getCenterCoords(root, tooltip);
 
   const standardPositions = [
     { orientation: CardinalOrientation.EAST, coords: east },
@@ -243,17 +241,19 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
 }
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
-function centerReducer(acc: Coords, cur: CardinalCoords): Coords {
-  if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
-    return acc;
-  } else if (acc === undefined) {
-    return cur.coords;
-  } else {
-    const center: Coords = getCenterCoords();
-    if (dist(center, cur.coords) > dist(center, acc)) {
+function getCenterReducer(root: Element): ((acc: Coords, cur: CardinalCoords) => Coords) {
+  return (acc: Coords, cur: CardinalCoords): Coords => {
+    if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
       return acc;
-    } else {
+    } else if (acc === undefined) {
       return cur.coords;
+    } else {
+      const center: Coords = getCenterCoords(root);
+      if (dist(center, cur.coords) > dist(center, acc)) {
+        return acc;
+      } else {
+        return cur.coords;
+      }
     }
   }
 }
@@ -264,17 +264,17 @@ function chooseBestPosition(candidates: CardinalCoords[],
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer} = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot } = args;
 
   if (!tooltip) {
     return;
   } else if (!target) {
-    return getCenterCoords(tooltip);
+    return getCenterCoords(tourRoot, tooltip);
   }
 
   const choosePositionFromPreferences = (): Coords => {
-    const reducer = positionCandidateReducer || centerReducer;
-    const candidates: CardinalCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipSeparation, true);
+    const reducer = positionCandidateReducer || getCenterReducer(tourRoot);
+    const candidates: CardinalCoords[] = getTooltipPositionCandidates(target, tooltip, tourRoot, padding, tooltipSeparation, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
       return chooseBestPosition(candidates, reducer);
     } else {
@@ -284,16 +284,16 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   }
 
   const rawPosition: Coords = choosePositionFromPreferences(); //position relative to current viewport
-  const adjustedPosition: Coords = addAppropriateOffset(rawPosition);
+  const adjustedPosition: Coords = addAppropriateOffset(rawPosition, tourRoot);
 
-  if (isElementInView(target) && isElementInView(tooltip, rawPosition)) {
+  if (isElementInView(target, tourRoot) && isElementInView(tooltip, tourRoot, rawPosition)) {
     return adjustedPosition;
   } else {
-    scrollToElement(target, true);
+    scrollToElement(target, tourRoot, true);
     return adjustedPosition;
   }
 }
 
-export function getMaskPosition(target: HTMLElement): Coords {
-  return addAppropriateOffset(getElementCoords(target));
+export function getMaskPosition(target: HTMLElement, root: Element): Coords {
+  return addAppropriateOffset(getElementCoords(target), root);
 }

@@ -29,7 +29,7 @@ const containerStyle: React.CSSProperties = {
   top: 50,
   height: 600,
   width: 600,
-  overflow: 'scroll',
+  // overflow: 'scroll',
   padding: '2rem'
 }
 

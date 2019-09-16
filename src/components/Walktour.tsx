@@ -62,8 +62,6 @@ const walktourDefaultProps: Partial<WalktourProps> = {
 const basePortalString: string = 'walktour-portal';
 const baseTooltipContainerString: string = 'walktour-tooltip-container';
 
-export let globalTourRoot: Element = document.body;
-
 export const Walktour = (props: WalktourProps) => {
 
   const {
@@ -112,8 +110,7 @@ export const Walktour = (props: WalktourProps) => {
       root = getNearestScrollAncestor(document.getElementById(basePortalString));
     }
 
-    globalTourRoot = root;
-    setTourRoot(globalTourRoot);
+    setTourRoot(root);
   }, []);
 
   React.useEffect(() => {
@@ -205,6 +202,7 @@ export const Walktour = (props: WalktourProps) => {
     padding: maskPadding,
     tooltipSeparation,
     orientationPreferences,
+    tourRoot
   });
 
   const containerStyle: React.CSSProperties = {
