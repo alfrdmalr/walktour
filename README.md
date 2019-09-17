@@ -39,9 +39,6 @@ Each step of the tour is defined by a `Step` object.
 | selector | string | CSS selector string used to identify a particular element on the page. |
 | description | string | Tooltip body text. |
 | _title_ | string | Tooltip heading text. |
-| _customTitleRenderer_ | (_title_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom title content. The function is passed the specified title string, as well as some [exposed tour logic](#walktourlogic). |
-| _customDescriptionRenderer_ | (_description_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom description content. The function is passed the specified description string, as well as some [exposed tour logic](#walktourlogic). |
-| _customFooterRenderer_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom footer content. The function is passed some [exposed tour logic](#walktourlogic) to allow for navigation control.|
 | ... | [`WalktourOptions`](#options) | Any of the optional [`WalktourOptions`](#options) attributes can be included as part of a `Step` object. | 
 
 ### Options
@@ -57,15 +54,24 @@ Step-level options will take precedence over global options, so take care when u
 | _tooltipSeparation_ | number | Distance between the targeted element and the tooltip. |
 | _tooltipWidth_ | number | Width, in pixels, of the tooltip. |
 | _transition_ | string | String representing the value of CSS transition shorthand property. |
-| _nextLabel_ | string | Text to be injected into the 'next' button in the tooltip footer. Default is 'next'. |
-| _prevLabel_ | string | Text to be injected into the 'back' button in the tooltip footer. Default is 'prev'. |
-| _skipLabel_ | string | Text to be injected into the 'close' button in the tooltip footer. Default is 'skip'. |
+| _nextLabel_ | string | Text to be injected into the `next` button in the tooltip footer. Default is "next". |
+| _prevLabel_ | string | Text to be injected into the `back` button in the tooltip footer. Default is "prev". |
+| _closeLabel_ | string | Text to be injected into the `close` button in the tooltip footer. Default is "skip". |
+| _disableNext_ | boolean | Determines whether the `next()` operation is allowed. |
+| _disablePrev_ | boolean | Determines whether the `prev()` operation is allowed. |
+| _disableClose_ | boolean | Determines whether the `close()` operation is allowed. |
 | _customTooltipRenderer_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Callback function to generate an entirely custom tooltip component. Some [exposed tour logic](#walktourlogic) is provided as an argument to the callback to allow such a tooltip to fully control navigation, rendering, and other functions provided by the default tooltip. |
+| _customTitleRenderer_ | (_title_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom title content. The function is passed the specified title string, as well as some [exposed tour logic](#walktourlogic). |
+| _customDescriptionRenderer_ | (_description_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom description content. The function is passed the specified description string, as well as some [exposed tour logic](#walktourlogic). |
+| _customFooterRenderer_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom footer content. The function is passed some [exposed tour logic](#walktourlogic) to allow for navigation control.|
 | _customNextFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'next' function. This is called each time that `next()` would normally be called. |
 | _customPrevFunc_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Callback function to replace the default 'prev' function. This is called each time that `prev()` would normally be called. |
 
+
+
 ### WalktourLogic
 The `WalktourLogic` object aims to provide custom renderers with as much functionality as possible by exposing basic functions and data that the tour uses to operate.
+All custom renderers are responsible for implementing the various `WalktourOptions` to their desired degree. For instance, a customFooterRenderer might choose to ignore the _disableClose_ option, or to always display "back" instead of the specified _prevLabel_.
  
 | **Attribute** | **Type** | **Description** |
 | ------------- | -------- | --------------- |
@@ -80,10 +86,14 @@ The `WalktourLogic` object aims to provide custom renderers with as much functio
 *if _customNextFunc_ or _customPrevFunc_ is specified, those custom functions will replace the `next`/`prev` functions in the `WalktourLogic` object, with the default logic passed as arguments to the custom functions. This means that a _customNextFunc_ could look like this:
 ```
 function myCustomNext(logic: WalktourLogic): void {
-  //do something when user presses 'next'
-  ...
-  //advance tour by one step
-  logic.next();
+  loadNextStepPromise().then(val => {
+    console.log(val);
+    //advance tour on promise fulfillment
+    logic.next();
+  }, rej => {
+    console.log(rej);
+    //don't advance tour
+  });
 }
 ```
 
