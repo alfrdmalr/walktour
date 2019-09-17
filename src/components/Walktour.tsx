@@ -27,7 +27,8 @@ export interface WalktourOptions {
   customPrevFunc?: (tourLogic: WalktourLogic) => void;
   prevLabel?: string;
   nextLabel?: string;
-  skipLabel?: string;
+  closeLabel?: string;
+
 }
 
 export interface Step extends WalktourOptions {
@@ -49,7 +50,7 @@ export interface WalktourProps extends WalktourOptions {
 const walktourDefaultProps: Partial<WalktourProps> = {
   prevLabel: 'prev',
   nextLabel: 'next',
-  skipLabel: 'skip',
+  closeLabel: 'close',
   tooltipWidth: 250,
   maskPadding: 5,
   tooltipSeparation: 10,
@@ -81,7 +82,7 @@ export const Walktour = (props: WalktourProps) => {
   const {
     prevLabel,
     nextLabel,
-    skipLabel,
+    closeLabel,
     maskPadding,
     disableMaskInteraction,
     disableCloseOnClick,
@@ -149,7 +150,7 @@ export const Walktour = (props: WalktourProps) => {
     goToStep(currentStepIndex - 1);
   }
 
-  const skip = () => {
+  const close = () => {
     goToStep(0);
     setVisible(false);
   }
@@ -157,7 +158,7 @@ export const Walktour = (props: WalktourProps) => {
   const baseLogic: WalktourLogic = {
     next: next,
     prev: prev,
-    close: skip,
+    close: close,
     goToStep: goToStep,
     stepContent: currentStepContent,
     stepIndex: currentStepIndex,
@@ -167,7 +168,7 @@ export const Walktour = (props: WalktourProps) => {
   const keyPressHandler = (event: React.KeyboardEvent) => {
     switch (event.key) {
       case "Escape":
-        skip();
+        close();
         event.preventDefault();
         break;
       case "ArrowRight":
@@ -233,7 +234,7 @@ export const Walktour = (props: WalktourProps) => {
           {...tourLogic}
           nextLabel={nextLabel}
           prevLabel={prevLabel}
-          skipLabel={skipLabel}
+          closeLabel={closeLabel}
         />
       }
     </div>

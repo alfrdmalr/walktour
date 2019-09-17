@@ -5,7 +5,7 @@ import { WalktourStyles, defaultStyles } from '../defaultstyles';
 interface TooltipProps extends WalktourLogic {
   nextLabel: string;
   prevLabel: string;
-  skipLabel: string;
+  closeLabel: string;
   styles?: WalktourStyles;
 }
 
@@ -26,7 +26,7 @@ export function Tooltip(props: TooltipProps) {
     styles,
     nextLabel,
     prevLabel,
-    skipLabel,
+    closeLabel,
   } = {
     styles: defaultStyles,
     ...props
@@ -61,7 +61,7 @@ export function Tooltip(props: TooltipProps) {
         : (
           <div style={styles.footer}>
             <button onClick={close} style={styles.tertiaryButton}>
-              {skipLabel}
+              {closeLabel}
             </button>
             <button
               onClick={prev}
