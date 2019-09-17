@@ -5,7 +5,7 @@ import { WalktourStyles, defaultStyles } from '../defaultstyles';
 interface TooltipProps extends WalktourLogic {
   nextLabel: string;
   prevLabel: string;
-  skipLabel: string;
+  closeLabel: string;
   styles?: WalktourStyles;
 }
 
@@ -19,14 +19,17 @@ export function Tooltip(props: TooltipProps) {
       description,
       customTitleRenderer,
       customDescriptionRenderer,
-      customFooterRenderer
+      customFooterRenderer,
+      disableClose,
+      disableNext,
+      disablePrev
     },
     stepIndex,
     allSteps,
     styles,
     nextLabel,
     prevLabel,
-    skipLabel,
+    closeLabel,
   } = {
     styles: defaultStyles,
     ...props
@@ -35,7 +38,10 @@ export function Tooltip(props: TooltipProps) {
   const tooltipStyle: React.CSSProperties = {
     ...styles.tooltip,
   }
-  
+
+  const prevDisabled: boolean = disablePrev !== undefined ? disablePrev : stepIndex === 0;
+  const nextDisabled: boolean = disableNext !== undefined ? disableNext : stepIndex + 1 === allSteps.length;
+
   return (
     <div style={tooltipStyle}>
       {customTitleRenderer
@@ -60,20 +66,24 @@ export function Tooltip(props: TooltipProps) {
         ? customFooterRenderer(props)
         : (
           <div style={styles.footer}>
-            <button onClick={close} style={styles.tertiaryButton}>
-              {skipLabel}
+            <button 
+            onClick={close} 
+            style={styles.tertiaryButton}
+            disabled={disableClose}
+            >
+              {closeLabel}
             </button>
             <button
               onClick={prev}
-              disabled={stepIndex === 0}
-              style={stepIndex !== 0 ? styles.secondaryButton : styles.disabledButton}
+              disabled={prevDisabled}
+              style={prevDisabled ? styles.disabledButton : styles.secondaryButton}
             >
               {prevLabel}
             </button>
             <button
               onClick={next}
-              disabled={stepIndex + 1 === allSteps.length}
-              style={stepIndex + 1 !== allSteps.length ? styles.primaryButton : styles.disabledButton}
+              disabled={nextDisabled}
+              style={nextDisabled ? styles.disabledButton : styles.primaryButton}
             >
               {nextLabel}
             </button>

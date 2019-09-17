@@ -27,7 +27,11 @@ export interface WalktourOptions {
   customPrevFunc?: (tourLogic: WalktourLogic) => void;
   prevLabel?: string;
   nextLabel?: string;
-  skipLabel?: string;
+  closeLabel?: string;
+  disableNext?: boolean;
+  disablePrev?: boolean;
+  disableClose?: boolean;
+
 }
 
 export interface Step extends WalktourOptions {
@@ -49,7 +53,7 @@ export interface WalktourProps extends WalktourOptions {
 const walktourDefaultProps: Partial<WalktourProps> = {
   prevLabel: 'prev',
   nextLabel: 'next',
-  skipLabel: 'skip',
+  closeLabel: 'close',
   tooltipWidth: 250,
   maskPadding: 5,
   tooltipSeparation: 10,
@@ -81,7 +85,7 @@ export const Walktour = (props: WalktourProps) => {
   const {
     prevLabel,
     nextLabel,
-    skipLabel,
+    closeLabel,
     maskPadding,
     disableMaskInteraction,
     disableCloseOnClick,
@@ -93,7 +97,10 @@ export const Walktour = (props: WalktourProps) => {
     zIndex,
     rootSelector,
     customNextFunc,
-    customPrevFunc
+    customPrevFunc,
+    disableClose,
+    disableNext,
+    disablePrev
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -149,7 +156,7 @@ export const Walktour = (props: WalktourProps) => {
     goToStep(currentStepIndex - 1);
   }
 
-  const skip = () => {
+  const close = () => {
     goToStep(0);
     setVisible(false);
   }
@@ -157,7 +164,7 @@ export const Walktour = (props: WalktourProps) => {
   const baseLogic: WalktourLogic = {
     next: next,
     prev: prev,
-    close: skip,
+    close: close,
     goToStep: goToStep,
     stepContent: currentStepContent,
     stepIndex: currentStepIndex,
@@ -167,24 +174,30 @@ export const Walktour = (props: WalktourProps) => {
   const keyPressHandler = (event: React.KeyboardEvent) => {
     switch (event.key) {
       case "Escape":
-        skip();
         event.preventDefault();
+        if (!disableClose) {
+          close();
+        }
         break;
       case "ArrowRight":
-        if (customNextFunc) {
-          customNextFunc(baseLogic);
-        } else {
-          next();
-        }
         event.preventDefault();
+        if (!disableNext) {
+          if (customNextFunc) {
+            customNextFunc(baseLogic);
+          } else {
+            next();
+          }
+        }
         break;
       case "ArrowLeft":
-        if (customPrevFunc) {
-          customPrevFunc(baseLogic);
-        } else {
-          prev();
-        }
         event.preventDefault();
+        if (!disablePrev) {
+          if (customPrevFunc) {
+            customPrevFunc(baseLogic);
+          } else {
+            prev();
+          }
+        }
         break;
     }
   }
@@ -194,9 +207,9 @@ export const Walktour = (props: WalktourProps) => {
   };
 
   const tourLogic: WalktourLogic = {
-   ...baseLogic,
-   ...customNextFunc && {next: () => customNextFunc(baseLogic)},
-   ...customPrevFunc && {prev: () => customPrevFunc(baseLogic)}
+    ...baseLogic,
+    ...customNextFunc && { next: () => customNextFunc(baseLogic) },
+    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) }
   };
 
   const tooltipPosition: Coords = getTooltipPosition({
@@ -233,7 +246,7 @@ export const Walktour = (props: WalktourProps) => {
           {...tourLogic}
           nextLabel={nextLabel}
           prevLabel={prevLabel}
-          skipLabel={skipLabel}
+          closeLabel={closeLabel}
         />
       }
     </div>
