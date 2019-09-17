@@ -3,9 +3,6 @@ import { WalktourLogic } from './Walktour';
 import { WalktourStyles, defaultStyles } from '../defaultstyles';
 
 interface TooltipProps extends WalktourLogic {
-  nextLabel: string;
-  prevLabel: string;
-  closeLabel: string;
   styles?: WalktourStyles;
 }
 
@@ -22,14 +19,14 @@ export function Tooltip(props: TooltipProps) {
       customFooterRenderer,
       disableClose,
       disableNext,
-      disablePrev
+      disablePrev,
+      nextLabel,
+      prevLabel,
+      closeLabel,
     },
     stepIndex,
     allSteps,
     styles,
-    nextLabel,
-    prevLabel,
-    closeLabel,
   } = {
     styles: defaultStyles,
     ...props
@@ -71,21 +68,21 @@ export function Tooltip(props: TooltipProps) {
             style={styles.tertiaryButton}
             disabled={disableClose}
             >
-              {closeLabel}
+              {closeLabel || "close"}
             </button>
             <button
               onClick={prev}
               disabled={prevDisabled}
               style={prevDisabled ? styles.disabledButton : styles.secondaryButton}
             >
-              {prevLabel}
+              {prevLabel || "prev"}
             </button>
             <button
               onClick={next}
               disabled={nextDisabled}
               style={nextDisabled ? styles.disabledButton : styles.primaryButton}
             >
-              {nextLabel}
+              {nextLabel || "next"}
             </button>
           </div>
         )}
