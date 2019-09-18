@@ -243,8 +243,8 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
 }
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
-function centerReducer(acc: Coords, cur: CardinalCoords): Coords {
-  if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
+function centerReducer(acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]): Coords {
+  if (cur.orientation === CardinalOrientation.CENTER && ind !== arr.length - 1) { //ignore centered coords since those will always be closest to the center
     return acc;
   } else if (acc === undefined) {
     return cur.coords;
