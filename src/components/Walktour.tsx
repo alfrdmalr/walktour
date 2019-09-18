@@ -51,9 +51,6 @@ export interface WalktourProps extends WalktourOptions {
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
-  prevLabel: 'prev',
-  nextLabel: 'next',
-  closeLabel: 'close',
   tooltipWidth: 250,
   maskPadding: 5,
   tooltipSeparation: 10,
@@ -244,9 +241,6 @@ export const Walktour = (props: WalktourProps) => {
         ? customTooltipRenderer(tourLogic)
         : <Tooltip
           {...tourLogic}
-          nextLabel={nextLabel}
-          prevLabel={prevLabel}
-          closeLabel={closeLabel}
         />
       }
     </div>
