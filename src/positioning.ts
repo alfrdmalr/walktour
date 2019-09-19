@@ -19,7 +19,7 @@ export interface Coords {
   y: number;
 }
 
-interface OrientationCoords {
+export interface OrientationCoords {
   orientation: CardinalOrientation;
   coords: Coords;
 }

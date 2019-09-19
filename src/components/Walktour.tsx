@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor } from '../positioning'
+import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor, OrientationCoords } from '../positioning'
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import * as ReactDOM from 'react-dom';
@@ -35,6 +35,7 @@ export interface WalktourOptions {
   disablePrev?: boolean;
   disableClose?: boolean;
   disableAutoScroll?: boolean;
+  positionCandidateReducer?: (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords;
 
 }
 
@@ -97,6 +98,7 @@ export const Walktour = (props: WalktourProps) => {
     disablePrev,
     disableAutoScroll,
     identifier,
+    positionCandidateReducer
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -214,7 +216,8 @@ export const Walktour = (props: WalktourProps) => {
     tooltipSeparation,
     orientationPreferences,
     tourRoot,
-    disableAutoScroll
+    disableAutoScroll,
+    positionCandidateReducer
   });
 
   const containerStyle: React.CSSProperties = {
