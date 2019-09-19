@@ -27,7 +27,7 @@ And then include it somewhere in your render function:
  | steps | Array<`Step`> | All the `Step` objects defining stops along the tour. |
  | _initialStepIndex_ | number | Start the tour on a particular step when opened. Default is 0. |
  | _zIndex_ | number | z-index value to give the tour components. |
- | _rootSelector_ | string | CSS selector string specifying the container element that the tour should be injected into. Only necessary if you want to constrain the scope of the tour and it's masking/scrolling to a particular element which is distinct from where the tour is instantiated. |
+ | _rootSelector_ | string | CSS selector string specifying the container element that the tour should be injected into. Only necessary if trying to constrain the scope of the tour and it's masking/scrolling to a particular element which is distinct from where the tour is instantiated. |
  | ... | [`WalktourOptions`](#options) | Any of the optional [`WalktourOptions`](#options) attributes can be included as props. | 
  
 
@@ -106,7 +106,7 @@ The tooltip can be positioned at various locations around the targeted element. 
 | South | "south" |
 | West | "west" |
 | North | "north" |
-| _Center_ | "center" |
+| _Center*_ | "center" |
 
 and 8 more specific positions, which are just combinations of the simple ones:
 
@@ -142,6 +142,12 @@ Step Level:
 An orientation can also be specified at either level with its corresponding string, like this:
 
 `{... orientationPreferences: ["south-east", "east-south", "south", "east"] ...}`
+
+
+*_Center_ places the tooltip at the current center of the viewport. As such, it may have odd behavior when used with scrolling.
+It also serves as the default position when the element targeted by a `Step`'s `selector` property cannot be found. 
+If a content agnostic, centered tooltip is desired, it's generally best to **not** request it using the `orientationPreferences` option. 
+Instead, specifiy that `Step`'s `selector` property value to `null` or `undefined`, or simply omit the property altogether. 
 
 ### Examples
 
