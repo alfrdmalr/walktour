@@ -119,9 +119,10 @@ function getCenterCoords(element?: HTMLElement): Coords {
   const elementData: ClientRect = element && element.getBoundingClientRect();
   const xOffset: number = element && elementData ? elementData.width / 2 : 0;
   const yOffset: number = element && elementData ? elementData.height / 2 : 0;
+  const startCoords: Coords = getViewportStart();
   return {
-    x: (getViewportWidth() / 2) - xOffset,
-    y: (getViewportHeight() / 2) - yOffset
+    x: startCoords.x + (getViewportWidth() / 2) - xOffset,
+    y: startCoords.y + (getViewportHeight() / 2) - yOffset
   }
 }
 
@@ -243,9 +244,14 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
 }
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
-function centerReducer(acc: Coords, cur: CardinalCoords): Coords {
+function centerReducer(acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]): Coords {
+ 
   if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
-    return acc;
+    if (ind === arr.length - 1 && acc === undefined ) { //unless  we're at the end and we still haven't picked a coord
+      return cur.coords;
+    } else {
+      return acc;
+    }
   } else if (acc === undefined) {
     return cur.coords;
   } else {
