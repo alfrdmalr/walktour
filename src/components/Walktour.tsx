@@ -223,25 +223,29 @@ export const Walktour = (props: WalktourProps) => {
     width: tooltipWidth
   }
 
-  const render = () => (<div id={getIdString(basePortalString, identifier)} style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
-    <Mask
-      target={target}
-      disableMaskInteraction={disableMaskInteraction}
-      disableCloseOnClick={disableCloseOnClick}
-      padding={maskPadding}
-      tourRoot={tourRoot}
-      close={tourLogic.close}
-    />
+  const render = () => (
+    <div
+      id={getIdString(basePortalString, identifier)}
+      style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}
+    >
+      <Mask
+        target={target}
+        disableMaskInteraction={disableMaskInteraction}
+        disableCloseOnClick={disableCloseOnClick}
+        padding={maskPadding}
+        tourRoot={tourRoot}
+        close={tourLogic.close}
+      />
 
-    <div id={getIdString(baseTooltipContainerString, identifier)} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
-      {customTooltipRenderer
-        ? customTooltipRenderer(tourLogic)
-        : <Tooltip
-          {...tourLogic}
-        />
-      }
-    </div>
-  </div>);
+      <div id={getIdString(baseTooltipContainerString, identifier)} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
+        {customTooltipRenderer
+          ? customTooltipRenderer(tourLogic)
+          : <Tooltip
+            {...tourLogic}
+          />
+        }
+      </div>
+    </div>);
 
   if (tourRoot) {
     return ReactDOM.createPortal(render(), tourRoot);
