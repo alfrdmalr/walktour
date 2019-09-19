@@ -93,7 +93,8 @@ export const Walktour = (props: WalktourProps) => {
     customPrevFunc,
     disableClose,
     disableNext,
-    disablePrev
+    disablePrev,
+    identifier
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -109,7 +110,7 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     if (!root) {
-      root = getNearestScrollAncestor(document.getElementById(`${basePortalString}${props.identifier && props.identifier}`));
+      root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
     }
 
     setTourRoot(root);
@@ -120,8 +121,8 @@ export const Walktour = (props: WalktourProps) => {
       return;
     }
 
-    const target: HTMLElement = document.querySelector(steps[currentStepIndex].selector);
-    const tooltipContainer: HTMLElement = document.getElementById(`${baseTooltipContainerString}${props.identifier && props.identifier}`);
+    const target: HTMLElement = document.querySelector(currentStepContent.selector);
+    const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
 
     setTarget(target);
 
@@ -222,7 +223,7 @@ export const Walktour = (props: WalktourProps) => {
     width: tooltipWidth
   }
 
-  const render = () => (<div id={`${basePortalString}${props.identifier && props.identifier}`} style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
+  const render = () => (<div id={getIdString(basePortalString, identifier)} style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
     <Mask
       target={target}
       disableMaskInteraction={disableMaskInteraction}
@@ -232,7 +233,7 @@ export const Walktour = (props: WalktourProps) => {
       close={tourLogic.close}
     />
 
-    <div id={`${baseTooltipContainerString}${props.identifier && props.identifier}`} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
+    <div id={getIdString(baseTooltipContainerString, identifier)} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
       {customTooltipRenderer
         ? customTooltipRenderer(tourLogic)
         : <Tooltip
@@ -247,4 +248,9 @@ export const Walktour = (props: WalktourProps) => {
   } else {
     return render();
   }
+}
+
+
+function getIdString(base: string, identifier?: string): string {
+  return `${base}${identifier ? `-${identifier}` : ``}`
 }
