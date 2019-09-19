@@ -34,6 +34,7 @@ export interface WalktourOptions {
   disableNext?: boolean;
   disablePrev?: boolean;
   disableClose?: boolean;
+  disableAutoScroll?: boolean;
 
 }
 
@@ -94,7 +95,8 @@ export const Walktour = (props: WalktourProps) => {
     disableClose,
     disableNext,
     disablePrev,
-    identifier
+    disableAutoScroll,
+    identifier,
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -211,7 +213,8 @@ export const Walktour = (props: WalktourProps) => {
     padding: maskPadding,
     tooltipSeparation,
     orientationPreferences,
-    tourRoot
+    tourRoot,
+    disableAutoScroll
   });
 
   const containerStyle: React.CSSProperties = {

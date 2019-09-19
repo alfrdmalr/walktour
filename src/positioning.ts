@@ -32,6 +32,7 @@ interface GetTooltipPositionArgs {
   tourRoot: Element;
   orientationPreferences?: CardinalOrientation[];
   positionCandidateReducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords;
+  disableAutoScroll?: boolean;
 }
 
 //helpers
@@ -277,7 +278,7 @@ function chooseBestPosition(candidates: CardinalCoords[],
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot } = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot, disableAutoScroll } = args;
 
   if (!tooltip) {
     return;
@@ -299,12 +300,10 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   const rawPosition: Coords = choosePositionFromPreferences(); //position relative to current viewport
   const adjustedPosition: Coords = addAppropriateOffset(rawPosition, tourRoot);
 
-  if (isElementInView(target, tourRoot) && isElementInView(tooltip, tourRoot, rawPosition)) {
-    return adjustedPosition;
-  } else {
+  if (!disableAutoScroll && (!isElementInView(target, tourRoot) || isElementInView(tooltip, tourRoot, rawPosition))) {
     scrollToElement(target, tourRoot, true);
-    return adjustedPosition;
   }
+  return adjustedPosition;
 }
 
 export function getMaskPosition(target: HTMLElement, root: Element): Coords {
