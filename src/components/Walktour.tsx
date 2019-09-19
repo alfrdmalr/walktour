@@ -22,6 +22,9 @@ export interface WalktourOptions {
   tooltipSeparation?: number;
   tooltipWidth?: number;
   transition?: string;
+  customTitleRenderer?: (title?: string, tourLogic?: WalktourLogic) => JSX.Element;
+  customDescriptionRenderer?: (description: string, tourLogic?: WalktourLogic) => JSX.Element;
+  customFooterRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
   customTooltipRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
   customNextFunc?: (tourLogic: WalktourLogic) => void;
   customPrevFunc?: (tourLogic: WalktourLogic) => void;
@@ -38,9 +41,6 @@ export interface Step extends WalktourOptions {
   selector: string;
   title?: string;
   description: string;
-  customTitleRenderer?: (title?: string, tourLogic?: WalktourLogic) => JSX.Element;
-  customDescriptionRenderer?: (description: string, tourLogic?: WalktourLogic) => JSX.Element;
-  customFooterRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
 }
 
 export interface WalktourProps extends WalktourOptions {
