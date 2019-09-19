@@ -275,7 +275,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   if (!tooltip) {
     return;
   } else if (!target) {
-    return getCenterCoords(tooltip);
+    return addAppropriateOffset(getCenterCoords(tooltip));
   }
 
   const choosePositionFromPreferences = (): Coords => {
