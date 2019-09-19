@@ -48,6 +48,7 @@ export interface WalktourProps extends WalktourOptions {
   initialStepIndex?: number;
   zIndex?: number;
   rootSelector?: string;
+  identifier?: string;
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
@@ -80,9 +81,6 @@ export const Walktour = (props: WalktourProps) => {
   const currentStepContent: Step = steps[currentStepIndex];
 
   const {
-    prevLabel,
-    nextLabel,
-    closeLabel,
     maskPadding,
     disableMaskInteraction,
     disableCloseOnClick,
@@ -113,7 +111,7 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     if (!root) {
-      root = getNearestScrollAncestor(document.getElementById(basePortalString));
+      root = getNearestScrollAncestor(document.getElementById(`${basePortalString}${props.identifier && props.identifier}`));
     }
 
     globalTourRoot = root;
@@ -126,7 +124,7 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     const target: HTMLElement = document.querySelector(steps[currentStepIndex].selector);
-    const tooltipContainer: HTMLElement = document.getElementById(baseTooltipContainerString);
+    const tooltipContainer: HTMLElement = document.getElementById(`${baseTooltipContainerString}${props.identifier && props.identifier}`);
 
     setTarget(target);
 
@@ -226,7 +224,7 @@ export const Walktour = (props: WalktourProps) => {
     width: tooltipWidth
   }
 
-  const render = () => (<div id={`${basePortalString}`} style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
+  const render = () => (<div id={`${basePortalString}${props.identifier && props.identifier}`} style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
     <Mask
       target={target}
       disableMaskInteraction={disableMaskInteraction}
@@ -236,7 +234,7 @@ export const Walktour = (props: WalktourProps) => {
       close={tourLogic.close}
     />
 
-    <div id={`${baseTooltipContainerString}`} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
+    <div id={`${baseTooltipContainerString}${props.identifier && props.identifier}`} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
       {customTooltipRenderer
         ? customTooltipRenderer(tourLogic)
         : <Tooltip
