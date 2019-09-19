@@ -117,9 +117,10 @@ function getCenterCoords(root: Element, element?: HTMLElement): Coords {
   const elementData: ClientRect = element && element.getBoundingClientRect();
   const xOffset: number = element && elementData ? elementData.width / 2 : 0;
   const yOffset: number = element && elementData ? elementData.height / 2 : 0;
+  const startCoords: Coords = getViewportStart(root);
   return {
-    x: (getViewportWidth(root) / 2) - xOffset,
-    y: (getViewportHeight(root) / 2) - yOffset
+    x: startCoords.x + (getViewportWidth(root) / 2) - xOffset,
+    y: startCoords.y + (getViewportHeight(root) / 2) - yOffset
   }
 }
 
@@ -241,18 +242,30 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
 }
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
-function getCenterReducer(root: Element): ((acc: Coords, cur: CardinalCoords) => Coords) {
-  return (acc: Coords, cur: CardinalCoords): Coords => {
+function getCenterReducer(root: Element): ((acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords) {
+  return (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]): Coords => {
+
     if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
-      return acc;
+      if (ind === arr.length - 1 && acc === undefined) { //unless  we're at the end and we still haven't picked a coord
+        return cur.coords;
+      } else {
+        return acc;
+      }
     } else if (acc === undefined) {
       return cur.coords;
     } else {
       const center: Coords = getCenterCoords(root);
       if (dist(center, cur.coords) > dist(center, acc)) {
         return acc;
-      } else {
+      } else if (acc === undefined) {
         return cur.coords;
+      } else {
+        const center: Coords = getCenterCoords(root);
+        if (dist(center, cur.coords) > dist(center, acc)) {
+          return acc;
+        } else {
+          return cur.coords;
+        }
       }
     }
   }
@@ -269,7 +282,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   if (!tooltip) {
     return;
   } else if (!target) {
-    return getCenterCoords(tourRoot, tooltip);
+    return addAppropriateOffset(getCenterCoords(tourRoot, tooltip), tourRoot);
   }
 
   const choosePositionFromPreferences = (): Coords => {
