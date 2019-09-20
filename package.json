@@ -9,7 +9,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "parcel demo/index.html --open",
+    "start": "parcel demo/index.html",
     "build": "rollup -c",
     "watch": "rollup -cw"
   },

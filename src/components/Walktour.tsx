@@ -48,6 +48,7 @@ export interface WalktourProps extends WalktourOptions {
   initialStepIndex?: number;
   zIndex?: number;
   rootSelector?: string;
+  identifier?: string;
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
@@ -62,8 +63,6 @@ const walktourDefaultProps: Partial<WalktourProps> = {
 
 const basePortalString: string = 'walktour-portal';
 const baseTooltipContainerString: string = 'walktour-tooltip-container';
-
-export let globalTourRoot: Element = document.body;
 
 export const Walktour = (props: WalktourProps) => {
 
@@ -95,32 +94,38 @@ export const Walktour = (props: WalktourProps) => {
     customPrevFunc,
     disableClose,
     disableNext,
-    disablePrev
+    disablePrev,
+    identifier
   } = {
     ...walktourDefaultProps,
     ...props,
     ...currentStepContent
   };
 
+  // after first render, set the tour root and initial position of target/tooltip
   React.useEffect(() => {
-    goToStep(currentStepIndex);
-
     let root: Element;
     if (rootSelector) {
       root = document.querySelector(rootSelector);
     }
 
     if (!root) {
-      root = getNearestScrollAncestor(document.getElementById(basePortalString));
+      root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
     }
 
-    globalTourRoot = root;
-    setTourRoot(globalTourRoot);
+    setTourRoot(root);
+    updateTour(root);
   }, []);
 
+  //update tour when step changes
   React.useEffect(() => {
+    tourRoot && updateTour(tourRoot);
+  }, [currentStepIndex])
 
-    const tooltipContainer: HTMLElement = document.getElementById(baseTooltipContainerString);
+
+  // update tooltip and target position in state
+  const updateTour = (root: Element) => {
+    const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
     const target: HTMLElement = document.querySelector(currentStepContent.selector);
 
     if (!tooltipContainer) {
@@ -143,11 +148,12 @@ export const Walktour = (props: WalktourProps) => {
         padding: maskPadding,
         tooltipSeparation,
         orientationPreferences,
+        tourRoot: root
       })
     );
 
     tooltipContainer.focus();
-  }, [currentStepIndex, tourRoot])
+  }
 
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= steps.length || stepIndex < 0) {
@@ -177,6 +183,12 @@ export const Walktour = (props: WalktourProps) => {
     stepContent: currentStepContent,
     stepIndex: currentStepIndex,
     allSteps: steps
+  };
+
+  const tourLogic: WalktourLogic = {
+    ...baseLogic,
+    ...customNextFunc && { next: () => customNextFunc(baseLogic) },
+    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) }
   };
 
   const keyPressHandler = (event: React.KeyboardEvent) => {
@@ -210,48 +222,67 @@ export const Walktour = (props: WalktourProps) => {
     }
   }
 
+  //don't render if the tour is closed or if there's no step data
   if (!isVisibleState || !currentStepContent) {
     return null
   };
 
-  const tourLogic: WalktourLogic = {
-    ...baseLogic,
-    ...customNextFunc && { next: () => customNextFunc(baseLogic) },
-    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) }
-  };
+  
+  const portalStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: zIndex,
+    visibility: tooltipPosition ? 'visible' : 'hidden'
+  }
 
-  const containerStyle: React.CSSProperties = {
+  const tooltipContainerStyle: React.CSSProperties = {
     position: 'absolute',
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
-    visibility: tooltipPosition ? 'visible' : 'hidden',
     width: tooltipWidth
   }
 
-  const render = () => (<div id={`${basePortalString}`} style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}>
-    <Mask
-      target={target}
-      disableMaskInteraction={disableMaskInteraction}
-      disableCloseOnClick={disableCloseOnClick}
-      padding={maskPadding}
-      tourRoot={tourRoot}
-      close={tourLogic.close}
-    />
+  // render mask, tooltip, and their shared "portal" container
+  const render = () => (
+    <div
+      id={getIdString(basePortalString, identifier)}
+      style={portalStyle}
+    >
+      <Mask
+        target={target}
+        disableMaskInteraction={disableMaskInteraction}
+        disableCloseOnClick={disableCloseOnClick}
+        padding={maskPadding}
+        tourRoot={tourRoot}
+        close={tourLogic.close}
+      />
 
-    <div id={`${baseTooltipContainerString}`} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
-      {customTooltipRenderer
-        ? customTooltipRenderer(tourLogic)
-        : <Tooltip
-          {...tourLogic}
-        />
-      }
-    </div>
-  </div>);
+      <div
+        id={getIdString(baseTooltipContainerString, identifier)}
+        style={tooltipContainerStyle}
+        onKeyDown={keyPressHandler}
+        tabIndex={0}>
+        {customTooltipRenderer
+          ? customTooltipRenderer(tourLogic)
+          : <Tooltip
+            {...tourLogic}
+          />
+        }
+      </div>
+    </div>);
 
+  // on first render, put everything in it's normal context.
+  // after first render (once we've determined the tour root) spawn a portal there for rendering.
   if (tourRoot) {
     return ReactDOM.createPortal(render(), tourRoot);
   } else {
     return render();
   }
+}
+
+
+function getIdString(base: string, identifier?: string): string {
+  return `${base}${identifier ? `-${identifier}` : ``}`
 }

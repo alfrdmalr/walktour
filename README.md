@@ -28,6 +28,7 @@ And then include it somewhere in your render function:
  | _initialStepIndex_ | number | Start the tour on a particular step when opened. Default is 0. |
  | _zIndex_ | number | z-index value to give the tour components. |
  | _rootSelector_ | string | CSS selector string specifying the container element that the tour should be injected into. Only necessary if trying to constrain the scope of the tour and it's masking/scrolling to a particular element which is distinct from where the tour is instantiated. |
+ | _identifier_ | string | An id string to be suffixed to the default Walktour IDs. Only necessary if multiple tours are running on the same page. More commonly, this means different tours in different components who are active on the same page. |
  | ... | [`WalktourOptions`](#options) | Any of the optional [`WalktourOptions`](#options) attributes can be included as props. | 
  
 
