@@ -131,10 +131,10 @@ const App = () => (
       <div id='twoTwo' style={styleElementTwo} />
       <div id='threeTwo' style={styleElementThree} />
 
-      <Walktour steps={stepsPartTwo} />
+      {/* <Walktour steps={stepsPartTwo} /> */}
     </div>
 
-    {/* <Walktour steps={steps} /> */}
+    <Walktour steps={steps} />
   </>
 )
 
