@@ -104,7 +104,7 @@ function getElementCoords(element: Element): Coords {
   return coords;
 }
 
-function isElementInView(element: HTMLElement, root: Element, atPosition?: Coords): boolean {
+export function isElementInView(element: HTMLElement, root: Element, atPosition?: Coords): boolean {
   const position: Coords = atPosition || getElementCoords(element);
   const elementData: ClientRect = element.getBoundingClientRect();
   const startCoords: Coords = getViewportStart(root);
@@ -125,7 +125,7 @@ function getCenterCoords(root: Element, element?: HTMLElement): Coords {
   }
 }
 
-function scrollToElement(element: HTMLElement, root: Element, centerElementInViewport?: boolean, padding?: number): void {
+export function scrollToElement(element: HTMLElement, root: Element, centerElementInViewport?: boolean, padding?: number): void {
   const el: Coords = addAppropriateOffset(getElementCoords(element), root);
   const elementData: ClientRect = element.getBoundingClientRect();
   let xOffset: number = 0;

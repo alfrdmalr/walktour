@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor, OrientationCoords } from '../positioning'
+import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor, OrientationCoords, isElementInView, scrollToElement } from '../positioning'
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import * as ReactDOM from 'react-dom';
@@ -126,13 +126,12 @@ export const Walktour = (props: WalktourProps) => {
     tourRoot && updateTour(tourRoot);
   }, [currentStepIndex])
 
-
   // update tooltip and target position in state
   const updateTour = (root: Element) => {
-    const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
+    const tooltip: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
     const target: HTMLElement = document.querySelector(currentStepContent.selector);
 
-    if (!tooltipContainer) {
+    if (!tooltip) {
       setTarget(null);
       setTooltip(null);
       setTooltipPosition(null);
@@ -141,25 +140,30 @@ export const Walktour = (props: WalktourProps) => {
 
     // If the tooltip is custom and absolutely positioned/floated, the container will not adopt those dimensions.
     // So we use the first child of the container (the tooltip itself) and fall back to the container if something goes wrong.
-    const tangibleTooltip = tooltipContainer.firstElementChild as HTMLElement || tooltipContainer;
-
+    const tangibleTooltip = tooltip.firstElementChild as HTMLElement || tooltip;
+    const tooltipPosition: Coords = getTooltipPosition({
+      target,
+      tooltip: tangibleTooltip,
+      padding: maskPadding,
+      tooltipSeparation,
+      orientationPreferences,
+      tourRoot: root,
+      disableAutoScroll,
+      positionCandidateReducer
+    });
+    
     setTarget(target);
-    setTooltip(tooltipContainer);
-    setTooltipPosition(
-      getTooltipPosition({
-        target,
-        tooltip: tangibleTooltip,
-        padding: maskPadding,
-        tooltipSeparation,
-        orientationPreferences,
-        tourRoot: root,
-        disableAutoScroll,
-        positionCandidateReducer
-      })
-    );
+    setTooltip(tooltip);
+    setTooltipPosition(tooltipPosition);
 
-    tooltipContainer.focus();
+    if (!disableAutoScroll && (!isElementInView(target, root) || !isElementInView(tooltip, root, tooltipPosition))) {
+      scrollToElement(target, root, true);
+      console.log('scrolling');
+    }
+
+    tooltip.focus();
   }
+
 
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= steps.length || stepIndex < 0) {
