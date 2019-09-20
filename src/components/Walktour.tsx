@@ -75,14 +75,12 @@ export const Walktour = (props: WalktourProps) => {
   const [isVisibleState, setVisible] = React.useState<boolean>(true);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
   const [tooltip, setTooltip] = React.useState<HTMLElement>(undefined);
+  const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent: Step = steps[currentStepIndex];
 
   const {
-    prevLabel,
-    nextLabel,
-    closeLabel,
     maskPadding,
     disableMaskInteraction,
     disableCloseOnClick,
@@ -121,20 +119,33 @@ export const Walktour = (props: WalktourProps) => {
   }, []);
 
   React.useEffect(() => {
-    if (isVisibleState === false) {
-      return;
-    }
 
-    const target: HTMLElement = document.querySelector(steps[currentStepIndex].selector);
     const tooltipContainer: HTMLElement = document.getElementById(baseTooltipContainerString);
-
-    setTarget(target);
+    const target: HTMLElement = document.querySelector(currentStepContent.selector);
 
     if (!tooltipContainer) {
+      setTarget(null);
+      setTooltip(null);
+      setTooltipPosition(null);
       return;
     }
 
-    setTooltip(tooltipContainer.firstElementChild as HTMLElement || tooltip);
+    // If the tooltip is custom and absolutely positioned/floated, the container will not adopt those dimensions.
+    // So we use the first child of the container (the tooltip itself) and fall back to the container if something goes wrong.
+    const tangibleTooltip = tooltipContainer.firstElementChild as HTMLElement || tooltipContainer;
+
+    setTarget(target);
+    setTooltip(tooltipContainer);
+    setTooltipPosition(
+      getTooltipPosition({
+        target,
+        tooltip: tangibleTooltip,
+        padding: maskPadding,
+        tooltipSeparation,
+        orientationPreferences,
+      })
+    );
+
     tooltipContainer.focus();
   }, [currentStepIndex, tourRoot])
 
@@ -208,14 +219,6 @@ export const Walktour = (props: WalktourProps) => {
     ...customNextFunc && { next: () => customNextFunc(baseLogic) },
     ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) }
   };
-
-  const tooltipPosition: Coords = getTooltipPosition({
-    target,
-    tooltip,
-    padding: maskPadding,
-    tooltipSeparation,
-    orientationPreferences,
-  });
 
   const containerStyle: React.CSSProperties = {
     position: 'absolute',
