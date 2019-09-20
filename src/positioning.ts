@@ -32,7 +32,6 @@ interface GetTooltipPositionArgs {
   tourRoot: Element;
   orientationPreferences?: CardinalOrientation[];
   positionCandidateReducer?: (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords;
-  disableAutoScroll?: boolean;
 }
 
 //helpers
@@ -278,7 +277,7 @@ function chooseBestPosition(candidates: OrientationCoords[],
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot, disableAutoScroll } = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot } = args;
 
   if (!tooltip) {
     return;
