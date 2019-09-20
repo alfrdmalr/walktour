@@ -67,6 +67,23 @@ Step-level options will take precedence over global options, so take care when u
 | _customFooterRenderer_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom footer content. The function is passed some [exposed tour logic](#walktourlogic) to allow for navigation control.|
 | _customNextFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'next' function. This is called each time that `next()` would normally be called. |
 | _customPrevFunc_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Callback function to replace the default 'prev' function. This is called each time that `prev()` would normally be called. |
+| _disableAutoScroll_ | boolean | Disable automatically scrolling elements into view. |
+| _positionCandidateReducer*_ | (_acc_: `Coords`, _cur_: `OrientationCoords`, _ind_: number, _arr_: `OrientationCoords[]`) => Coords | Custom reducer callback to obtain a tooltip position from a list of candidates. In nearly all cases it's preferable to specify `orientationPreferences` instead of providing a custom reducer. |
+
+*An `OrientationCoords` object has the following shape:
+```
+{
+  coords: Coords,
+  orientation: CardinalOrientation
+}
+```
+where `Coords` is an object of the form:
+```
+{ 
+  x: number, 
+  y: number 
+}
+```
 
 
 
@@ -138,7 +155,7 @@ Tour Level:
 
 Step Level:
 
-`{ ... title: "Manual Positioning", orientationPreferences: [CardinalOrientation.EAST], ...}`
+`{... title: "Manual Positioning", orientationPreferences: [CardinalOrientation.EAST], ...}`
 
 An orientation can also be specified at either level with its corresponding string, like this:
 
@@ -149,6 +166,9 @@ An orientation can also be specified at either level with its corresponding stri
 It also serves as the default position when the element targeted by a `Step`'s `selector` property cannot be found. 
 If a content agnostic, centered tooltip is desired, it's generally best to **not** request it using the `orientationPreferences` option. 
 Instead, specifiy that `Step`'s `selector` property value to `null` or `undefined`, or simply omit the property altogether. 
+It is also currently recommended that `disableAutoScroll: false` be included to combat any scrolling inconsistencies:
+
+`{... selector: null, description: "This tooltip is centered, disableAutoScroll: true, ...}`
 
 ### Examples
 

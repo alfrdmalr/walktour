@@ -19,7 +19,7 @@ export interface Coords {
   y: number;
 }
 
-interface CardinalCoords {
+export interface OrientationCoords {
   orientation: CardinalOrientation;
   coords: Coords;
 }
@@ -31,7 +31,8 @@ interface GetTooltipPositionArgs {
   tooltipSeparation: number;
   tourRoot: Element;
   orientationPreferences?: CardinalOrientation[];
-  positionCandidateReducer?: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords;
+  positionCandidateReducer?: (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords;
+  disableAutoScroll?: boolean;
 }
 
 //helpers
@@ -178,7 +179,7 @@ export function getNearestScrollAncestor(element: Element): Element {
 
 //tooltip positioning logic
 
-function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement, root: Element, padding: number, tooltipDistance: number, includeAllPositions?: boolean): CardinalCoords[] {
+function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement, root: Element, padding: number, tooltipDistance: number, includeAllPositions?: boolean): OrientationCoords[] {
   const targetData: ClientRect = target.getBoundingClientRect();
   const tooltipData: ClientRect = tooltip.getBoundingClientRect();
   if (!targetData || !tooltipData) {
@@ -206,7 +207,7 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
     { orientation: CardinalOrientation.NORTH, coords: north },
   ];
 
-  let additionalPositions: CardinalCoords[];
+  let additionalPositions: OrientationCoords[];
   if (includeAllPositions) {
     const eastAlign: number = coords.x - (tooltipData.width - targetData.width) + padding;
     const southAlign: number = coords.y - (tooltipData.height - targetData.height) + padding;
@@ -242,8 +243,8 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
 }
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
-function getCenterReducer(root: Element): ((acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords) {
-  return (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]): Coords => {
+function getCenterReducer(root: Element): ((acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords) {
+  return (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]): Coords => {
 
     if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
       if (ind === arr.length - 1 && acc === undefined) { //unless  we're at the end and we still haven't picked a coord
@@ -271,13 +272,13 @@ function getCenterReducer(root: Element): ((acc: Coords, cur: CardinalCoords, in
   }
 }
 
-function chooseBestPosition(candidates: CardinalCoords[],
-  reducer: (acc: Coords, cur: CardinalCoords, ind: number, arr: CardinalCoords[]) => Coords): Coords {
+function chooseBestPosition(candidates: OrientationCoords[],
+  reducer: (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords): Coords {
   return candidates.reduce(reducer, undefined);
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot } = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot, disableAutoScroll } = args;
 
   if (!tooltip) {
     return;
@@ -287,11 +288,11 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
 
   const choosePositionFromPreferences = (): Coords => {
     const reducer = positionCandidateReducer || getCenterReducer(tourRoot);
-    const candidates: CardinalCoords[] = getTooltipPositionCandidates(target, tooltip, tourRoot, padding, tooltipSeparation, true);
+    const candidates: OrientationCoords[] = getTooltipPositionCandidates(target, tooltip, tourRoot, padding, tooltipSeparation, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
       return chooseBestPosition(candidates, reducer);
     } else {
-      const preferenceFilter = (cc: CardinalCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
+      const preferenceFilter = (cc: OrientationCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
       return chooseBestPosition(candidates.filter(preferenceFilter), reducer);
     }
   }
@@ -299,12 +300,10 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   const rawPosition: Coords = choosePositionFromPreferences(); //position relative to current viewport
   const adjustedPosition: Coords = addAppropriateOffset(rawPosition, tourRoot);
 
-  if (isElementInView(target, tourRoot) && isElementInView(tooltip, tourRoot, rawPosition)) {
-    return adjustedPosition;
-  } else {
+  if (!disableAutoScroll && (!isElementInView(target, tourRoot) || !isElementInView(tooltip, tourRoot, rawPosition))) {
     scrollToElement(target, tourRoot, true);
-    return adjustedPosition;
   }
+  return adjustedPosition;
 }
 
 export function getMaskPosition(target: HTMLElement, root: Element): Coords {
