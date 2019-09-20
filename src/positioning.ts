@@ -300,9 +300,6 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   const rawPosition: Coords = choosePositionFromPreferences(); //position relative to current viewport
   const adjustedPosition: Coords = addAppropriateOffset(rawPosition, tourRoot);
 
-  if (!disableAutoScroll && (!isElementInView(target, tourRoot) || !isElementInView(tooltip, tourRoot, rawPosition))) {
-    scrollToElement(target, tourRoot, true);
-  }
   return adjustedPosition;
 }
 
