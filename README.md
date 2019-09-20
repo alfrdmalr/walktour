@@ -191,3 +191,19 @@ class App extends Component<> {
   }
 }
 ```
+
+### Development / Demo
+Clone the repo with:
+
+`git clone https://github.com/alfrdmalr/walktour.git`
+
+Navigate to the new directory and install the necessary development dependencies:
+
+`cd walktour && yarn install`
+
+Launch the development server:
+
+`yarn start`
+
+Once the server is running, it will specify a URL (typically http://localhost:1234). Navigate there in your browser to see your changes and interact with the demo app!
+
