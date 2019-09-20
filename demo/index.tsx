@@ -26,7 +26,7 @@ const steps: Step[] = [
 
 const stepsPartTwo: Step[] = [
   { selector: '#oneTwo', description: '...you can also have scoped tours' },
-  { selector: null, disableAutoScroll: true, description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
+  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
   { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', 
   orientationPreferences: [CardinalOrientation.SOUTH]},
 ]

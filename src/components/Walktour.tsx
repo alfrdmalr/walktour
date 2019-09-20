@@ -76,6 +76,7 @@ export const Walktour = (props: WalktourProps) => {
   const [isVisibleState, setVisible] = React.useState<boolean>(true);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
   const [tooltip, setTooltip] = React.useState<HTMLElement>(undefined);
+  const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent: Step = steps[currentStepIndex];
@@ -105,9 +106,8 @@ export const Walktour = (props: WalktourProps) => {
     ...currentStepContent
   };
 
+  // after first render, set the tour root and initial position of target/tooltip
   React.useEffect(() => {
-    goToStep(currentStepIndex);
-
     let root: Element;
     if (rootSelector) {
       root = document.querySelector(rootSelector);
@@ -118,25 +118,48 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     setTourRoot(root);
+    updateTour(root);
   }, []);
 
+  //update tour when step changes
   React.useEffect(() => {
-    if (isVisibleState === false) {
-      return;
-    }
+    tourRoot && updateTour(tourRoot);
+  }, [currentStepIndex])
 
-    const target: HTMLElement = document.querySelector(currentStepContent.selector);
+
+  // update tooltip and target position in state
+  const updateTour = (root: Element) => {
     const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
-
-    setTarget(target);
+    const target: HTMLElement = document.querySelector(currentStepContent.selector);
 
     if (!tooltipContainer) {
+      setTarget(null);
+      setTooltip(null);
+      setTooltipPosition(null);
       return;
     }
 
-    setTooltip(tooltipContainer.firstElementChild as HTMLElement || tooltip);
+    // If the tooltip is custom and absolutely positioned/floated, the container will not adopt those dimensions.
+    // So we use the first child of the container (the tooltip itself) and fall back to the container if something goes wrong.
+    const tangibleTooltip = tooltipContainer.firstElementChild as HTMLElement || tooltipContainer;
+
+    setTarget(target);
+    setTooltip(tooltipContainer);
+    setTooltipPosition(
+      getTooltipPosition({
+        target,
+        tooltip: tangibleTooltip,
+        padding: maskPadding,
+        tooltipSeparation,
+        orientationPreferences,
+        tourRoot: root,
+        disableAutoScroll,
+        positionCandidateReducer
+      })
+    );
+
     tooltipContainer.focus();
-  }, [currentStepIndex, tourRoot])
+  }
 
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= steps.length || stepIndex < 0) {
@@ -166,6 +189,12 @@ export const Walktour = (props: WalktourProps) => {
     stepContent: currentStepContent,
     stepIndex: currentStepIndex,
     allSteps: steps
+  };
+
+  const tourLogic: WalktourLogic = {
+    ...baseLogic,
+    ...customNextFunc && { next: () => customNextFunc(baseLogic) },
+    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) }
   };
 
   const keyPressHandler = (event: React.KeyboardEvent) => {
@@ -199,40 +228,33 @@ export const Walktour = (props: WalktourProps) => {
     }
   }
 
+  //don't render if the tour is closed or if there's no step data
   if (!isVisibleState || !currentStepContent) {
     return null
   };
 
-  const tourLogic: WalktourLogic = {
-    ...baseLogic,
-    ...customNextFunc && { next: () => customNextFunc(baseLogic) },
-    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) }
-  };
+  
+  const portalStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: zIndex,
+    visibility: tooltipPosition ? 'visible' : 'hidden'
+  }
 
-  const tooltipPosition: Coords = getTooltipPosition({
-    target,
-    tooltip,
-    padding: maskPadding,
-    tooltipSeparation,
-    orientationPreferences,
-    tourRoot,
-    disableAutoScroll,
-    positionCandidateReducer
-  });
-
-  const containerStyle: React.CSSProperties = {
+  const tooltipContainerStyle: React.CSSProperties = {
     position: 'absolute',
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
-    visibility: tooltipPosition ? 'visible' : 'hidden',
     width: tooltipWidth
   }
 
+  // render mask, tooltip, and their shared "portal" container
   const render = () => (
     <div
       id={getIdString(basePortalString, identifier)}
-      style={{ position: 'absolute', top: 0, left: 0, zIndex: zIndex }}
+      style={portalStyle}
     >
       <Mask
         target={target}
@@ -243,7 +265,11 @@ export const Walktour = (props: WalktourProps) => {
         close={tourLogic.close}
       />
 
-      <div id={getIdString(baseTooltipContainerString, identifier)} style={containerStyle} onKeyDown={keyPressHandler} tabIndex={0}>
+      <div
+        id={getIdString(baseTooltipContainerString, identifier)}
+        style={tooltipContainerStyle}
+        onKeyDown={keyPressHandler}
+        tabIndex={0}>
         {customTooltipRenderer
           ? customTooltipRenderer(tourLogic)
           : <Tooltip
@@ -253,6 +279,8 @@ export const Walktour = (props: WalktourProps) => {
       </div>
     </div>);
 
+  // on first render, put everything in it's normal context.
+  // after first render (once we've determined the tour root) spawn a portal there for rendering.
   if (tourRoot) {
     return ReactDOM.createPortal(render(), tourRoot);
   } else {
