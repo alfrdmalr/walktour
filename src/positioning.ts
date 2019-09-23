@@ -44,11 +44,23 @@ function dist(a: Coords, b: Coords): number {
 }
 
 function getViewportHeight(root: Element): number {
-  return root.clientHeight;
+  if (document.body.isSameNode(root)) {
+    return Math.max(root.clientHeight,
+      document.documentElement.clientHeight,
+      window.innerHeight);
+  } else {
+    return root.clientHeight;
+  }
 }
 
 function getViewportWidth(root: Element): number {
-  return root.clientWidth;
+  if (document.body.isSameNode(root)) {
+    return Math.max(root.clientWidth,
+      document.documentElement.clientHeight,
+      window.innerHeight);
+  } else {
+    return root.clientWidth;
+  }
 }
 
 function getViewportStart(root: Element): Coords {
