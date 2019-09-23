@@ -155,9 +155,8 @@ export const Walktour = (props: WalktourProps) => {
     setTooltip(tooltip);
     setTooltipPosition(tooltipPosition);
 
-    if (!disableAutoScroll && (!isElementInView(target, root) || !isElementInView(tooltip, root, tooltipPosition))) {
-      scrollToElement(target, root, true);
-      console.log('scrolling');
+    if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tooltip, tooltipPosition))) {
+      scrollToElement(root, target);
     }
 
     tooltip.focus();
