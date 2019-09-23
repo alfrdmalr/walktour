@@ -31,7 +31,7 @@ export function Mask(props: MaskProps): JSX.Element {
   }
 
   const targetData: ClientRect = target.getBoundingClientRect();
-  const coords: Coords = getMaskPosition(target, tourRoot);
+  const coords: Coords = getMaskPosition(tourRoot, target);
 
   const cutoutTop: number = coords.y - padding;
   const cutoutLeft: number = coords.x - padding;
