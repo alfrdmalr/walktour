@@ -5,7 +5,7 @@ import { Walktour, Step, WalktourLogic } from '../src/components/Walktour'
 import { CardinalOrientation } from '../src/positioning';
 
 const steps: Step[] = [
-  { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
+  { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!' },
   { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
   { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements' },
   { selector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
@@ -26,111 +26,44 @@ const steps: Step[] = [
 
 const stepsPartTwo: Step[] = [
   { selector: '#oneTwo', description: '...you can also have scoped tours' },
-  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
-  { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', 
-  orientationPreferences: [CardinalOrientation.SOUTH]},
+  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it' },
+  {
+    selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component',
+    orientationPreferences: [CardinalOrientation.SOUTH]
+  },
 ]
 
-const containerStyle: React.CSSProperties = {
-  position: 'absolute',
-  left: 1800,
-  top: 1800,
-  height: 600,
-  width: 600,
-  overflow: 'scroll',
-  padding: '2rem'
-}
-
-const styleElementOne: React.CSSProperties = {
-  background: 'grey',
-  width: 200,
-  height: 100,
-}
-
-const styleElementTwo: React.CSSProperties = {
-  background: 'cornflowerblue',
-  width: 100,
-  height: 200,
-  left: 300,
-  top: 300,
-  position: 'absolute'
-}
-
-const styleElementThree: React.CSSProperties = {
-  background: 'magenta',
-  width: 600,
-  height: 100,
-  left: 900,
-  top: 15,
-  position: 'absolute'
-}
-
-const styleElementFour: React.CSSProperties = {
-  background: 'orange',
-  width: 200,
-  height: 100,
-  left: 1120,
-  top: 580,
-  position: 'absolute'
-}
-
-const styleElementFive: React.CSSProperties = {
-  position: 'absolute',
-  top: '350px',
-  left: '650px',
-  cursor: "pointer"
-}
-
-const styleElementSix: React.CSSProperties = {
-  background: 'aquamarine',
-  width: 200,
-  height: 100,
-  left: 450,
-  top: 450,
-  position: 'absolute'
-}
-
-const styleElementSeven: React.CSSProperties = {
-  background: 'linear-gradient(to right, red, white, blue)',
-  width: 200,
-  height: 100,
-  left: 169,
-  top: 1776,
-  position: 'absolute',
-}
-
-const styleElementEight: React.CSSProperties = {
-  background: 'transparent',
-  width: 200,
-  height: 100,
-  left: 10,
-  top: 650,
-  position: 'absolute',
-  border: '5px dotted black',
-  borderRadius: '5px'
-}
+const containerStyle: React.CSSProperties = { position: 'absolute', left: 1800, top: 1800, height: 600, width: 600, overflow: 'scroll', padding: '2rem' }
+const oneStyle: React.CSSProperties = { background: 'grey', width: 200, height: 100, }
+const twoStyle: React.CSSProperties = { background: 'cornflowerblue', width: 100, height: 200, left: 300, top: 300, position: 'absolute' }
+const threeStyle: React.CSSProperties = { background: 'magenta', width: 600, height: 100, left: 900, top: 15, position: 'absolute' }
+const fourStyle: React.CSSProperties = { background: 'orange', width: 200, height: 100, left: 1120, top: 580, position: 'absolute' }
+const fiveStyle: React.CSSProperties = { position: 'absolute', top: '350px', left: '650px', cursor: "pointer" }
+const sixStyle: React.CSSProperties = { background: 'aquamarine', width: 200, height: 100, left: 450, top: 450, position: 'absolute' }
+const sevenStyle: React.CSSProperties = { background: 'linear-gradient(to right, red, white, blue)', width: 200, height: 100, left: 169, top: 1776, position: 'absolute', }
+const eightStyle: React.CSSProperties = { background: 'transparent', width: 200, height: 100, left: 10, top: 650, position: 'absolute', border: '5px dotted black', borderRadius: '5px' }
 
 
 const App = () => (
   <>
-    <div id={'one'} style={styleElementOne} />
-    <div id={'two'} style={styleElementTwo} />
-    <div id={'three'} style={styleElementThree} />
-    <div className={'four'} style={styleElementFour} />
+    <div id={'one'} style={oneStyle} />
+    <div id={'two'} style={twoStyle} />
+    <div id={'three'} style={threeStyle} />
+    <div className={'four'} style={fourStyle} />
     <button
-      style={styleElementFive} id="five"
+      style={fiveStyle} id="five"
       onClick={() => alert('Button has been clicked.')}
     >
       Try Clicking Me!
     </button>
-    <div id='six' style={styleElementSix} />
-    <div id='seven' style={styleElementSeven} />
-    <div id='eight' style={styleElementEight} />
+    <div id='six' style={sixStyle} />
+    <div id='seven' style={sevenStyle} />
+    <div id='eight' style={eightStyle} />
 
     <div style={containerStyle} id="demo-container">
-      <div id='oneTwo' style={styleElementOne} />
-      <div id='twoTwo' style={styleElementTwo} />
-      <div id='threeTwo' style={styleElementThree} />
+      <div id='oneTwo' style={oneStyle} />
+      <div id='twoTwo' style={twoStyle} />
+      <div id='threeTwo' style={threeStyle} />
 
       <Walktour steps={stepsPartTwo} identifier={"1"} />
     </div>
