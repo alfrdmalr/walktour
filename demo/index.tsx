@@ -20,13 +20,21 @@ const steps: Step[] = [
   { selector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { selector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
   { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
-  { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, orientationPreferences: [CardinalOrientation.EASTSOUTH] }
+  { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} /> },
+  { selector: '#demo-container', title: "Encapsulated Tours", description: 'Not only can you have multiple tours on a page...' }
+]
+
+const stepsPartTwo: Step[] = [
+  { selector: '#oneTwo', description: '...you can also have scoped tours' },
+  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
+  { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', 
+  orientationPreferences: [CardinalOrientation.SOUTH]},
 ]
 
 const containerStyle: React.CSSProperties = {
   position: 'absolute',
-  left: 50,
-  top: 50,
+  left: 1800,
+  top: 1800,
   height: 600,
   width: 600,
   overflow: 'scroll',
@@ -104,7 +112,7 @@ const styleElementEight: React.CSSProperties = {
 
 
 const App = () => (
-  <div style={containerStyle} id="demo-container">
+  <>
     <div id={'one'} style={styleElementOne} />
     <div id={'two'} style={styleElementTwo} />
     <div id={'three'} style={styleElementThree} />
@@ -119,9 +127,16 @@ const App = () => (
     <div id='seven' style={styleElementSeven} />
     <div id='eight' style={styleElementEight} />
 
+    <div style={containerStyle} id="demo-container">
+      <div id='oneTwo' style={styleElementOne} />
+      <div id='twoTwo' style={styleElementTwo} />
+      <div id='threeTwo' style={styleElementThree} />
 
-    <Walktour steps={steps} />
-  </div>
+      <Walktour steps={stepsPartTwo} identifier={"1"} />
+    </div>
+
+    <Walktour steps={steps} identifier={"2"} />
+  </>
 )
 
 ReactDOM.render(<App />, document.getElementById('app'))
