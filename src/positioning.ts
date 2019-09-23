@@ -56,8 +56,8 @@ function getViewportHeight(root: Element): number {
 function getViewportWidth(root: Element): number {
   if (document.body.isSameNode(root)) {
     return Math.max(root.clientWidth,
-      document.documentElement.clientHeight,
-      window.innerHeight);
+      document.documentElement.clientWidth,
+      window.innerWidth);
   } else {
     return root.clientWidth;
   }
