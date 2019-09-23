@@ -264,10 +264,6 @@ function getCenterReducer(root: Element): ((acc: Coords, cur: OrientationCoords,
   }
 }
 
-function chooseBestPosition(candidates: OrientationCoords[],
-  reducer: (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords): Coords {
-  return candidates.reduce(reducer, undefined);
-}
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot } = args;
@@ -281,11 +277,12 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   const choosePositionFromPreferences = (): Coords => {
     const reducer = positionCandidateReducer || getCenterReducer(tourRoot);
     const candidates: OrientationCoords[] = getTooltipPositionCandidates(tourRoot, target, tooltip, padding, tooltipSeparation, true);
+
     if (!orientationPreferences || orientationPreferences.length === 0) {
-      return chooseBestPosition(candidates, reducer);
+      return candidates.reduce(reducer, undefined);
     } else {
       const preferenceFilter = (cc: OrientationCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
-      return chooseBestPosition(candidates.filter(preferenceFilter), reducer);
+      return candidates.filter(preferenceFilter).reduce(reducer, undefined);
     }
   }
 
