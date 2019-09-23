@@ -5,6 +5,8 @@ Guided tour/walkthrough component for react projects.
 [npm](https://www.npmjs.com/package/walktour) |
 [GitHub](https://github.com/alfrdmalr/walktour)
 
+[See the demo](https://alfrdmalr.github.io/walktour-demo)
+
 ### Installation
 * `yarn add walktour`
 
