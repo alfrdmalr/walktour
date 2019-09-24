@@ -14,6 +14,9 @@
     "watch": "rollup -cw",
     "test": "jest"
   },
+  "jest": {
+    "preset": "ts-jest"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/alfrdmalr/walktour"
@@ -26,14 +29,6 @@
     "react-dom": "^16.8.6"
   },
   "devDependencies": {
-    "@babel/core": "7.4.4",
-    "@babel/plugin-proposal-class-properties": "7.4.4",
-    "@babel/plugin-proposal-decorators": "7.4.4",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-syntax-dynamic-import": "7.2.0",
-    "@babel/plugin-transform-react-jsx": "^7.0.0",
-    "@babel/preset-env": "7.4.4",
-    "@babel/preset-react": "7.0.0",
     "@types/react": "^16.9.1",
     "@types/react-dom": "^16.8.5",
     "awesome-typescript-loader": "^5.2.1",
@@ -46,6 +41,9 @@
     "rollup": "^1.20.3",
     "rollup-plugin-typescript2": "^0.24.0",
     "source-map-loader": "^0.2.4",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "@types/jest": "^24.0.18",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0"
   }
 }
