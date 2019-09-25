@@ -36,7 +36,7 @@ interface GetTooltipPositionArgs {
 
 //helpers
 
-function dist(a: Coords, b: Coords): number {
+export function dist(a: Coords, b: Coords): number {
   return Math.sqrt(
     Math.pow((Math.abs(a.x - b.x)), 2) +
     Math.pow((Math.abs(a.y - b.y)), 2))
@@ -113,6 +113,9 @@ function addAppropriateOffset(root: Element, coords: Coords) {
 }
 
 function getElementCoords(element: Element): Coords {
+  if (!element) {
+    return;
+  }
   const elementData: ClientRect = element.getBoundingClientRect();
   let coords: Coords = { x: elementData.left, y: elementData.top }
 

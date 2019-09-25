@@ -5,7 +5,7 @@ import { Walktour, Step, WalktourLogic } from '../src/components/Walktour'
 import { CardinalOrientation } from '../src/positioning';
 
 const steps: Step[] = [
-  { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
+  { selector: null, title: 'Guided Tour Component', description: 'Welcome to the tour!'},
   { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
   { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements' },
   { selector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
@@ -135,7 +135,7 @@ const App = () => (
       <Walktour steps={stepsPartTwo} identifier={"1"} />
     </div>
 
-    <Walktour steps={steps} identifier={"2"} />
+    <Walktour disableCloseOnClick steps={steps} identifier={"2"} />
   </>
 )
 

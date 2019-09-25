@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor, OrientationCoords, isElementInView, scrollToElement } from '../positioning'
+import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor, OrientationCoords, isElementInView, scrollToElement, getTargetPosition, dist } from '../positioning'
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import * as ReactDOM from 'react-dom';
@@ -73,8 +73,9 @@ export const Walktour = (props: WalktourProps) => {
     initialStepIndex
   } = props;
 
-  const [isVisibleState, setVisible] = React.useState<boolean>(true);
+  const [visible, setVisible] = React.useState<boolean>(true);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
+  const [targetPosition, setTargetPosition] = React.useState<Coords>(undefined);
   const [tooltip, setTooltip] = React.useState<HTMLElement>(undefined);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined)
@@ -126,8 +127,29 @@ export const Walktour = (props: WalktourProps) => {
     tourRoot && updateTour(tourRoot);
   }, [currentStepIndex])
 
+  //adjust for changes in the page layout
+  React.useEffect(() => {
+    if (!tourRoot || !tooltip || !target) {
+      console.log('no tour elements defined')
+      return;
+    }
+
+    const rerenderTolerance: number = 1;
+    
+    const currentTargetPosition: Coords = getTargetPosition(tourRoot, target);
+    console.log("current", currentTargetPosition)
+    console.log("stored", targetPosition);
+    console.log("distance", dist(currentTargetPosition, targetPosition))
+    // if the target's position has changed sufficiently, we need to update
+    // this can happen with responsive design as the window changes size, or as elements are repositioned
+    if (dist(currentTargetPosition, targetPosition) > rerenderTolerance) {
+      console.log("distance > threshold, updating")
+      updateTour(tourRoot);
+    }
+  })
+
   // update tooltip and target position in state
-  const updateTour = (root: Element) => {
+  const updateTour = (tourRoot: Element) => {
     const tooltip: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
     const target: HTMLElement = document.querySelector(currentStepContent.selector);
 
@@ -135,28 +157,31 @@ export const Walktour = (props: WalktourProps) => {
       setTarget(null);
       setTooltip(null);
       setTooltipPosition(null);
+      setTargetPosition(null);
       return;
     }
 
     // If the tooltip is custom and absolutely positioned/floated, the container will not adopt those dimensions.
     // So we use the first child of the container (the tooltip itself) and fall back to the container if something goes wrong.
     const tangibleTooltip = tooltip.firstElementChild as HTMLElement || tooltip;
+    const targetPosition: Coords = getTargetPosition(tourRoot, target);
     const tooltipPosition: Coords = getTooltipPosition({
       target,
       tooltip: tangibleTooltip,
       padding: maskPadding,
       tooltipSeparation,
       orientationPreferences,
-      tourRoot: root,
+      tourRoot,
       positionCandidateReducer
     });
-    
+
     setTarget(target);
     setTooltip(tooltip);
     setTooltipPosition(tooltipPosition);
+    setTargetPosition(targetPosition);
 
-    if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tooltip, tooltipPosition))) {
-      scrollToElement(root, target);
+    if (!disableAutoScroll && (!isElementInView(tourRoot, target) || !isElementInView(tourRoot, tooltip, tooltipPosition))) {
+      scrollToElement(tourRoot, target);
     }
 
     tooltip.focus();
@@ -231,11 +256,11 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   //don't render if the tour is closed or if there's no step data
-  if (!isVisibleState || !currentStepContent) {
+  if (!visible || !currentStepContent) {
     return null
   };
 
-  
+
   const portalStyle: React.CSSProperties = {
     position: 'absolute',
     top: 0,
