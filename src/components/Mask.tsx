@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coords, getMaskPosition } from "../positioning";
+import { Coords, getTargetPosition } from "../positioning";
 
 interface MaskProps {
   target: HTMLElement;
@@ -31,7 +31,7 @@ export function Mask(props: MaskProps): JSX.Element {
   }
 
   const targetData: ClientRect = target.getBoundingClientRect();
-  const coords: Coords = getMaskPosition(tourRoot, target);
+  const coords: Coords = getTargetPosition(tourRoot, target);
 
   const cutoutTop: number = coords.y - padding;
   const cutoutLeft: number = coords.x - padding;

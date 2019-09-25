@@ -321,6 +321,6 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   return addAppropriateOffset(tourRoot, rawPosition);
 }
 
-export function getMaskPosition(root: Element, target: HTMLElement): Coords {
+export function getTargetPosition(root: Element, target: HTMLElement): Coords {
   return addAppropriateOffset(root, getElementCoords(target));
 }
