@@ -132,10 +132,10 @@ const App = () => (
       <div id='twoTwo' style={styleElementTwo} />
       <div id='threeTwo' style={styleElementThree} />
 
-      <Walktour steps={stepsPartTwo} identifier={"1"} />
+      {/* <Walktour steps={stepsPartTwo} identifier={"2"} /> */}
     </div>
 
-    <Walktour disableCloseOnClick steps={steps} identifier={"2"} />
+    <Walktour disableCloseOnClick steps={steps} identifier={"1"} />
   </>
 )
 
