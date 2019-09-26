@@ -75,7 +75,6 @@ export const Walktour = (props: WalktourProps) => {
 
   const [isVisibleState, setVisible] = React.useState<boolean>(true);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
-  const [tooltip, setTooltip] = React.useState<HTMLElement>(undefined);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
@@ -134,7 +133,6 @@ export const Walktour = (props: WalktourProps) => {
 
     if (!tooltipContainer) {
       setTarget(null);
-      setTooltip(null);
       setTooltipPosition(null);
       return;
     }
@@ -144,7 +142,6 @@ export const Walktour = (props: WalktourProps) => {
     const tangibleTooltip = tooltipContainer.firstElementChild as HTMLElement || tooltipContainer;
 
     setTarget(target);
-    setTooltip(tooltipContainer);
     setTooltipPosition(
       getTooltipPosition({
         target,
