@@ -36,7 +36,6 @@ export interface WalktourOptions {
   disableClose?: boolean;
   disableAutoScroll?: boolean;
   positionCandidateReducer?: (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords;
-
 }
 
 export interface Step extends WalktourOptions {
@@ -73,14 +72,18 @@ export const Walktour = (props: WalktourProps) => {
     initialStepIndex
   } = props;
 
-  const [visible, setVisible] = React.useState<boolean>(true);
+  const [isVisible, setVisible] = React.useState<boolean>(true);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
   const [targetPosition, setTargetPosition] = React.useState<Coords>(undefined);
-  const [tooltip, setTooltip] = React.useState<HTMLElement>(undefined);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
-  const [tourRoot, setTourRoot] = React.useState<Element>(undefined)
+  const tourRoot = React.useRef<Element>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent: Step = steps[currentStepIndex];
+
+  //don't render if the tour is hidden or if there's no step data
+  if (!isVisible || !currentStepContent) {
+    return null
+  };
 
   const {
     maskPadding,
@@ -118,44 +121,25 @@ export const Walktour = (props: WalktourProps) => {
       root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
     }
 
-    setTourRoot(root);
-    updateTour(root);
+    tourRoot.current = root;
   }, []);
 
   //update tour when step changes
   React.useEffect(() => {
-    tourRoot && updateTour(tourRoot);
-  }, [currentStepIndex])
-
-  //adjust for changes in the page layout
-  React.useEffect(() => {
-    if (!tourRoot || !tooltip || !target) {
-      console.log('no tour elements defined')
-      return;
-    }
-
-    const rerenderTolerance: number = 1;
-    
-    const currentTargetPosition: Coords = getTargetPosition(tourRoot, target);
-    console.log("current", currentTargetPosition)
-    console.log("stored", targetPosition);
-    console.log("distance", dist(currentTargetPosition, targetPosition))
-    // if the target's position has changed sufficiently, we need to update
-    // this can happen with responsive design as the window changes size, or as elements are repositioned
-    if (dist(currentTargetPosition, targetPosition) > rerenderTolerance) {
-      console.log("distance > threshold, updating")
-      updateTour(tourRoot);
-    }
-  })
+    updateTour();
+  }, [currentStepIndex]);
 
   // update tooltip and target position in state
-  const updateTour = (tourRoot: Element) => {
-    const tooltip: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
+  const updateTour = () => {
+    const root = tourRoot.current;
+    if (!root) {
+      return;
+    }
+    const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
     const target: HTMLElement = document.querySelector(currentStepContent.selector);
 
-    if (!tooltip) {
+    if (!tooltipContainer) {
       setTarget(null);
-      setTooltip(null);
       setTooltipPosition(null);
       setTargetPosition(null);
       return;
@@ -163,28 +147,27 @@ export const Walktour = (props: WalktourProps) => {
 
     // If the tooltip is custom and absolutely positioned/floated, the container will not adopt those dimensions.
     // So we use the first child of the container (the tooltip itself) and fall back to the container if something goes wrong.
-    const tangibleTooltip = tooltip.firstElementChild as HTMLElement || tooltip;
-    const targetPosition: Coords = getTargetPosition(tourRoot, target);
+    const tangibleTooltip = tooltipContainer.firstElementChild as HTMLElement || tooltipContainer;
+    const targetPosition: Coords = getTargetPosition(root, target);
     const tooltipPosition: Coords = getTooltipPosition({
       target,
       tooltip: tangibleTooltip,
       padding: maskPadding,
       tooltipSeparation,
       orientationPreferences,
-      tourRoot,
+      tourRoot: root,
       positionCandidateReducer
     });
 
     setTarget(target);
-    setTooltip(tooltip);
     setTooltipPosition(tooltipPosition);
     setTargetPosition(targetPosition);
 
-    if (!disableAutoScroll && (!isElementInView(tourRoot, target) || !isElementInView(tourRoot, tooltip, tooltipPosition))) {
-      scrollToElement(tourRoot, target);
+    if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tangibleTooltip, tooltipPosition))) {
+      scrollToElement(root, target);
     }
 
-    tooltip.focus();
+    tooltipContainer.focus();
   }
 
 
@@ -255,12 +238,6 @@ export const Walktour = (props: WalktourProps) => {
     }
   }
 
-  //don't render if the tour is closed or if there's no step data
-  if (!visible || !currentStepContent) {
-    return null
-  };
-
-
   const portalStyle: React.CSSProperties = {
     position: 'absolute',
     top: 0,
@@ -288,7 +265,7 @@ export const Walktour = (props: WalktourProps) => {
         disableMaskInteraction={disableMaskInteraction}
         disableCloseOnClick={disableCloseOnClick}
         padding={maskPadding}
-        tourRoot={tourRoot}
+        tourRoot={tourRoot.current}
         close={tourLogic.close}
       />
 
@@ -308,8 +285,8 @@ export const Walktour = (props: WalktourProps) => {
 
   // on first render, put everything in it's normal context.
   // after first render (once we've determined the tour root) spawn a portal there for rendering.
-  if (tourRoot) {
-    return ReactDOM.createPortal(render(), tourRoot);
+  if (tourRoot.current) {
+    return ReactDOM.createPortal(render(), tourRoot.current);
   } else {
     return render();
   }
