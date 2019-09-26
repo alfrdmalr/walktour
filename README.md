@@ -71,6 +71,9 @@ Step-level options will take precedence over global options, so take care when u
 | _customPrevFunc_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Callback function to replace the default 'prev' function. This is called each time that `prev()` would normally be called. |
 | _disableAutoScroll_ | boolean | Disable automatically scrolling elements into view. |
 | _positionCandidateReducer*_ | (_acc_: `Coords`, _cur_: `OrientationCoords`, _ind_: number, _arr_: `OrientationCoords[]`) => Coords | Custom reducer callback to obtain a tooltip position from a list of candidates. In nearly all cases it's preferable to specify `orientationPreferences` instead of providing a custom reducer. |
+| _movingTarget_ | boolean | If true, the tour will watch the target element for position changes. If the position is sufficiently different (as specified by `renderTolerance`) from its initial position, the tooltip and mask will adjust themselves accordingly. |
+| _renderTolerance_ | number | Distance, in pixels, for the target element to have moved before triggering an update. Default is 2. |
+| _updateInterval_ | number | Duration, in milliseconds, between polling for changes to a target's positioning. Default is 500. |
 
 *An `OrientationCoords` object has the following shape:
 ```
@@ -86,8 +89,6 @@ where `Coords` is an object of the form:
   y: number 
 }
 ```
-
-
 
 ### WalktourLogic
 The `WalktourLogic` object aims to provide custom renderers with as much functionality as possible by exposing basic functions and data that the tour uses to operate.

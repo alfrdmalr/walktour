@@ -25,8 +25,8 @@ const steps: Step[] = [
 ]
 
 const stepsPartTwo: Step[] = [
-  { selector: '#oneTwo', description: '...you can also have scoped tours' },
-  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
+  { selector: '#oneTwo', description: '...you can also have scoped tours'},
+  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it', movingTarget: false},
   { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', 
   orientationPreferences: [CardinalOrientation.SOUTH]},
 ]
@@ -132,10 +132,10 @@ const App = () => (
       <div id='twoTwo' style={styleElementTwo} />
       <div id='threeTwo' style={styleElementThree} />
 
-      <Walktour steps={stepsPartTwo} identifier={"2"} />
+      <Walktour steps={stepsPartTwo} movingTarget identifier={"2"} />
     </div>
 
-    <Walktour disableCloseOnClick steps={steps} identifier={"1"} />
+    <Walktour disableCloseOnClick steps={steps} movingTarget identifier={"1"} />
   </>
 )
 

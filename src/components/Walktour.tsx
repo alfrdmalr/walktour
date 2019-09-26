@@ -36,6 +36,9 @@ export interface WalktourOptions {
   disableClose?: boolean;
   disableAutoScroll?: boolean;
   positionCandidateReducer?: (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords;
+  movingTarget?: boolean;
+  updateInterval?: number;
+  renderTolerance?: number;
 }
 
 export interface Step extends WalktourOptions {
@@ -59,7 +62,8 @@ const walktourDefaultProps: Partial<WalktourProps> = {
   transition: 'top 200ms ease, left 200ms ease',
   disableMaskInteraction: false,
   disableCloseOnClick: false,
-  zIndex: 9999
+  zIndex: 9999,
+  renderTolerance: 2
 }
 
 const basePortalString: string = 'walktour-portal';
@@ -77,10 +81,11 @@ export const Walktour = (props: WalktourProps) => {
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const tourRoot = React.useRef<Element>(undefined);
+
   const targetPosition = React.useRef<Coords>(undefined);
   const watcherId = React.useRef<number>(undefined);
-  const currentStepContent: Step = steps[currentStepIndex];
 
+  const currentStepContent: Step = steps[currentStepIndex];
   const {
     maskPadding,
     disableMaskInteraction,
@@ -99,7 +104,10 @@ export const Walktour = (props: WalktourProps) => {
     disablePrev,
     disableAutoScroll,
     identifier,
-    positionCandidateReducer
+    positionCandidateReducer,
+    movingTarget,
+    renderTolerance,
+    updateInterval
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -112,14 +120,12 @@ export const Walktour = (props: WalktourProps) => {
     if (rootSelector) {
       root = document.querySelector(rootSelector);
     }
-
     if (!root) {
       root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
     }
-
     tourRoot.current = root;
 
-    return () => window.clearInterval(watcherId.current);
+    return () => window.clearInterval(watcherId.current); //clear the target watcher on unmount
   }, []);
 
 
@@ -134,29 +140,17 @@ export const Walktour = (props: WalktourProps) => {
       window.clearInterval(watcherId.current);
     }
 
-    if (!target) {
+    if (!target || !movingTarget) {
       return;
     }
 
-    const id = window.setInterval(() => {
-      console.log('targeting: ', targetPosition.current)
-      if (shouldUpdate(tourRoot.current, target, targetPosition.current)) {
+    watcherId.current = window.setInterval(() => {
+      if (shouldUpdate(tourRoot.current, target, targetPosition.current, renderTolerance)) {
         updateTour();
       }
-    }, 1000)
+    }, updateInterval)
 
-    watcherId.current = id;
   }, [target])
-
-  const shouldUpdate = (tourRoot: Element, target: HTMLElement, targetPosition: Coords): boolean => {
-    if (!tourRoot || !target || !targetPosition) {
-      return false;
-    }
-
-    const rerenderTolerance: number = 1;
-    const currentTargetPosition: Coords = getTargetPosition(tourRoot, target);
-    return dist(currentTargetPosition, targetPosition) > rerenderTolerance;
-  }
 
   // update tooltip and target position in state
   const updateTour = () => {
@@ -217,7 +211,6 @@ export const Walktour = (props: WalktourProps) => {
   const close = () => {
     goToStep(0);
     setVisible(false);
-    // window.clearInterval(watcherId.current);
   }
 
   const baseLogic: WalktourLogic = {
@@ -267,6 +260,11 @@ export const Walktour = (props: WalktourProps) => {
     }
   }
 
+  //don't render if the tour is hidden or if there's no step data
+  if (!isVisible || !currentStepContent) {
+    return null
+  };
+
   const portalStyle: React.CSSProperties = {
     position: 'absolute',
     top: 0,
@@ -282,11 +280,6 @@ export const Walktour = (props: WalktourProps) => {
     transition: transition,
     width: tooltipWidth
   }
-
-   //don't render if the tour is hidden or if there's no step data
-   if (!isVisible || !currentStepContent) {
-    return null
-  };
 
   // render mask, tooltip, and their shared "portal" container
   const render = () => (
@@ -326,7 +319,15 @@ export const Walktour = (props: WalktourProps) => {
   }
 }
 
-
 function getIdString(base: string, identifier?: string): string {
   return `${base}${identifier ? `-${identifier}` : ``}`
+}
+
+function shouldUpdate(tourRoot: Element, target: HTMLElement, targetPosition: Coords, rerenderTolerance: number): boolean {
+  if (!tourRoot || !target || !targetPosition) {
+    return false;
+  }
+
+  const currentTargetPosition: Coords = getTargetPosition(tourRoot, target);
+  return dist(currentTargetPosition, targetPosition) > rerenderTolerance;
 }
