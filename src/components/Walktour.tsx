@@ -79,8 +79,8 @@ export const Walktour = (props: WalktourProps) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent: Step = steps[currentStepIndex];
 
-   //don't render if the tour is hidden or if there's no step data
-   if (!isVisible || !currentStepContent) {
+  //don't render if the tour is hidden or if there's no step data
+  if (!isVisible || !currentStepContent) {
     return null
   };
 
@@ -127,12 +127,6 @@ export const Walktour = (props: WalktourProps) => {
 
   //update tour when step changes
   React.useEffect(() => {
-    updateTour();
-  }, [currentStepIndex])
-
-
-  // update tooltip and target position in state
-  const updateTour = () => {
     if (!tourRoot.current) {
       return;
     }
@@ -163,7 +157,8 @@ export const Walktour = (props: WalktourProps) => {
     );
 
     tooltipContainer.focus();
-  }
+  }, [currentStepIndex])
+
 
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= steps.length || stepIndex < 0) {
