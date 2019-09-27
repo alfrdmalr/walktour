@@ -122,15 +122,17 @@ function getElementCoords(element: Element): Coords {
   return coords;
 }
 
-export function isElementInView(root: Element, element: HTMLElement, atPosition?: Coords): boolean {
+export function isElementInView(root: Element, element: HTMLElement, atPosition?: Coords, needsAdjusting?: boolean): boolean {
   if (!root || !element) {
-    return;
+    return false;
   }
-  const position: Coords = atPosition || getElementCoords(element);
+  const explicitPosition: Coords = atPosition && (needsAdjusting ? addAppropriateOffset(root, atPosition) : atPosition)
+  const position: Coords = explicitPosition || addAppropriateOffset(root, getElementCoords(element));
   const elementData: ClientRect = element.getBoundingClientRect();
-  const startCoords: Coords = getViewportStart(root);
-  const xVisibility: boolean = (position.x >= startCoords.x) && (position.x + elementData.width) <= getViewportWidth(root);
-  const yVisibility: boolean = (position.y >= startCoords.y) && (position.y + elementData.height) <= getViewportHeight(root);
+  const startCoords: Coords = addAppropriateOffset(root, getViewportStart(root));
+  const endCoords: Coords = addAppropriateOffset(root, {x: getViewportWidth(root), y: getViewportHeight(root)});
+  const xVisibility: boolean = (position.x >= startCoords.x) && ((position.x + elementData.width) <= endCoords.x);
+  const yVisibility: boolean = (position.y >= startCoords.y) && ((position.y + elementData.height) <= endCoords.y);
 
   return xVisibility && yVisibility;
 }
