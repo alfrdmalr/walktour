@@ -116,9 +116,9 @@ function getElementCoords(element: Element): Coords {
   return coords;
 }
 
-// atPosition should be adjusted for scroll/parent offset as needed
-function isElementInView(element: HTMLElement, root: Element, atPosition?: Coords): boolean {
-  const position: Coords = atPosition || addAppropriateOffset(getElementCoords(element), root);
+function isElementInView(element: HTMLElement, root: Element, atPosition?: Coords, needsAdjusting?: boolean): boolean {
+  const explicitPosition: Coords = atPosition && (needsAdjusting ? addAppropriateOffset(atPosition, root) : atPosition)
+  const position: Coords = explicitPosition || addAppropriateOffset(getElementCoords(element), root);
   const elementData: ClientRect = element.getBoundingClientRect();
   const startCoords: Coords = addAppropriateOffset(getViewportStart(root), root);
   const endCoords: Coords = addAppropriateOffset({x: getViewportWidth(root), y: getViewportHeight(root)}, root);
