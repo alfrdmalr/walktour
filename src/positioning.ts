@@ -74,6 +74,13 @@ function getViewportStart(root: Element): Coords {
   }
 }
 
+function getViewportEnd(root: Element): Coords {
+  return {
+    x: getViewportWidth(root),
+    y: getViewportHeight(root)
+  }
+}
+
 function getCurrentScrollOffset(root: Element): Coords {
   //use documentElement instead of body for scroll-related purposes 
   if (document.body.isSameNode(root)) {
@@ -116,12 +123,27 @@ function getElementCoords(element: Element): Coords {
   return coords;
 }
 
+function addElementCenterOffset(coords: Coords, element: Element): Coords {
+  if (!element) {
+    return coords;
+  }
+
+  const elementData: ClientRect = element.getBoundingClientRect();
+  const xOffset: number = elementData ? elementData.width / 2 : 0;
+  const yOffset: number = elementData ? elementData.height / 2 : 0;
+
+  return {
+    x: coords.x - xOffset,
+    y: coords.y - yOffset
+  }
+}
+
 function isElementInView(element: HTMLElement, root: Element, atPosition?: Coords, needsAdjusting?: boolean): boolean {
   const explicitPosition: Coords = atPosition && (needsAdjusting ? addAppropriateOffset(atPosition, root) : atPosition)
   const position: Coords = explicitPosition || addAppropriateOffset(getElementCoords(element), root);
   const elementData: ClientRect = element.getBoundingClientRect();
   const startCoords: Coords = addAppropriateOffset(getViewportStart(root), root);
-  const endCoords: Coords = addAppropriateOffset({x: getViewportWidth(root), y: getViewportHeight(root)}, root);
+  const endCoords: Coords = addAppropriateOffset(getViewportEnd(root), root);
   const xVisibility: boolean = (position.x >= startCoords.x) && ((position.x + elementData.width) <= endCoords.x);
   const yVisibility: boolean = (position.y >= startCoords.y) && ((position.y + elementData.height) <= endCoords.y);
 
@@ -129,14 +151,11 @@ function isElementInView(element: HTMLElement, root: Element, atPosition?: Coord
 }
 
 function getCenterCoords(root: Element, element?: HTMLElement): Coords {
-  const elementData: ClientRect = element && element.getBoundingClientRect();
-  const xOffset: number = element && elementData ? elementData.width / 2 : 0;
-  const yOffset: number = element && elementData ? elementData.height / 2 : 0;
   const startCoords: Coords = getViewportStart(root);
-  return {
-    x: startCoords.x + (getViewportWidth(root) / 2) - xOffset,
-    y: startCoords.y + (getViewportHeight(root) / 2) - yOffset
-  }
+  return addElementCenterOffset({
+    x: startCoords.x + (getViewportWidth(root) / 2),
+    y: startCoords.y + (getViewportHeight(root) / 2)
+  }, element)
 }
 
 function scrollToElement(element: HTMLElement, root: Element, centerElementInViewport?: boolean, padding?: number): void {
