@@ -285,20 +285,7 @@ function getTooltipPositionCandidates(root: Element, target: HTMLElement, toolti
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
 function getCenterReducer(root: Element, tooltip: HTMLElement): ((acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords) {
-  const center: Coords = getCenterCoords(root);
-
-  // offset by the tooltip dimensions so that we're comparing the 
-  // tooltip center, not its origin
-  const useTooltipCenter = (coords: Coords): Coords => {
-    const tooltipDimensions: ClientRect = tooltip.getBoundingClientRect();
-    const xOffset: number = tooltipDimensions ? tooltipDimensions.width / 2 : 0;
-    const yOffset: number = tooltipDimensions ? tooltipDimensions.height / 2 : 0;
-
-    return {
-      x: coords.x + xOffset,
-      y: coords.y + yOffset
-    }
-  }
+  const center: Coords = getCenterCoords(root, tooltip);
 
   return (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]): Coords => {
     if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
@@ -310,9 +297,7 @@ function getCenterReducer(root: Element, tooltip: HTMLElement): ((acc: Coords, c
     } else if (acc === undefined) {
       return cur.coords;
     } else {
-      const curWithTooltip: Coords = useTooltipCenter(cur.coords);
-      const accWithTooltip: Coords = useTooltipCenter(acc);
-      if (dist(center, curWithTooltip) > dist(center, accWithTooltip)) {
+      if (dist(center, cur.coords) > dist(center, acc)) {
         return acc;
       } else {
         return cur.coords;
