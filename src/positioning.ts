@@ -74,6 +74,13 @@ function getViewportStart(root: Element): Coords {
   }
 }
 
+function getViewportEnd(root: Element): Coords {
+  return {
+    x: getViewportWidth(root),
+    y: getViewportHeight(root)
+  }
+}
+
 function getCurrentScrollOffset(root: Element): Coords {
   //use documentElement instead of body for scroll-related purposes 
   if (document.body.isSameNode(root)) {
@@ -116,12 +123,27 @@ function getElementCoords(element: Element): Coords {
   return coords;
 }
 
+function addElementCenterOffset(coords: Coords, element: Element): Coords {
+  if (!element) {
+    return coords;
+  }
+
+  const elementData: ClientRect = element.getBoundingClientRect();
+  const xOffset: number = elementData ? elementData.width / 2 : 0;
+  const yOffset: number = elementData ? elementData.height / 2 : 0;
+
+  return {
+    x: coords.x - xOffset,
+    y: coords.y - yOffset
+  }
+}
+
 function isElementInView(element: HTMLElement, root: Element, atPosition?: Coords, needsAdjusting?: boolean): boolean {
   const explicitPosition: Coords = atPosition && (needsAdjusting ? addAppropriateOffset(atPosition, root) : atPosition)
   const position: Coords = explicitPosition || addAppropriateOffset(getElementCoords(element), root);
   const elementData: ClientRect = element.getBoundingClientRect();
   const startCoords: Coords = addAppropriateOffset(getViewportStart(root), root);
-  const endCoords: Coords = addAppropriateOffset({x: getViewportWidth(root), y: getViewportHeight(root)}, root);
+  const endCoords: Coords = addAppropriateOffset(getViewportEnd(root), root);
   const xVisibility: boolean = (position.x >= startCoords.x) && ((position.x + elementData.width) <= endCoords.x);
   const yVisibility: boolean = (position.y >= startCoords.y) && ((position.y + elementData.height) <= endCoords.y);
 
@@ -129,14 +151,11 @@ function isElementInView(element: HTMLElement, root: Element, atPosition?: Coord
 }
 
 function getCenterCoords(root: Element, element?: HTMLElement): Coords {
-  const elementData: ClientRect = element && element.getBoundingClientRect();
-  const xOffset: number = element && elementData ? elementData.width / 2 : 0;
-  const yOffset: number = element && elementData ? elementData.height / 2 : 0;
   const startCoords: Coords = getViewportStart(root);
-  return {
-    x: startCoords.x + (getViewportWidth(root) / 2) - xOffset,
-    y: startCoords.y + (getViewportHeight(root) / 2) - yOffset
-  }
+  return addElementCenterOffset({
+    x: startCoords.x + (getViewportWidth(root) / 2),
+    y: startCoords.y + (getViewportHeight(root) / 2)
+  }, element)
 }
 
 function scrollToElement(element: HTMLElement, root: Element, centerElementInViewport?: boolean, padding?: number): void {
@@ -257,9 +276,23 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
 }
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
-function getCenterReducer(root: Element): ((acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords) {
-  return (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]): Coords => {
+function getCenterReducer(root: Element, tooltip: HTMLElement): ((acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords) {
+  const center: Coords = getCenterCoords(root);
 
+  // offset by the tooltip dimensions so that we're comparing the 
+  // tooltip center, not its origin
+  const useTooltipCenter = (coords: Coords): Coords => {
+    const tooltipDimensions: ClientRect = tooltip.getBoundingClientRect();
+    const xOffset: number = tooltipDimensions ? tooltipDimensions.width / 2 : 0;
+    const yOffset: number = tooltipDimensions ? tooltipDimensions.height / 2 : 0;
+
+    return {
+      x: coords.x + xOffset,
+      y: coords.y + yOffset
+    }
+  }
+
+  return (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]): Coords => {
     if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
       if (ind === arr.length - 1 && acc === undefined) { //unless  we're at the end and we still haven't picked a coord
         return cur.coords;
@@ -269,18 +302,12 @@ function getCenterReducer(root: Element): ((acc: Coords, cur: OrientationCoords,
     } else if (acc === undefined) {
       return cur.coords;
     } else {
-      const center: Coords = getCenterCoords(root);
-      if (dist(center, cur.coords) > dist(center, acc)) {
+      const curWithTooltip: Coords = useTooltipCenter(cur.coords);
+      const accWithTooltip: Coords = useTooltipCenter(acc);
+      if (dist(center, curWithTooltip) > dist(center, accWithTooltip)) {
         return acc;
-      } else if (acc === undefined) {
-        return cur.coords;
       } else {
-        const center: Coords = getCenterCoords(root);
-        if (dist(center, cur.coords) > dist(center, acc)) {
-          return acc;
-        } else {
-          return cur.coords;
-        }
+        return cur.coords;
       }
     }
   }
@@ -301,7 +328,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   }
 
   const choosePositionFromPreferences = (): Coords => {
-    const reducer = positionCandidateReducer || getCenterReducer(tourRoot);
+    const reducer = positionCandidateReducer || getCenterReducer(tourRoot, tooltip);
     const candidates: OrientationCoords[] = getTooltipPositionCandidates(target, tooltip, tourRoot, padding, tooltipSeparation, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
       return chooseBestPosition(candidates, reducer);
@@ -314,7 +341,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   const rawPosition: Coords = choosePositionFromPreferences(); //position relative to current viewport
   const adjustedPosition: Coords = addAppropriateOffset(rawPosition, tourRoot);
 
-  if (!disableAutoScroll && (!isElementInView(target, tourRoot) || !isElementInView(tooltip, tourRoot, rawPosition))) {
+  if (!disableAutoScroll && (!isElementInView(target, tourRoot) || !isElementInView(tooltip, tourRoot, rawPosition, true))) {
     scrollToElement(target, tourRoot, true);
   }
   return adjustedPosition;
