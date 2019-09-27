@@ -19,6 +19,11 @@ export interface Coords {
   y: number;
 }
 
+export interface Dims {
+  width: number;
+  height: number;
+}
+
 export interface OrientationCoords {
   orientation: CardinalOrientation;
   coords: Coords;
@@ -59,6 +64,13 @@ function getViewportWidth(root: Element): number {
       window.innerWidth);
   } else {
     return root.clientWidth;
+  }
+}
+
+function getViewportDims(root: Element): Dims {
+  return {
+    width: getViewportWidth(root),
+    height: getViewportHeight(root)
   }
 }
 
@@ -129,21 +141,6 @@ function getElementCoords(element: Element): Coords {
   return coords;
 }
 
-function addElementCenterOffset(coords: Coords, element: Element): Coords {
-  if (!element) {
-    return coords;
-  }
-
-  const elementData: ClientRect = element.getBoundingClientRect();
-  const xOffset: number = elementData ? elementData.width / 2 : 0;
-  const yOffset: number = elementData ? elementData.height / 2 : 0;
-
-  return {
-    x: coords.x - xOffset,
-    y: coords.y - yOffset
-  }
-}
-
 export function isElementInView(root: Element, element: HTMLElement, atPosition?: Coords, needsAdjusting?: boolean): boolean {
   if (!root || !element) {
     return false;
@@ -159,30 +156,49 @@ export function isElementInView(root: Element, element: HTMLElement, atPosition?
   return xVisibility && yVisibility;
 }
 
-function getCenterCoords(root: Element, element?: HTMLElement): Coords {
+//apply a common offset calculation where b is centered relative to a. If b is larger than a, the result is that a will be centered within b.
+function applyCenterOffset(origin: Coords, a: Dims, b: Dims): Coords {
+  return {
+    x: origin.x + (a.width / 2) - (b.width / 2),
+    y: origin.y + (a.height / 2) - (b.height / 2)
+  }
+}
+
+// get the coordinates the viewport would need to be placed for the element to be centered
+function centerElementInViewport(root: Element, element: HTMLElement): Coords {
+  const elementData: ClientRect = element.getBoundingClientRect();
+  const elementDims: Dims = {width: elementData.width, height: elementData.height}
+  const elementCoords: Coords = getElementCoords(element);
+
+  return applyCenterOffset(elementCoords, elementDims, getViewportDims(root))
+}
+
+// get the center coord of the viewport. If element is provided, the return value is the origin 
+// which would align that element's center with the viewport center
+function getViewportCenter(root: Element, element?: HTMLElement): Coords {
   if (!root) {
     return;
   }
+  const elementData: ClientRect = element && element.getBoundingClientRect();
   const startCoords: Coords = getViewportStart(root);
-  return addElementCenterOffset({
-    x: startCoords.x + (getViewportWidth(root) / 2),
-    y: startCoords.y + (getViewportHeight(root) / 2)
-  }, element)
+  const viewportDims: Dims = getViewportDims(root);
+  const elementDims: Dims = elementData
+    ? { width: elementData.width, height: elementData.height }
+    : {width: 0, height: 0}
+
+  return applyCenterOffset(startCoords, viewportDims, elementDims);
 }
 
 export function scrollToElement(root: Element, element: HTMLElement): void {
   if (!root || !element) {
     return;
   }
-  const el: Coords = addAppropriateOffset(root, getElementCoords(element));
-  const elementData: ClientRect = element.getBoundingClientRect();
 
-  const xOffset = (getViewportWidth(root) - elementData.width) / 2;
-  const yOffset = (getViewportHeight(root) - elementData.height) / 2;
+  const coords = addAppropriateOffset(root, centerElementInViewport(root, element));
 
   const scrollOptions: ScrollToOptions = {
-    top: el.y - yOffset,
-    left: el.x - xOffset,
+    top: coords.y,
+    left: coords.x,
     behavior: 'smooth'
   }
 
@@ -239,7 +255,7 @@ function getTooltipPositionCandidates(root: Element, target: HTMLElement, toolti
   const south: Coords = { x: centerX, y: southOffset }
   const west: Coords = { x: westOffset, y: centerY };
   const north: Coords = { x: centerX, y: northOffset };
-  const center: Coords = getCenterCoords(root, tooltip);
+  const center: Coords = getViewportCenter(root, tooltip);
 
   const standardPositions = [
     { orientation: CardinalOrientation.EAST, coords: east },
@@ -285,7 +301,7 @@ function getTooltipPositionCandidates(root: Element, target: HTMLElement, toolti
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
 function getCenterReducer(root: Element, tooltip: HTMLElement): ((acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords) {
-  const center: Coords = getCenterCoords(root, tooltip);
+  const center: Coords = getViewportCenter(root, tooltip);
 
   return (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]): Coords => {
     if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
@@ -310,7 +326,7 @@ function getCenterReducer(root: Element, tooltip: HTMLElement): ((acc: Coords, c
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot } = args;
 
-  const defaultPosition: Coords = addAppropriateOffset(tourRoot, getCenterCoords(tourRoot, tooltip));
+  const defaultPosition: Coords = addAppropriateOffset(tourRoot, getViewportCenter(tourRoot, tooltip));
   const choosePositionFromPreferences = (): Coords => {
     const candidates: OrientationCoords[] = getTooltipPositionCandidates(tourRoot, target, tooltip, padding, tooltipSeparation, true);
     const reducer = positionCandidateReducer || getCenterReducer(tourRoot, tooltip);
