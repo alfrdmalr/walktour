@@ -276,9 +276,23 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
 }
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
-function getCenterReducer(root: Element): ((acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords) {
-  return (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]): Coords => {
+function getCenterReducer(root: Element, tooltip: HTMLElement): ((acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords) {
+  const center: Coords = getCenterCoords(root);
 
+  // offset by the tooltip dimensions so that we're comparing the 
+  // tooltip center, not its origin
+  const useTooltipCenter = (coords: Coords): Coords => {
+    const tooltipDimensions: ClientRect = tooltip.getBoundingClientRect();
+    const xOffset: number = tooltipDimensions ? tooltipDimensions.width / 2 : 0;
+    const yOffset: number = tooltipDimensions ? tooltipDimensions.height / 2 : 0;
+
+    return {
+      x: coords.x + xOffset,
+      y: coords.y + yOffset
+    }
+  }
+
+  return (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]): Coords => {
     if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
       if (ind === arr.length - 1 && acc === undefined) { //unless  we're at the end and we still haven't picked a coord
         return cur.coords;
@@ -288,8 +302,9 @@ function getCenterReducer(root: Element): ((acc: Coords, cur: OrientationCoords,
     } else if (acc === undefined) {
       return cur.coords;
     } else {
-      const center: Coords = getCenterCoords(root);
-      if (dist(center, cur.coords) > dist(center, acc)) {
+      const curWithTooltip: Coords = useTooltipCenter(cur.coords);
+      const accWithTooltip: Coords = useTooltipCenter(acc);
+      if (dist(center, curWithTooltip) > dist(center, accWithTooltip)) {
         return acc;
       } else {
         return cur.coords;
@@ -313,7 +328,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   }
 
   const choosePositionFromPreferences = (): Coords => {
-    const reducer = positionCandidateReducer || getCenterReducer(tourRoot);
+    const reducer = positionCandidateReducer || getCenterReducer(tourRoot, tooltip);
     const candidates: OrientationCoords[] = getTooltipPositionCandidates(target, tooltip, tourRoot, padding, tooltipSeparation, true);
     if (!orientationPreferences || orientationPreferences.length === 0) {
       return chooseBestPosition(candidates, reducer);
@@ -326,7 +341,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   const rawPosition: Coords = choosePositionFromPreferences(); //position relative to current viewport
   const adjustedPosition: Coords = addAppropriateOffset(rawPosition, tourRoot);
 
-  if (!disableAutoScroll && (!isElementInView(target, tourRoot) || !isElementInView(tooltip, tourRoot, rawPosition))) {
+  if (!disableAutoScroll && (!isElementInView(target, tourRoot) || !isElementInView(tooltip, tourRoot, rawPosition, true))) {
     scrollToElement(target, tourRoot, true);
   }
   return adjustedPosition;
