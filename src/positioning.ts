@@ -116,12 +116,14 @@ function getElementCoords(element: Element): Coords {
   return coords;
 }
 
+// atPosition should be adjusted for scroll/parent offset as needed
 function isElementInView(element: HTMLElement, root: Element, atPosition?: Coords): boolean {
-  const position: Coords = atPosition || getElementCoords(element);
+  const position: Coords = atPosition || addAppropriateOffset(getElementCoords(element), root);
   const elementData: ClientRect = element.getBoundingClientRect();
-  const startCoords: Coords = getViewportStart(root);
-  const xVisibility: boolean = (position.x >= startCoords.x) && (position.x + elementData.width) <= getViewportWidth(root);
-  const yVisibility: boolean = (position.y >= startCoords.y) && (position.y + elementData.height) <= getViewportHeight(root);
+  const startCoords: Coords = addAppropriateOffset(getViewportStart(root), root);
+  const endCoords: Coords = addAppropriateOffset({x: getViewportWidth(root), y: getViewportHeight(root)}, root);
+  const xVisibility: boolean = (position.x >= startCoords.x) && ((position.x + elementData.width) <= endCoords.x);
+  const yVisibility: boolean = (position.y >= startCoords.y) && ((position.y + elementData.height) <= endCoords.y);
 
   return xVisibility && yVisibility;
 }
