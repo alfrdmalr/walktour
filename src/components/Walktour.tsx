@@ -79,11 +79,6 @@ export const Walktour = (props: WalktourProps) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const currentStepContent: Step = steps[currentStepIndex];
 
-  //don't render if the tour is hidden or if there's no step data
-  if (!isVisible || !currentStepContent) {
-    return null
-  };
-
   const {
     maskPadding,
     disableMaskInteraction,
@@ -226,6 +221,11 @@ export const Walktour = (props: WalktourProps) => {
         break;
     }
   }
+
+  //don't render if the tour is hidden or if there's no step data
+  if (!isVisible || !currentStepContent) {
+    return null
+  };
 
   const portalStyle: React.CSSProperties = {
     position: 'absolute',
