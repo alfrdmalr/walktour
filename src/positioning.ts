@@ -291,15 +291,8 @@ function getCenterReducer(root: Element): ((acc: Coords, cur: OrientationCoords,
       const center: Coords = getCenterCoords(root);
       if (dist(center, cur.coords) > dist(center, acc)) {
         return acc;
-      } else if (acc === undefined) {
-        return cur.coords;
       } else {
-        const center: Coords = getCenterCoords(root);
-        if (dist(center, cur.coords) > dist(center, acc)) {
-          return acc;
-        } else {
-          return cur.coords;
-        }
+        return cur.coords;
       }
     }
   }
