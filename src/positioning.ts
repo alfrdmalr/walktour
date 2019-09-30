@@ -36,7 +36,7 @@ interface GetTooltipPositionArgs {
   tooltipSeparation: number;
   tourRoot: Element;
   orientationPreferences?: CardinalOrientation[];
-  positionCandidateReducer?: (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords;
+  getPositionFromCandidates?: (candidates: OrientationCoords[]) => Coords;
 }
 
 //helpers
@@ -322,21 +322,18 @@ function getCenterReducer(root: Element, tooltip: HTMLElement): ((acc: Coords, c
   }
 }
 
+function filterPreferredCandidates(candidates: OrientationCoords[], orientationPreferences?: CardinalOrientation[]): OrientationCoords[] {
+  if (!orientationPreferences || orientationPreferences.length === 0) {
+    return candidates;
+  } else {
+    const preferenceFilter = (cc: OrientationCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
+    return candidates.filter(preferenceFilter);
+  }
+}
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, positionCandidateReducer, tourRoot } = args;
-
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, getPositionFromCandidates, tourRoot } = args;
   const defaultPosition: Coords = addAppropriateOffset(tourRoot, getViewportCenter(tourRoot, tooltip));
-  const choosePositionFromPreferences = (): Coords => {
-    const candidates: OrientationCoords[] = getTooltipPositionCandidates(tourRoot, target, tooltip, padding, tooltipSeparation, true);
-    const reducer = positionCandidateReducer || getCenterReducer(tourRoot, tooltip);
-    if (!orientationPreferences || orientationPreferences.length === 0) {
-      return candidates.reduce(reducer, undefined);
-    } else {
-      const preferenceFilter = (cc: OrientationCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
-      return candidates.filter(preferenceFilter).reduce(reducer, undefined);
-    }
-  }
 
   if (!tooltip || !tourRoot) {
     return;
@@ -344,7 +341,10 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     return defaultPosition;
   }
 
-  const rawPosition: Coords = choosePositionFromPreferences(); //position relative to current viewport
+  const candidates: OrientationCoords[] = getTooltipPositionCandidates(tourRoot, target, tooltip, padding, tooltipSeparation, true);
+  const choosePosition = getPositionFromCandidates || ((candidates: OrientationCoords[]) => candidates.reduce(getCenterReducer(tourRoot, tooltip), undefined));
+
+  const rawPosition: Coords = choosePosition(filterPreferredCandidates(candidates, orientationPreferences)); //position relative to current viewport
 
   if (!rawPosition) {
     return defaultPosition;
