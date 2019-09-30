@@ -35,7 +35,7 @@ export interface WalktourOptions {
   disablePrev?: boolean;
   disableClose?: boolean;
   disableAutoScroll?: boolean;
-  positionCandidateReducer?: (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords;
+  getPositionFromCandidates?: (candidates: OrientationCoords[]) => Coords;
   movingTarget?: boolean;
   updateInterval?: number;
   renderTolerance?: number;
@@ -105,7 +105,7 @@ export const Walktour = (props: WalktourProps) => {
     disablePrev,
     disableAutoScroll,
     identifier,
-    positionCandidateReducer,
+    getPositionFromCandidates,
     movingTarget,
     renderTolerance,
     updateInterval
@@ -163,7 +163,7 @@ export const Walktour = (props: WalktourProps) => {
       tooltipSeparation,
       orientationPreferences,
       tourRoot: root,
-      positionCandidateReducer
+      getPositionFromCandidates
     });
 
     setTarget(target);
