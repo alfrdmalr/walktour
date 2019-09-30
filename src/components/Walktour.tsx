@@ -81,8 +81,8 @@ export const Walktour = (props: WalktourProps) => {
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
-  const tourRoot = React.useRef<Element>(undefined);
 
+  const tourRoot = React.useRef<Element>(undefined);
   const targetPosition = React.useRef<Coords>(undefined);
   const watcherId = React.useRef<number>(undefined);
 
@@ -124,7 +124,7 @@ export const Walktour = (props: WalktourProps) => {
     if (!root) {
       root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
     }
-  
+
     tourRoot.current = root;
 
     return () => clearWatcher(watcherId) //clear the target watcher on unmount
@@ -141,9 +141,7 @@ export const Walktour = (props: WalktourProps) => {
     const root: Element = tourRoot.current;
     const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
 
-    if (watcherId.current) {
-      clearWatcher(watcherId);
-    }
+    clearWatcher(watcherId);
 
     if (!root || !tooltipContainer) {
       setTarget(null);
@@ -157,7 +155,7 @@ export const Walktour = (props: WalktourProps) => {
     const tangibleTooltip = tooltipContainer.firstElementChild as HTMLElement || tooltipContainer;
     const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
     const target: HTMLElement = getTarget();
-    const newTargetPosition: Coords = getTargetPosition(root, target);
+    const currentTargetPosition: Coords = getTargetPosition(root, target);
     const tooltipPosition: Coords = getTooltipPosition({
       target,
       tooltip: tangibleTooltip,
@@ -170,7 +168,7 @@ export const Walktour = (props: WalktourProps) => {
 
     setTarget(target);
     setTooltipPosition(tooltipPosition);
-    targetPosition.current = newTargetPosition;
+    targetPosition.current = currentTargetPosition;
 
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
     if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tangibleTooltip, tooltipPosition))) {
