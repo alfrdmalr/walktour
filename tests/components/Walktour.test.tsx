@@ -25,14 +25,16 @@ describe('Walktour render structure', () => {
     expect(mask.exists()).toBe(true);
   })
 
-  // test('with target', () => {
-  //   const tour = mount(<div>
-  //     <div id="one" />
-  //     <Walktour steps={[{ selector: '#one', description: 'hello world', title: 'Hey Earth!' }]} />
-  //   </div>)
+  test('with target', () => {
+    const tour = mount(<div>
+      <div id="one" />
+      <Walktour steps={[{ selector: '#one', description: 'hello world', title: 'Hey Earth!' }]} />
+    </div>)
 
-  // const tooltip = tour.find('#walktour-tooltip-container') 
-  
+  const tooltip = tour.find('#walktour-tooltip-container') 
 
-  // })
+  expect(tooltip.exists()).toBe(true);
+  expect(tooltip.find('button')).toHaveLength(3); // skip, previous, next
+
+  })
 })
