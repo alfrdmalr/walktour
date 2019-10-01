@@ -314,7 +314,7 @@ export const Walktour = (props: WalktourProps) => {
       </div>
     </div>);
 
-  // on first render, put everything in it's normal context.
+  // on first render, put everything in its normal context.
   // after first render (once we've determined the tour root) spawn a portal there for rendering.
   if (tourRoot.current) {
     return ReactDOM.createPortal(render(), tourRoot.current);
