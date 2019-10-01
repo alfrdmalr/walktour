@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Coords, getTargetPosition } from "../positioning";
+import { Coords } from '../utils/dom';
+import { getTargetPosition } from '../utils/positioning';
 
 interface MaskProps {
   target: HTMLElement;
