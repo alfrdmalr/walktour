@@ -30,6 +30,7 @@ export interface WalktourOptions {
   customTooltipRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
   customNextFunc?: (tourLogic: WalktourLogic) => void;
   customPrevFunc?: (tourLogic: WalktourLogic) => void;
+  customCloseFunc?: (tourLogic: WalktourLogic) => void;
   prevLabel?: string;
   nextLabel?: string;
   closeLabel?: string;
@@ -102,6 +103,7 @@ export const Walktour = (props: WalktourProps) => {
     rootSelector,
     customNextFunc,
     customPrevFunc,
+    customCloseFunc,
     disableClose,
     disableNext,
     disablePrev,
@@ -230,7 +232,8 @@ export const Walktour = (props: WalktourProps) => {
   const tourLogic: WalktourLogic = {
     ...baseLogic,
     ...customNextFunc && { next: () => customNextFunc(baseLogic) },
-    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) }
+    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) },
+    ...customCloseFunc && { close: () => customCloseFunc(baseLogic) }
   };
 
   const keyPressHandler = (event: React.KeyboardEvent) => {
@@ -238,27 +241,19 @@ export const Walktour = (props: WalktourProps) => {
       case "Escape":
         event.preventDefault();
         if (!disableClose) {
-          close();
+          tourLogic.close();
         }
         break;
       case "ArrowRight":
         event.preventDefault();
         if (!disableNext) {
-          if (customNextFunc) {
-            customNextFunc(baseLogic);
-          } else {
-            next();
-          }
+          tourLogic.next()
         }
         break;
       case "ArrowLeft":
         event.preventDefault();
         if (!disablePrev) {
-          if (customPrevFunc) {
-            customPrevFunc(baseLogic);
-          } else {
-            prev();
-          }
+          tourLogic.prev();
         }
         break;
     }
