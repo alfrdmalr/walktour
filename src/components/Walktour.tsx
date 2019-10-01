@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor, OrientationCoords, isElementInView, scrollToElement, getTargetPosition, dist } from '../positioning'
+import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
-import * as ReactDOM from 'react-dom';
+import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
+import { Coords, getNearestScrollAncestor, dist } from '../utils/dom';
+import { isElementInView, scrollToElement } from '../utils/scroll';
 
 export interface WalktourLogic {
   next: () => void;
