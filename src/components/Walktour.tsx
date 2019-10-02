@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Coords, getTooltipPosition, CardinalOrientation, getNearestScrollAncestor, OrientationCoords, isElementInView, scrollToElement, getTargetPosition, dist } from '../positioning'
+import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
-import * as ReactDOM from 'react-dom';
+import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
+import { Coords, getNearestScrollAncestor, dist } from '../utils/dom';
+import { isElementInView, scrollToElement } from '../utils/scroll';
 
 export interface WalktourLogic {
   next: () => void;
@@ -28,6 +30,7 @@ export interface WalktourOptions {
   customTooltipRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
   customNextFunc?: (tourLogic: WalktourLogic) => void;
   customPrevFunc?: (tourLogic: WalktourLogic) => void;
+  customCloseFunc?: (tourLogic: WalktourLogic) => void;
   prevLabel?: string;
   nextLabel?: string;
   closeLabel?: string;
@@ -100,6 +103,7 @@ export const Walktour = (props: WalktourProps) => {
     rootSelector,
     customNextFunc,
     customPrevFunc,
+    customCloseFunc,
     disableClose,
     disableNext,
     disablePrev,
@@ -228,7 +232,8 @@ export const Walktour = (props: WalktourProps) => {
   const tourLogic: WalktourLogic = {
     ...baseLogic,
     ...customNextFunc && { next: () => customNextFunc(baseLogic) },
-    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) }
+    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) },
+    ...customCloseFunc && { close: () => customCloseFunc(baseLogic) }
   };
 
   const keyPressHandler = (event: React.KeyboardEvent) => {
@@ -236,27 +241,19 @@ export const Walktour = (props: WalktourProps) => {
       case "Escape":
         event.preventDefault();
         if (!disableClose) {
-          close();
+          tourLogic.close();
         }
         break;
       case "ArrowRight":
         event.preventDefault();
         if (!disableNext) {
-          if (customNextFunc) {
-            customNextFunc(baseLogic);
-          } else {
-            next();
-          }
+          tourLogic.next()
         }
         break;
       case "ArrowLeft":
         event.preventDefault();
         if (!disablePrev) {
-          if (customPrevFunc) {
-            customPrevFunc(baseLogic);
-          } else {
-            prev();
-          }
+          tourLogic.prev();
         }
         break;
     }
@@ -312,7 +309,7 @@ export const Walktour = (props: WalktourProps) => {
       </div>
     </div>);
 
-  // on first render, put everything in it's normal context.
+  // on first render, put everything in its normal context.
   // after first render (once we've determined the tour root) spawn a portal there for rendering.
   if (tourRoot.current) {
     return ReactDOM.createPortal(render(), tourRoot.current);

@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
 import { Walktour, Step, WalktourLogic } from '../src/components/Walktour'
-import { CardinalOrientation } from '../src/positioning';
+import { CardinalOrientation } from '../src/utils/positioning'
 
 const steps: Step[] = [
   { selector: null, title: 'Guided Tour Component', description: 'Welcome to the tour!'},
@@ -60,7 +60,7 @@ const App = () => (
 
     <div style={containerStyle} id="demo-container">
       <div id='oneTwo' style={oneStyle} />
-      <div id='twoTwo' style={twoStyle} />
+      <div id='twoTwo' style={{...twoStyle, position: 'sticky'}} />
       <div id='threeTwo' style={threeStyle} />
 
       <Walktour steps={stepsPartTwo} movingTarget identifier={"2"} />

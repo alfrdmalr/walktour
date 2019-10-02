@@ -1,2 +1,3 @@
+
 export {Walktour, Step, WalktourProps, WalktourOptions, WalktourLogic} from './components/Walktour';
-export {CardinalOrientation} from './positioning';
+export {CardinalOrientation} from './utils/positioning';
