@@ -31,7 +31,7 @@ const stepsPartTwo: Step[] = [
   orientationPreferences: [CardinalOrientation.SOUTH]},
 ]
 
-const containerStyle: React.CSSProperties = { position: 'absolute', left: 1800, top: 1800, height: 600, width: 600, overflow: 'scroll', padding: '2rem' }
+const containerStyle: React.CSSProperties = { position: 'absolute', left: 1800, top: 1800, height: 600, width: 600, overflow: 'auto', padding: '2rem' }
 const oneStyle: React.CSSProperties = { background: 'grey', width: 200, height: 100, }
 const twoStyle: React.CSSProperties = { background: 'cornflowerblue', width: 100, height: 200, left: 300, top: 300, position: 'absolute' }
 const threeStyle: React.CSSProperties = { background: 'magenta', width: 600, height: 100, left: 900, top: 15, position: 'absolute' }
@@ -40,7 +40,6 @@ const fiveStyle: React.CSSProperties = { position: 'absolute', top: '350px', lef
 const sixStyle: React.CSSProperties = { background: 'aquamarine', width: 200, height: 100, left: 450, top: 450, position: 'absolute' }
 const sevenStyle: React.CSSProperties = { background: 'linear-gradient(to right, red, white, blue)', width: 200, height: 100, left: 169, top: 1776, position: 'absolute', }
 const eightStyle: React.CSSProperties = { background: 'transparent', width: 200, height: 100, left: 10, top: 650, position: 'absolute', border: '5px dotted black', borderRadius: '5px' }
-
 
 const App = () => (
   <>
@@ -60,7 +59,7 @@ const App = () => (
 
     <div style={containerStyle} id="demo-container">
       <div id='oneTwo' style={oneStyle} />
-      <div id='twoTwo' style={{...twoStyle, position: 'sticky'}} />
+      <div id='twoTwo' style={{...twoStyle}} />
       <div id='threeTwo' style={threeStyle} />
 
       <Walktour steps={stepsPartTwo} movingTarget identifier={"2"} />

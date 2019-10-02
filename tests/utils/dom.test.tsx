@@ -2,6 +2,7 @@ import { dist, Coords, getElementCoords, getNearestScrollAncestor } from '../../
 import { shallow, mount } from 'enzyme';
 import * as React from 'react';
 
+// Testing "dist" function, which calculates the distance between two points
 describe('dist', () => {
   const coordsOrigin: Coords = { x: 0, y: 0 }
   const coords100: Coords = { x: 100, y: 100 }
@@ -43,6 +44,7 @@ describe('dist', () => {
   })
 })
 
+// testing "getElementCoords", which returns the coordinates of the element on the screen.
 describe('get element coords', () => {
   test('origin', () => {
     mockGBCR({ x: 0, y: 0 })
@@ -55,50 +57,87 @@ describe('get element coords', () => {
   })
 })
 
+// testing "getNearestScrollAncestor", which crawls up the dom tree looking for the nearest element that has scrolling capabilities.
 describe('get nearest scroll ancestor', () => {
   const page = mount(<div id='parent'>
     <div id='child-1'>
       <button id="btn">button</button>
     </div>
-    <div id='child-2' style={{overflow: 'scroll'}}>
+    <div id='child-2' style={{ overflow: 'scroll' }}>
       <div id='grandchild'>
         <div id='great-grandchild'>
-          <div id='great-great-grandchild'>child</div>
+          <div id='great-great-grandchild' style={{overflow: 'visible'}}>
+            <div id="great-great-great-grandchild"></div>
+
+          </div>
+
         </div>
       </div>
-      <div id='grandchild-2' style={{overflowY: 'auto'}}>
+      <div id='grandchild-2' style={{ overflowY: 'auto' }}>
         <div id="great-grandchild-2">overflow y child</div>>
       </div>
-      <div id='grandchild-3' style={{overflowX: 'hidden'}}>
-        <div>overflow hidden child</div>>
+      <div id='grandchild-3' style={{ overflowX: 'hidden' }}>
+        <div id="great-grandchild-3">overflow hidden child</div>>
       </div>
+      <div id='child-3' style={{ overflowX: 'visible', overflowY: 'scroll' }}>
+        <div id="grandchild-4"></div>
+      </div>
+
     </div>
   </div>);
 
   test('default scroll ancestor is document body', () => {
-    const button = page.find('#btn');
-    expect(getNearestScrollAncestor(button.getDOMNode())).toBe(document.body);
+    const button = page.find('#btn').getDOMNode();
+    expect(getNearestScrollAncestor(button)).toBe(document.body);
 
   })
 
-  test('nested descendant', () => {
-    const nestedChild = page.find('#great-great-grandchild');
-    expect(getNearestScrollAncestor(nestedChild.getDOMNode())).not.toBe(document.body);
-    expect(getNearestScrollAncestor(nestedChild.getDOMNode())).toBe(page.find('#child-2').getDOMNode())
+  test('nested descendant finds correct element', () => {
+    const nestedChild = page.find('#great-grandchild').getDOMNode();;
+    const c2 = page.find('#child-2').getDOMNode()
+
+    expect(getNearestScrollAncestor(nestedChild)).not.toBe(document.body);
+    expect(getNearestScrollAncestor(nestedChild)).toBe(c2)
   })
 
-  test('direct descendant', () => {
-    const grandchild = page.find('#grandchild')
-    expect(getNearestScrollAncestor(grandchild.getDOMNode())).toBe(page.find('#child-2').getDOMNode()); 
+  test('overflow visible doesnt count as a scroll container', () => {
+    const g3gc = page.find('#great-great-great-grandchild').getDOMNode()
+    const gggc = page.find('#great-great-grandchild').getDOMNode();
+    expect(getNearestScrollAncestor(g3gc)).not.toBe(gggc);
+    expect(getNearestScrollAncestor(g3gc)).toBe(getNearestScrollAncestor(gggc)); //they should have the same ancestor, whatever it may be
+  }) 
+
+  test('direct descendant returns parent', () => {
+    const grandchild = page.find('#grandchild').getDOMNode()
+    const c2 = page.find('#child-2').getDOMNode();
+
+    expect(getNearestScrollAncestor(grandchild)).toBe(page.find('#child-2').getDOMNode());
   })
 
-  test('self', () => {
-    const greatGrandchild = page.find('#great-grandchild-2');
-    const grandchildScroll = page.find('#grandchild-2')
-    expect(getNearestScrollAncestor(grandchildScroll.getDOMNode())).toBe(grandchildScroll.getDOMNode()); //self
-    expect(getNearestScrollAncestor(greatGrandchild.getDOMNode())).toBe(grandchildScroll.getDOMNode()); //immediate descendant
+  test('self returns self', () => {
+    const greatGrandchild = page.find('#great-grandchild-2').getDOMNode();
+    const grandchildScroll = page.find('#grandchild-2').getDOMNode();
+
+    expect(getNearestScrollAncestor(grandchildScroll)).toBe(grandchildScroll) //self
+    expect(getNearestScrollAncestor(greatGrandchild)).toBe(grandchildScroll); //immediate descendant
   })
-  
+
+  test('overflow hidden doesnt count', () => {
+    const ggc3 = page.find('#great-grandchild-3').getDOMNode();
+    const g3 = page.find('#grandchild-3').getDOMNode();
+
+    expect(getNearestScrollAncestor(ggc3)).not.toBe(g3); //overflow is hidden, don't put the tour there
+  })
+
+  test('only one overflow needs to be set', () => {
+    const gc4 = page.find('#grandchild-4').getDOMNode();
+    const c3 = page.find('#child-3').getDOMNode();
+
+    expect(getNearestScrollAncestor(gc4)).toBe(c3);
+  })
+
+ 
+
 
 })
 
