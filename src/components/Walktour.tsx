@@ -42,6 +42,7 @@ export interface WalktourOptions {
   movingTarget?: boolean;
   updateInterval?: number;
   renderTolerance?: number;
+  disableMask?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -112,7 +113,8 @@ export const Walktour = (props: WalktourProps) => {
     getPositionFromCandidates,
     movingTarget,
     renderTolerance,
-    updateInterval
+    updateInterval,
+    disableMask,
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -286,6 +288,7 @@ export const Walktour = (props: WalktourProps) => {
       id={getIdString(basePortalString, identifier)}
       style={portalStyle}
     >
+      {!disableMask && 
       <Mask
         target={target}
         disableMaskInteraction={disableMaskInteraction}
@@ -293,7 +296,7 @@ export const Walktour = (props: WalktourProps) => {
         padding={maskPadding}
         tourRoot={tourRoot.current}
         close={tourLogic.close}
-      />
+      />}
 
       <div
         id={getIdString(baseTooltipContainerString, identifier)}
