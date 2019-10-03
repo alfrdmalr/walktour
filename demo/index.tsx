@@ -62,10 +62,10 @@ const App = () => (
       <div id='twoTwo' style={{...twoStyle}} />
       <div id='threeTwo' style={threeStyle} />
 
-      <Walktour steps={stepsPartTwo} movingTarget identifier={"2"} />
+      <Walktour steps={stepsPartTwo}  identifier={"2"} />
     </div>
 
-    <Walktour disableCloseOnClick steps={steps} movingTarget identifier={"1"} />
+    <Walktour disableCloseOnClick steps={steps} disableAutoScroll identifier={"1"} />
   </>
 )
 

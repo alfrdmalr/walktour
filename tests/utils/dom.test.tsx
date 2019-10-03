@@ -1,6 +1,7 @@
 import { dist, Coords, getElementCoords, getNearestScrollAncestor } from '../../src/utils/dom';
 import { shallow, mount } from 'enzyme';
 import * as React from 'react';
+import { mockGBCR } from '../mocks';
 
 // Testing "dist" function, which calculates the distance between two points
 describe('dist', () => {
@@ -16,13 +17,13 @@ describe('dist', () => {
   const coordsUgly3: Coords = { x: 678.12, y: -399 }
   const coordsUndef: Coords = undefined;
 
-  test('dist base case', () => {
+  test('base case', () => {
     expect(dist(coordsUndef, coordsOrigin)).toBe(undefined);
     expect(dist(coordsOrigin, coordsOrigin)).toBe(0);
     expect(dist(coords100, coords100)).toBe(0);
   })
 
-  test('dist different points', () => {
+  test('different points', () => {
     //trivial
     expect(dist(coordsTop, coordsOrigin)).toBeCloseTo(100);
     expect(dist(coordsLeft, coordsOrigin)).toBeCloseTo(100);
@@ -36,7 +37,7 @@ describe('dist', () => {
   })
 
   //negatives shouldn't impact the distance.
-  test('dist with negatives', () => {
+  test('negative coordinates', () => {
     expect(dist(coordsTopNegative, coordsOrigin)).toBeCloseTo(100);
     expect(dist(coordsLeftNegative, coordsOrigin)).toBeCloseTo(100);
     expect(dist(coordsLeftNegative, coords100Negative)).toBeCloseTo(100);
@@ -45,7 +46,7 @@ describe('dist', () => {
 })
 
 // testing "getElementCoords", which returns the coordinates of the element on the screen.
-describe('get element coords', () => {
+describe('getElementCoords', () => {
   test('origin', () => {
     mockGBCR({ x: 0, y: 0 })
     expect(getElementCoords(document.createElement('div'))).toStrictEqual({ x: 0, y: 0 })
@@ -58,7 +59,7 @@ describe('get element coords', () => {
 })
 
 // testing "getNearestScrollAncestor", which crawls up the dom tree looking for the nearest element that has scrolling capabilities.
-describe('get nearest scroll ancestor', () => {
+describe('getNearestScrollAncestor', () => {
   const page = mount(<div id='parent'>
     <div id='child-1'>
       <button id="btn">button</button>
@@ -68,9 +69,7 @@ describe('get nearest scroll ancestor', () => {
         <div id='great-grandchild'>
           <div id='great-great-grandchild' style={{overflow: 'visible'}}>
             <div id="great-great-great-grandchild"></div>
-
           </div>
-
         </div>
       </div>
       <div id='grandchild-2' style={{ overflowY: 'auto' }}>
@@ -129,31 +128,10 @@ describe('get nearest scroll ancestor', () => {
     expect(getNearestScrollAncestor(ggc3)).not.toBe(g3); //overflow is hidden, don't put the tour there
   })
 
-  test('only one overflow needs to be set', () => {
+  test('only one axis needs to allow scrolling', () => {
     const gc4 = page.find('#grandchild-4').getDOMNode();
     const c3 = page.find('#child-3').getDOMNode();
 
     expect(getNearestScrollAncestor(gc4)).toBe(c3);
   })
-
- 
-
-
 })
-
-// have to mock getBoundingClientRect because jsdom isn't actually rendered
-function mockGBCR(args: { x?: number, y?: number, w?: number, h?: number }): void {
-  const { x, y, h, w } = args;
-  Element.prototype.getBoundingClientRect = jest.fn(() => {
-    return {
-      width: w,
-      height: h,
-      top: y,
-      left: x,
-      right: x + w,
-      bottom: y + h,
-      x: x,
-      y: y
-    }
-  })
-}
