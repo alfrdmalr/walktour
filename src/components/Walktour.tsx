@@ -91,12 +91,18 @@ export const Walktour = (props: WalktourProps) => {
   const watcherId = React.useRef<number>(undefined);
 
   const currentStepContent: Step = steps[currentStepIndex];
+
+  const options: WalktourOptions & WalktourProps & Step = {
+    ...walktourDefaultProps,
+    ...props,
+    ...currentStepContent
+  }
+
   const {
     maskPadding,
     disableMaskInteraction,
     disableCloseOnClick,
     tooltipSeparation,
-    tooltipWidth,
     transition,
     orientationPreferences,
     customTooltipRenderer,
@@ -158,7 +164,7 @@ export const Walktour = (props: WalktourProps) => {
 
     // If the tooltip is custom and absolutely positioned/floated, the container will not adopt those dimensions.
     // So we use the first child of the container (the tooltip itself) and fall back to the container if something goes wrong.
-    const tangibleTooltip = tooltipContainer.firstElementChild as HTMLElement || tooltipContainer;
+    const tangibleTooltip = tooltipContainer;
     const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
     const target: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, target);
@@ -226,7 +232,7 @@ export const Walktour = (props: WalktourProps) => {
     prev: prev,
     close: close,
     goToStep: goToStep,
-    stepContent: currentStepContent,
+    stepContent: {...options}, //pass options in as well to expose any defaults that aren't specified
     stepIndex: currentStepIndex,
     allSteps: steps
   };
@@ -279,7 +285,6 @@ export const Walktour = (props: WalktourProps) => {
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
-    width: tooltipWidth
   }
 
   // render mask, tooltip, and their shared "portal" container

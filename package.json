@@ -11,7 +11,8 @@
   "scripts": {
     "start": "parcel demo/index.html",
     "build": "rollup -c",
-    "watch": "rollup -cw"
+    "watch": "rollup -cw",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -25,19 +26,18 @@
     "react-dom": "^16.8.6"
   },
   "devDependencies": {
-    "@babel/core": "7.4.4",
-    "@babel/plugin-proposal-class-properties": "7.4.4",
-    "@babel/plugin-proposal-decorators": "7.4.4",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-syntax-dynamic-import": "7.2.0",
-    "@babel/plugin-transform-react-jsx": "^7.0.0",
-    "@babel/preset-env": "7.4.4",
-    "@babel/preset-react": "7.0.0",
+    "@types/enzyme": "^3.10.3",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
+    "@types/jest": "^24.0.18",
     "@types/react": "^16.9.1",
     "@types/react-dom": "^16.8.5",
     "awesome-typescript-loader": "^5.2.1",
     "cssnano": "^4.1.10",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "enzyme-to-json": "^3.4.0",
     "html-loader": "^0.5.5",
+    "jest": "^24.9.0",
     "parcel": "^1.12.3",
     "prettier": "^1.17.1",
     "react": "^16.9.0",
@@ -45,6 +45,7 @@
     "rollup": "^1.20.3",
     "rollup-plugin-typescript2": "^0.24.0",
     "source-map-loader": "^0.2.4",
+    "ts-jest": "^24.1.0",
     "typescript": "^3.5.3"
   }
 }

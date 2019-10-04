@@ -9,6 +9,10 @@ export interface Dims {
 }
 
 export function dist(a: Coords, b: Coords): number {
+  if (!a || !b) {
+    return;
+  }
+
   return Math.sqrt(
     Math.pow((Math.abs(a.x - b.x)), 2) +
     Math.pow((Math.abs(a.y - b.y)), 2))
