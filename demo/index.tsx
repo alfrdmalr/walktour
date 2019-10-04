@@ -62,10 +62,10 @@ const App = () => (
       <div id='twoTwo' style={{...twoStyle}} />
       <div id='threeTwo' style={threeStyle} />
 
-      <Walktour steps={stepsPartTwo} disableAutoScroll identifier={"2"} />
+      <Walktour steps={stepsPartTwo} identifier={"2"} />
     </div>
 
-    <Walktour disableCloseOnClick steps={steps} disableAutoScroll identifier={"1"} />
+    <Walktour disableCloseOnClick steps={steps} identifier={"1"} />
   </>
 )
 
@@ -83,7 +83,8 @@ function CustomTooltip(props: CustomTooltipProps) {
     fontFamily: 'Consolas, serif',
     border: '1px solid cornsilk',
     maxWidth: 300,
-    padding: 10
+    padding: 10,
+    minWidth: 320
   }
   return <div style={style}>
     <p>You can also render your own custom components instead of the default tooltip.</p>

@@ -63,13 +63,13 @@ Step-level options will take precedence over global options, so take care when u
 | _disableNext_ | boolean | Determines whether the `next()` operation is allowed. |
 | _disablePrev_ | boolean | Determines whether the `prev()` operation is allowed. |
 | _disableClose_ | boolean | Determines whether the `close()` operation is allowed. |
-| _customTooltipRenderer_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Callback function to generate an entirely custom tooltip component. Some [exposed tour logic](#walktourlogic) is provided as an argument to the callback to allow such a tooltip to fully control navigation, rendering, and other functions provided by the default tooltip. |
+| _customTooltipRenderer_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Callback function to generate an entirely custom tooltip component. Some [exposed tour logic](#walktourlogic) is provided as an argument to the callback to allow such a tooltip to fully control navigation, rendering, and other functions provided by the default tooltip. WARNING: Using `position: absolute` or `fixed` may break positioning of the tooltip and is not recommended. |
 | _customTitleRenderer_ | (_title_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom title content. The function is passed the specified title string, as well as some [exposed tour logic](#walktourlogic). |
 | _customDescriptionRenderer_ | (_description_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom description content. The function is passed the specified description string, as well as some [exposed tour logic](#walktourlogic). |
 | _customFooterRenderer_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom footer content. The function is passed some [exposed tour logic](#walktourlogic) to allow for navigation control.|
 | _customNextFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'next' function. This is called each time that `next()` would normally be called. |
 | _customPrevFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'prev' function. This is called each time that `prev()` would normally be called. |
-| _customCloseFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'close' function. This is called eachtime that `close()` would normally be called. |
+| _customCloseFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'close' function. This is called each time that `close()` would normally be called. |
 | _disableAutoScroll_ | boolean | Disable automatically scrolling elements into view. |
 | _getPositionFromCandidates_ | (candidates: `OrientationCoords[]`) => Coords | Optional callback to specify how the tooltip position is chosen. Only use if positioning is more complex than can be achieved with `orientationPreferences`; for instance, the tooltip position could be based on proximity to the cursor position or some other factor that's not known ahead of time. |
 | _movingTarget_ | boolean | If true, the tour will watch the target element for position changes. If the position is sufficiently different (as specified by `renderTolerance`) from its initial position, the tooltip and mask will adjust themselves accordingly. This can also be used if a particular target element is hidden or does not yet exist at the time the tour arrives to it. |
@@ -86,12 +86,12 @@ All custom renderers are responsible for implementing the various `WalktourOptio
 | goToStep | (stepNumber: number) => void | Tells the tour to jump to the specified step index. |
 | next* | () => void | Advances the tour by a single step. |
 | prev* | () => void | Returns the tour to the previous step. |
-| close | () => void | Closes the tour. |
-| stepContent | `Step` | `Step` object associated with the current step index. |
+| close* | () => void | Closes the tour. |
+| stepContent** | `Step` | `Step` object associated with the current step index. |
 | stepIndex | number | Current step index. |
 | allSteps | Array<`Step`> | Collection of every `Step` in the tour. |
 
-*if any _customFunc_ is specified, that custom function will replace the respective function in the `WalktourLogic` object, with the default logic passed as arguments to the custom functions. This means that a _customNextFunc_ could look like this:
+*If any _customFunc_ is specified, that custom function will replace the respective function in the `WalktourLogic` object, with the default logic passed as arguments to the custom functions. This means that a _customNextFunc_ could look like this:
 ```
 function myCustomNext(logic: WalktourLogic): void {
   loadNextStepPromise().then(val => {
@@ -105,6 +105,8 @@ function myCustomNext(logic: WalktourLogic): void {
 }
 ```
 It's especially important to call `close()` if providing _customCloseFunc_, since there are cleanup events which are handled by the default `close()` call.
+
+**All options available for a `Step` object will be provided in the `WalktourLogic` object, even if those options haven't been specified for a particular step. For instance, if the `tooltipWidth` option is passed to `Walktour` itself, but not to any individual step, each step's `WalktourObject` will still have the most relevant value for `tooltipWidth` as part of its `stepContent`.
 
 ### Orientation And Alignment
 The tooltip can be positioned at various locations around the targeted element. There are five simple positions:
