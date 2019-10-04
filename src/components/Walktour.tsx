@@ -42,6 +42,7 @@ export interface WalktourOptions {
   movingTarget?: boolean;
   updateInterval?: number;
   renderTolerance?: number;
+  disableMask?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -118,8 +119,13 @@ export const Walktour = (props: WalktourProps) => {
     getPositionFromCandidates,
     movingTarget,
     renderTolerance,
-    updateInterval
-  } = options;
+    updateInterval,
+    disableMask,
+  } = {
+    ...walktourDefaultProps,
+    ...props,
+    ...currentStepContent
+  };
 
   // after first render(s), set the tour root and initial position of target/tooltip
   React.useEffect(() => {
@@ -287,6 +293,7 @@ export const Walktour = (props: WalktourProps) => {
       id={getIdString(basePortalString, identifier)}
       style={portalStyle}
     >
+      {!disableMask && 
       <Mask
         target={target}
         disableMaskInteraction={disableMaskInteraction}
@@ -294,7 +301,7 @@ export const Walktour = (props: WalktourProps) => {
         padding={maskPadding}
         tourRoot={tourRoot.current}
         close={tourLogic.close}
-      />
+      />}
 
       <div
         id={getIdString(baseTooltipContainerString, identifier)}

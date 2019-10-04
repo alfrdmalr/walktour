@@ -17,7 +17,7 @@ const steps: Step[] = [
   { selector: '#three', title: 'Smart Positioning', description: 'The tooltip is automatically positioned within view' },
   { selector: '#six', title: "Explicit Positioning", description: 'East!', orientationPreferences: [CardinalOrientation.EAST] },
   { selector: '#six', title: "Explicit Positioning", description: 'South!', orientationPreferences: [CardinalOrientation.SOUTH] },
-  { selector: '#six', title: "Get More Specific!", description: 'North with West alignment!!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
+  { selector: '#six', title: "Get More Specific!", description: 'North with West alignment!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { selector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
   { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} /> },
