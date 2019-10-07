@@ -75,6 +75,7 @@ Step-level options will take precedence over global options, so take care when u
 | _movingTarget_ | boolean | If true, the tour will watch the target element for position changes. If the position is sufficiently different (as specified by `renderTolerance`) from its initial position, the tooltip and mask will adjust themselves accordingly. This can also be used if a particular target element is hidden or does not yet exist at the time the tour arrives to it. |
 | _renderTolerance_ | number | Distance, in pixels, for the target element to have moved before triggering an update. Default is 2. |
 | _updateInterval_ | number | Duration, in milliseconds, between polling for changes to a target's positioning. Default is 500. |
+| _disableMask_ | boolean | Determines whether the overlay/cutout should be disabled. Default is false. |
 
 
 ### WalktourLogic
