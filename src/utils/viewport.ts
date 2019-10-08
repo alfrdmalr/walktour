@@ -4,6 +4,7 @@ export function getViewportHeight(root: Element): number {
   if (document.body.isSameNode(root)) {
     return Math.max(root.clientHeight,
       document.documentElement.clientHeight,
+      document.body.clientHeight, 
       window.innerHeight);
   } else {
     return root.clientHeight;
@@ -14,6 +15,7 @@ export function getViewportWidth(root: Element): number {
   if (document.body.isSameNode(root)) {
     return Math.max(root.clientWidth,
       document.documentElement.clientWidth,
+      document.body.clientWidth,
       window.innerWidth);
   } else {
     return root.clientWidth;

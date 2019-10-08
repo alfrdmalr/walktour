@@ -5,8 +5,8 @@ export function getCurrentScrollOffset(root: Element): Coords {
   //use documentElement instead of body for scroll-related purposes 
   if (document.body.isSameNode(root)) {
     return {
-      x: document.documentElement.scrollLeft,
-      y: document.documentElement.scrollTop
+      x: document.documentElement.scrollLeft || document.body.scrollLeft,
+      y: document.documentElement.scrollTop || document.body.scrollTop
     }
   } else {
     return {
