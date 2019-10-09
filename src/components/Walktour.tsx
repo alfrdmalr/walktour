@@ -72,7 +72,7 @@ const walktourDefaultProps: Partial<WalktourProps> = {
 }
 
 const basePortalString: string = 'walktour-portal';
-const baseMaskString: string = 'walktour-mask'; 
+const baseMaskString: string = 'walktour-mask';
 const baseTooltipContainerString: string = 'walktour-tooltip-container';
 
 export const Walktour = (props: WalktourProps) => {
@@ -183,6 +183,8 @@ export const Walktour = (props: WalktourProps) => {
     setTooltipPosition(tooltipPosition);
     targetPosition.current = currentTargetPosition;
 
+    tooltipContainer.focus();
+
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
     if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tangibleTooltip, tooltipPosition))) {
       scrollToElement(root, target);
@@ -203,8 +205,6 @@ export const Walktour = (props: WalktourProps) => {
       // set the watcher
       watcherId.current = window.setInterval(updateWithTarget, updateInterval)
     }
-
-    tooltipContainer.focus();
   }
 
   const goToStep = (stepIndex: number) => {
@@ -233,7 +233,7 @@ export const Walktour = (props: WalktourProps) => {
     prev: prev,
     close: close,
     goToStep: goToStep,
-    stepContent: {...options}, //pass options in as well to expose any defaults that aren't specified
+    stepContent: { ...options }, //pass options in as well to expose any defaults that aren't specified
     stepIndex: currentStepIndex,
     allSteps: steps
   };
@@ -297,15 +297,15 @@ export const Walktour = (props: WalktourProps) => {
       style={portalStyle}
     >
       {!disableMask && tourRoot.current &&
-      <Mask
-        maskId={getIdString(baseMaskString, identifier)}
-        target={target}
-        disableMaskInteraction={disableMaskInteraction}
-        disableCloseOnClick={disableCloseOnClick}
-        padding={maskPadding}
-        tourRoot={tourRoot.current}
-        close={tourLogic.close}
-      />}
+        <Mask
+          maskId={getIdString(baseMaskString, identifier)}
+          target={target}
+          disableMaskInteraction={disableMaskInteraction}
+          disableCloseOnClick={disableCloseOnClick}
+          padding={maskPadding}
+          tourRoot={tourRoot.current}
+          close={tourLogic.close}
+        />}
 
       <div
         id={getIdString(baseTooltipContainerString, identifier)}
