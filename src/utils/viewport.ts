@@ -1,23 +1,11 @@
-import { Dims, Coords, getElementCoords } from "./dom";
+import { Dims, Coords, getElementCoords, isDefaultScrollingElement } from "./dom";
 
 export function getViewportHeight(root: Element): number {
-  if (document.body.isSameNode(root)) {
-    return Math.max(root.clientHeight,
-      document.documentElement.clientHeight,
-      window.innerHeight);
-  } else {
-    return root.clientHeight;
-  }
+  return root.clientHeight;
 }
 
 export function getViewportWidth(root: Element): number {
-  if (document.body.isSameNode(root)) {
-    return Math.max(root.clientWidth,
-      document.documentElement.clientWidth,
-      window.innerWidth);
-  } else {
-    return root.clientWidth;
-  }
+  return root.clientWidth;
 }
 
 export function getViewportDims(root: Element): Dims {
@@ -27,8 +15,23 @@ export function getViewportDims(root: Element): Dims {
   }
 }
 
+export function getViewportScrollHeight(root: Element): number {
+  return root.scrollHeight;
+}
+
+export function getViewportScrollWidth(root: Element): number {
+  return root.scrollWidth;
+}
+
+export function getViewportScrollDims(root: Element): Dims {
+  return {
+    width: getViewportScrollWidth(root),
+    height: getViewportScrollHeight(root)
+  }
+}
+
 export function getViewportStart(root: Element): Coords {
-  if (document.body.isSameNode(root)) {
+  if (isDefaultScrollingElement(root)) {
     return {
       x: 0,
       y: 0

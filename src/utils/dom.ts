@@ -41,8 +41,8 @@ export function getNearestScrollAncestor(element: Element): Element {
       style(el, "overflow-y") +
       style(el, "overflow-x"));
 
-  if (!element || element.isSameNode(document.body)) {
-    return document.body;
+  if (!element || isDefaultScrollingElement(element)) {
+    return getDefaultScrollingElement();
   } else {
     if (scroll(element)) {
       return element;
@@ -51,3 +51,32 @@ export function getNearestScrollAncestor(element: Element): Element {
     }
   }
 }
+
+//https://github.com/GreenGremlin/scroll-doc/blob/master/index.js
+export function getDefaultScrollingElement(): Element {
+  const windowStart: number = window.pageYOffset; //slightly better support than scrollY
+  document.documentElement.scrollTop = windowStart + 1;
+  if (window.pageXOffset > windowStart) {
+    document.documentElement.scrollTop = windowStart; //reset
+    return document.documentElement;
+  } else {
+    return document.scrollingElement || document.body;
+  }
+}
+
+export function isDefaultScrollingElement(root: Element) {
+  return root.isSameNode(document.body) || root.isSameNode(document.scrollingElement) || root.isSameNode(document.documentElement);
+}
+
+//if we're not putting the portal in a custom container, it needs to be at the body level
+export function getValidPortalRoot(root: Element) {
+  // check for the potential default scrolling elements that might be returned from the above function
+  if (isDefaultScrollingElement(root)) {
+    return document.body;
+  } else {
+    return root;
+  }
+}
+
+
+

@@ -24,16 +24,19 @@ export function scrollToElement(root: Element, element: HTMLElement): void {
 
   const coords = addAppropriateOffset(root, centerElementInViewport(root, element));
 
-  const scrollOptions: ScrollToOptions = {
-    top: coords.y,
-    left: coords.x,
-    behavior: 'smooth'
-  }
+  // check if the 'scrollBehavior' property is supported. Support for this property is consistent
+  // with support for scrollToOptions, and if it's supported we can scroll smoothly
+  const smoothScrollingIsSupported = 'scrollBehavior' in document.documentElement.style;
+  if (smoothScrollingIsSupported) {
+    const scrollOptions: ScrollToOptions = {
+      top: coords.y,
+      left: coords.x,
+      behavior: 'smooth'
+    }
 
-  //use documentElement instead of body for scrolling related calls
-  if (document.body.isSameNode(root)) {
-    document.documentElement.scrollTo(scrollOptions)
-  } else {
     root.scrollTo(scrollOptions);
+  } else {
+    root.scrollTop = coords.y;
+    root.scrollLeft = coords.x;
   }
 }

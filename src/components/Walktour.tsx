@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
-import { Coords, getNearestScrollAncestor, dist } from '../utils/dom';
+import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot } from '../utils/dom';
 import { isElementInView, scrollToElement } from '../utils/scroll';
 
 export interface WalktourLogic {
@@ -72,6 +72,7 @@ const walktourDefaultProps: Partial<WalktourProps> = {
 }
 
 const basePortalString: string = 'walktour-portal';
+const baseMaskString: string = 'walktour-mask';
 const baseTooltipContainerString: string = 'walktour-tooltip-container';
 
 export const Walktour = (props: WalktourProps) => {
@@ -182,6 +183,8 @@ export const Walktour = (props: WalktourProps) => {
     setTooltipPosition(tooltipPosition);
     targetPosition.current = currentTargetPosition;
 
+    tooltipContainer.focus();
+
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
     if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tangibleTooltip, tooltipPosition))) {
       scrollToElement(root, target);
@@ -202,8 +205,6 @@ export const Walktour = (props: WalktourProps) => {
       // set the watcher
       watcherId.current = window.setInterval(updateWithTarget, updateInterval)
     }
-
-    tooltipContainer.focus();
   }
 
   const goToStep = (stepIndex: number) => {
@@ -232,7 +233,7 @@ export const Walktour = (props: WalktourProps) => {
     prev: prev,
     close: close,
     goToStep: goToStep,
-    stepContent: {...options}, //pass options in as well to expose any defaults that aren't specified
+    stepContent: { ...options }, //pass options in as well to expose any defaults that aren't specified
     stepIndex: currentStepIndex,
     allSteps: steps
   };
@@ -277,7 +278,8 @@ export const Walktour = (props: WalktourProps) => {
     top: 0,
     left: 0,
     zIndex: zIndex,
-    visibility: tooltipPosition ? 'visible' : 'hidden'
+    visibility: tooltipPosition ? 'visible' : 'hidden',
+    pointerEvents: "none"
   }
 
   const tooltipContainerStyle: React.CSSProperties = {
@@ -285,6 +287,7 @@ export const Walktour = (props: WalktourProps) => {
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
+    pointerEvents: 'auto'
   }
 
   // render mask, tooltip, and their shared "portal" container
@@ -293,15 +296,16 @@ export const Walktour = (props: WalktourProps) => {
       id={getIdString(basePortalString, identifier)}
       style={portalStyle}
     >
-      {!disableMask && 
-      <Mask
-        target={target}
-        disableMaskInteraction={disableMaskInteraction}
-        disableCloseOnClick={disableCloseOnClick}
-        padding={maskPadding}
-        tourRoot={tourRoot.current}
-        close={tourLogic.close}
-      />}
+      {!disableMask && tourRoot.current &&
+        <Mask
+          maskId={getIdString(baseMaskString, identifier)}
+          target={target}
+          disableMaskInteraction={disableMaskInteraction}
+          disableCloseOnClick={disableCloseOnClick}
+          padding={maskPadding}
+          tourRoot={tourRoot.current}
+          close={tourLogic.close}
+        />}
 
       <div
         id={getIdString(baseTooltipContainerString, identifier)}
@@ -320,7 +324,7 @@ export const Walktour = (props: WalktourProps) => {
   // on first render, put everything in its normal context.
   // after first render (once we've determined the tour root) spawn a portal there for rendering.
   if (tourRoot.current) {
-    return ReactDOM.createPortal(render(), tourRoot.current);
+    return ReactDOM.createPortal(render(), getValidPortalRoot(tourRoot.current));
   } else {
     return render();
   }
