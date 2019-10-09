@@ -72,6 +72,7 @@ const walktourDefaultProps: Partial<WalktourProps> = {
 }
 
 const basePortalString: string = 'walktour-portal';
+const baseMaskString: string = 'walktour-mask'; 
 const baseTooltipContainerString: string = 'walktour-tooltip-container';
 
 export const Walktour = (props: WalktourProps) => {
@@ -277,7 +278,8 @@ export const Walktour = (props: WalktourProps) => {
     top: 0,
     left: 0,
     zIndex: zIndex,
-    visibility: tooltipPosition ? 'visible' : 'hidden'
+    visibility: tooltipPosition ? 'visible' : 'hidden',
+    pointerEvents: "none"
   }
 
   const tooltipContainerStyle: React.CSSProperties = {
@@ -285,6 +287,7 @@ export const Walktour = (props: WalktourProps) => {
     top: tooltipPosition && tooltipPosition.y,
     left: tooltipPosition && tooltipPosition.x,
     transition: transition,
+    pointerEvents: 'auto'
   }
 
   // render mask, tooltip, and their shared "portal" container
@@ -295,6 +298,7 @@ export const Walktour = (props: WalktourProps) => {
     >
       {!disableMask && 
       <Mask
+        maskId={getIdString(baseMaskString, identifier)}
         target={target}
         disableMaskInteraction={disableMaskInteraction}
         disableCloseOnClick={disableCloseOnClick}
