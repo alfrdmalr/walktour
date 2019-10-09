@@ -1,18 +1,10 @@
-import { Coords, getElementCoords, Dims } from "./dom";
+import { Coords, getElementCoords, Dims, isDefaultScrollingElement } from "./dom";
 import { getViewportStart, getViewportDims } from "./viewport";
 
 export function getCurrentScrollOffset(root: Element): Coords {
-  //use documentElement instead of body for scroll-related purposes 
-  if (document.body.isSameNode(root)) {
-    return {
-      x: document.documentElement.scrollLeft || document.body.scrollLeft,
-      y: document.documentElement.scrollTop || document.body.scrollTop
-    }
-  } else {
-    return {
-      x: root.scrollLeft,
-      y: root.scrollTop
-    }
+  return {
+    x: root.scrollLeft,
+    y: root.scrollTop
   }
 }
 
@@ -29,7 +21,9 @@ export function addAppropriateOffset(root: Element, coords: Coords) {
     return;
   }
 
-  if (!document.body.isSameNode(root)) {
+  // if there's a custom root, then we need to offset by that root's positioning relative to the window
+  // before adjusting for its scroll values
+  if (!isDefaultScrollingElement(root)) {
     const rootCoords: Coords = getElementCoords(root);
     return addScrollOffset(root, {
       x: coords.x - rootCoords.x,
