@@ -296,7 +296,7 @@ export const Walktour = (props: WalktourProps) => {
       id={getIdString(basePortalString, identifier)}
       style={portalStyle}
     >
-      {!disableMask && 
+      {!disableMask && tourRoot.current &&
       <Mask
         maskId={getIdString(baseMaskString, identifier)}
         target={target}

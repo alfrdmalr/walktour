@@ -15,6 +15,21 @@ export function getViewportDims(root: Element): Dims {
   }
 }
 
+export function getViewportScrollHeight(root: Element): number {
+  return root.scrollHeight;
+}
+
+export function getViewportScrollWidth(root: Element): number {
+  return root.scrollWidth;
+}
+
+export function getViewportScrollDims(root: Element): Dims {
+  return {
+    width: getViewportScrollWidth(root),
+    height: getViewportScrollHeight(root)
+  }
+}
+
 export function getViewportStart(root: Element): Coords {
   if (isDefaultScrollingElement(root)) {
     return {

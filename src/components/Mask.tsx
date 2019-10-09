@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Coords } from '../utils/dom';
 import { getTargetPosition } from '../utils/positioning';
+import { getViewportScrollDims } from '../utils/viewport';
 
 interface MaskProps {
   target: HTMLElement;
@@ -14,10 +15,7 @@ interface MaskProps {
 
 export function Mask(props: MaskProps): JSX.Element {
   const { target, disableMaskInteraction, padding, tourRoot, close, disableCloseOnClick, maskId } = props;
-
-  const containerBottom: number = (tourRoot && !document.body.isSameNode(tourRoot)) ? tourRoot.scrollHeight : document.documentElement.scrollHeight;
-  const containerRight: number = (tourRoot && !document.body.isSameNode(tourRoot)) ? tourRoot.scrollWidth : document.documentElement.scrollWidth;
-
+  const {width: containerWidth, height: containerHeight} = getViewportScrollDims(tourRoot);
   const pathId = `clip-path-${maskId}`;
 
 
@@ -35,20 +33,20 @@ export function Mask(props: MaskProps): JSX.Element {
     const cutoutBottom: number = coords.y + targetData.height + padding;
 
     return `0 0, 
-            0 ${containerBottom}, 
-            ${cutoutLeft} ${containerBottom}, 
+            0 ${containerHeight}, 
+            ${cutoutLeft} ${containerHeight}, 
             ${cutoutLeft} ${cutoutTop}, 
             ${cutoutRight} ${cutoutTop}, 
             ${cutoutRight} ${cutoutBottom}, 
             ${cutoutLeft} ${cutoutBottom}, 
-            ${cutoutLeft} ${containerBottom}, 
-            ${containerRight} ${containerBottom}, 
-            ${containerRight} 0`;
+            ${cutoutLeft} ${containerHeight}, 
+            ${containerWidth} ${containerHeight}, 
+            ${containerWidth} 0`;
   }
 
   const svgStyle: React.CSSProperties = {
-    height: containerBottom,
-    width: containerRight,
+    height: containerHeight,
+    width: containerWidth,
     pointerEvents: disableMaskInteraction ? 'auto' : 'none'
   }
 
@@ -67,8 +65,8 @@ export function Mask(props: MaskProps): JSX.Element {
         onClick={disableCloseOnClick ? null : close}
         x={0}
         y={0}
-        width={containerRight}
-        height={containerBottom}
+        width={containerWidth}
+        height={containerHeight}
         fill='black'
         fillOpacity={0.3}
         pointerEvents='auto'
