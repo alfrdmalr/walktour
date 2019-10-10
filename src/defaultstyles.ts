@@ -37,7 +37,8 @@ export const defaultStyles: WalktourStyles = {
     borderRadius: '5px',
     boxShadow: '0 3px 8px 0 rgba(0,0,0,.25)',
     color: '#4d4d4d',
-    minWidth: 250 //so that buttons have adequate spacing
+    minWidth: 215, //so that buttons have adequate spacing
+    maxWidth: 285,
   },
   footer: {
     display: 'flex',
