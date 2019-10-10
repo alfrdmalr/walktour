@@ -10,11 +10,13 @@ interface MaskProps {
   tourRoot: Element;
   disableMaskInteraction?: boolean;
   disableCloseOnClick?: boolean;
+  disableMask?: boolean;
   maskId: string;
+  
 }
 
 export function Mask(props: MaskProps): JSX.Element {
-  const { target, disableMaskInteraction, padding, tourRoot, close, disableCloseOnClick, maskId } = props;
+  const { target, disableMaskInteraction, padding, tourRoot, close, disableCloseOnClick, maskId, disableMask } = props;
   const {width: containerWidth, height: containerHeight} = getViewportScrollDims(tourRoot);
   const pathId = `clip-path-${maskId}`;
 
@@ -47,7 +49,8 @@ export function Mask(props: MaskProps): JSX.Element {
   const svgStyle: React.CSSProperties = {
     height: containerHeight,
     width: containerWidth,
-    pointerEvents: disableMaskInteraction ? 'auto' : 'none'
+    pointerEvents: disableMaskInteraction ? 'auto' : 'none',
+    visibility: disableMask ? 'hidden' : 'visible'
   }
 
   return (
