@@ -23,9 +23,18 @@ export function getElementCoords(element: Element): Coords {
     return;
   }
   const elementData: ClientRect = element.getBoundingClientRect();
-  let coords: Coords = { x: elementData.left, y: elementData.top }
+  return {
+    x: elementData.left,
+    y: elementData.top
+  }
+}
 
-  return coords;
+export function getElementDims(element: Element): Dims {
+  const elementData = element.getBoundingClientRect();
+  return {
+    width: elementData.width,
+    height: elementData.height
+  }
 }
 
 //https://gist.github.com/gre/296291b8ce0d8fe6e1c3ea4f1d1c5c3b
@@ -78,5 +87,45 @@ export function getValidPortalRoot(root: Element) {
   }
 }
 
+export function getCombinedData(aCoords: Coords, aDims: Dims, bCoords: Coords, bDims: Dims): { coords: Coords, dims: Dims } {
+
+  // generates similar data as getBoundingClientRect but using hypothetical positions
+  const generateBounds = (coords: Coords, dims: Dims): {left: number, right: number, top: number, bottom: number} => {
+    return {
+      left: coords.x,
+      right: coords.x + dims.width,
+      top: coords.y,
+      bottom: coords.y + dims.height
+    }
+  }
+
+  const mostExtreme = (a: number, b: number, largest: boolean): number => {
+    return (a > b)
+      ? (largest ? a : b)
+      : (largest ? b : a)
+  }
+
+  const aBounds = generateBounds(aCoords, aDims);
+  const bBounds = generateBounds(bCoords, bDims);
+
+  
+  const left: number = mostExtreme(aBounds.left, bBounds.left, false);
+  const right: number = mostExtreme(aBounds.right, bBounds.right, true);
+  const top: number = mostExtreme(aBounds.top, bBounds.top, false);
+  const bottom: number = mostExtreme(aBounds.bottom, bBounds.bottom, true);
+
+  return {
+    coords: {
+      x: left,
+      y: top
+    },
+    dims: {
+      height: bottom - top,
+      width: right - left
+    }
+  }
+
+
+}
 
 

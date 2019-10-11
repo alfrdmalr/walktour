@@ -4,7 +4,8 @@ import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
 import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot } from '../utils/dom';
-import { isElementInView, scrollToElement } from '../utils/scroll';
+import { isElementInView, scrollToElement, scrollToDestination } from '../utils/scroll';
+import { centerElementsInViewport } from '../utils/offset';
 
 export interface WalktourLogic {
   next: () => void;
@@ -161,15 +162,12 @@ export const Walktour = (props: WalktourProps) => {
       return;
     }
 
-    // If the tooltip is custom and absolutely positioned/floated, the container will not adopt those dimensions.
-    // So we use the first child of the container (the tooltip itself) and fall back to the container if something goes wrong.
-    const tangibleTooltip = tooltipContainer;
     const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
     const target: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, target);
     const tooltipPosition: Coords = getTooltipPosition({
       target,
-      tooltip: tangibleTooltip,
+      tooltip: tooltipContainer,
       padding: maskPadding,
       tooltipSeparation,
       orientationPreferences,
@@ -184,8 +182,9 @@ export const Walktour = (props: WalktourProps) => {
     tooltipContainer.focus();
 
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
-    if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tangibleTooltip, tooltipPosition))) {
-      scrollToElement(root, target);
+    if (!disableAutoScroll && target && (!isElementInView(root, target) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
+      // scrollToElement(root, target);
+      scrollToDestination(root, centerElementsInViewport(root, tooltipContainer, target, tooltipPosition, currentTargetPosition))
     }
 
     // if the user requests a watcher and there's supposed to be a target
@@ -194,7 +193,7 @@ export const Walktour = (props: WalktourProps) => {
         // target might currently be undefined (missing/loading)
         // presumably, since the user specified a selector, the element exists somewhere, so if we 
         // don't have it yet we poll for it at the same interval that we check for updates
-        const currentTarget = target || getTarget();
+        const currentTarget = getTarget();
         if (shouldUpdate(root, currentTarget, targetPosition.current, renderTolerance)) {
           updateTour();
         }

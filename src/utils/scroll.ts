@@ -1,4 +1,4 @@
-import { Coords, getElementCoords } from "./dom";
+import { Coords, getElementCoords, getElementDims, Dims } from "./dom";
 import { addAppropriateOffset, centerElementInViewport } from "./offset";
 import { getViewportStart, getViewportEnd } from "./viewport";
 
@@ -8,11 +8,11 @@ export function isElementInView(root: Element, element: HTMLElement, atPosition?
   }
   const explicitPosition: Coords = atPosition && (needsAdjusting ? addAppropriateOffset(root, atPosition) : atPosition)
   const position: Coords = explicitPosition || addAppropriateOffset(root, getElementCoords(element));
-  const elementData: ClientRect = element.getBoundingClientRect();
+  const elementDims: Dims = getElementDims(element);
   const startCoords: Coords = addAppropriateOffset(root, getViewportStart(root));
   const endCoords: Coords = addAppropriateOffset(root, getViewportEnd(root));
-  const xVisibility: boolean = (position.x >= startCoords.x) && ((position.x + elementData.width) <= endCoords.x);
-  const yVisibility: boolean = (position.y >= startCoords.y) && ((position.y + elementData.height) <= endCoords.y);
+  const xVisibility: boolean = (position.x >= startCoords.x) && ((position.x + elementDims.width) <= endCoords.x);
+  const yVisibility: boolean = (position.y >= startCoords.y) && ((position.y + elementDims.height) <= endCoords.y);
 
   return xVisibility && yVisibility;
 }
@@ -24,10 +24,13 @@ export function scrollToElement(root: Element, element: HTMLElement): void {
 
   const coords = addAppropriateOffset(root, centerElementInViewport(root, element));
 
-  scrollTo(root, coords);
+  scrollToDestination(root, coords);
 }
 
-export function scrollTo(root: Element, destination: Coords): void {
+export function scrollToDestination(root: Element, destination: Coords): void {
+  if (!root || !destination) {
+    return;
+  }
   // check if the 'scrollBehavior' property is supported. Support for this property is consistent
   // with support for scrollToOptions, and if it's supported we can scroll smoothly
   const smoothScrollingIsSupported = 'scrollBehavior' in document.documentElement.style;
