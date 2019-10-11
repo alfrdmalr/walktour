@@ -5,6 +5,7 @@ import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
 import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot } from '../utils/dom';
 import { isElementInView, scrollToElement } from '../utils/scroll';
+import { debounce } from '../utils/tour';
 
 export interface WalktourLogic {
   next: () => void;
@@ -56,6 +57,8 @@ export interface WalktourProps extends WalktourOptions {
   zIndex?: number;
   rootSelector?: string;
   identifier?: string;
+  setUpdateListener?: (update: () => void) => void;
+  removeUpdateListener?: (update: () => void) => void;
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
@@ -120,6 +123,8 @@ export const Walktour = (props: WalktourProps) => {
     renderTolerance,
     updateInterval,
     disableMask,
+    setUpdateListener,
+    removeUpdateListener
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -138,7 +143,14 @@ export const Walktour = (props: WalktourProps) => {
 
     tourRoot.current = root;
 
-    return () => clearWatcher(watcherId) //clear the target watcher on unmount
+    const debouncedUpdate: () => void  = debounce(updateTour);
+
+    setUpdateListener && setUpdateListener(debouncedUpdate);
+
+    return () => {
+      clearWatcher(watcherId); //clear the target watcher on unmount
+      removeUpdateListener && removeUpdateListener(debouncedUpdate);
+    } 
   }, []);
 
 
