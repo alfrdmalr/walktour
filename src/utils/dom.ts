@@ -18,6 +18,14 @@ export function dist(a: Coords, b: Coords): number {
     Math.pow((Math.abs(a.y - b.y)), 2))
 }
 
+export function areaDiff(a: Dims, b: Dims): number {
+  if (!a || !b) {
+    return;
+  }
+
+  return Math.abs((a.height * a.width) - (b.height * b.width));
+}
+
 export function getElementCoords(element: Element): Coords {
   if (!element) {
     return;

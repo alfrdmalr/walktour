@@ -3,9 +3,9 @@ import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
-import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot } from '../utils/dom';
+import { Coords, getNearestScrollAncestor,  getValidPortalRoot, Dims } from '../utils/dom';
 import { isElementInView, scrollToElement } from '../utils/scroll';
-import { debounce } from '../utils/tour';
+import { debounce, getIdString, clearWatcher, shouldUpdate, removeListener, addListener, refreshListeners } from '../utils/tour';
 
 export interface WalktourLogic {
   next: () => void;
@@ -43,7 +43,6 @@ export interface WalktourOptions {
   updateInterval?: number;
   renderTolerance?: number;
   disableMask?: boolean;
-  disableListeners?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -60,6 +59,7 @@ export interface WalktourProps extends WalktourOptions {
   identifier?: string;
   setUpdateListener?: (update: () => void) => void;
   removeUpdateListener?: (update: () => void) => void;
+  disableListeners?: boolean;
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
@@ -91,7 +91,10 @@ export const Walktour = (props: WalktourProps) => {
 
   const tourRoot = React.useRef<Element>(undefined);
   const targetPosition = React.useRef<Coords>(undefined);
+  const targetSize = React.useRef<Dims>(undefined);
   const watcherId = React.useRef<number>(undefined);
+  // we use this ref to store a particular (debounced) version of the updateTour function, so that 
+  // we can remove it using removeEventListener even when called from a different step 
   const updateRef = React.useRef<() => void>(undefined);
 
   const currentStepContent: Step = steps[currentStepIndex];
@@ -134,7 +137,11 @@ export const Walktour = (props: WalktourProps) => {
     ...currentStepContent
   };
 
-  // after first render(s), set the tour root and initial position of target/tooltip
+  React.useEffect(() => {
+    return cleanup;
+  }, []);
+
+  // set/reset the tour root 
   React.useEffect(() => {
     let root: Element;
     if (rootSelector) {
@@ -145,14 +152,11 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     tourRoot.current = root;
-
-    return cleanup;
-  }, []);
+  }, [rootSelector, identifier])
 
 
   // update tour when step changes
   React.useEffect(() => {
-    !disableListeners && refreshListeners();
     updateTour();
   }, [currentStepIndex, currentStepContent])
 
@@ -167,12 +171,14 @@ export const Walktour = (props: WalktourProps) => {
       setTarget(null);
       setTooltipPosition(null);
       targetPosition.current = null;
+      targetSize.current = null;
       return;
     }
 
     const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
     const target: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, target);
+    const currentTargetDims: Dims = {width: target.getBoundingClientRect().width, height: target.getBoundingClientRect().height}; //TODO getelementdims
     const tooltipPosition: Coords = getTooltipPosition({
       target,
       tooltip: tooltipContainer,
@@ -186,6 +192,7 @@ export const Walktour = (props: WalktourProps) => {
     setTarget(target);
     setTooltipPosition(tooltipPosition);
     targetPosition.current = currentTargetPosition;
+    targetSize.current = currentTargetDims;
 
     tooltipContainer.focus();
 
@@ -194,28 +201,19 @@ export const Walktour = (props: WalktourProps) => {
       scrollToElement(root, target);
     }
 
+    const debouncedUpdate = debounce(() => {
+      const currentTarget = getTarget();
+      if (shouldUpdate(root, tooltipContainer, currentTarget, targetPosition.current, targetSize.current, renderTolerance)) {
+        updateTour();
+      }
+    })
+
     // if the user requests a watcher and there's supposed to be a target
     if (movingTarget && (target || currentStepContent.selector)) {
-      const updateWithTarget = () => {
-        // target might currently be undefined (missing/loading)
-        // presumably, since the user specified a selector, the element exists somewhere, so if we 
-        // don't have it yet we poll for it at the same interval that we check for updates
-        const currentTarget = target || getTarget();
-        if (shouldUpdate(root, currentTarget, targetPosition.current, renderTolerance)) {
-          updateTour();
-        }
-      };
-
-      // set the watcher
-      watcherId.current = window.setInterval(updateWithTarget, updateInterval)
+      watcherId.current = window.setInterval(debouncedUpdate, updateInterval)
     }
-  }
 
-  const refreshListeners = () => {
-    removeListener(updateRef.current, removeUpdateListener);
-    const debouncedUpdate = debounce(updateTour);
-    addListener(debouncedUpdate, setUpdateListener);
-    updateRef.current = debouncedUpdate;
+    !disableListeners && refreshListeners(debouncedUpdate, updateRef, setUpdateListener, removeUpdateListener);
   }
 
   const goToStep = (stepIndex: number) => {
@@ -335,42 +333,3 @@ export const Walktour = (props: WalktourProps) => {
   }
 }
 
-function getIdString(base: string, identifier?: string): string {
-  return `${base}${identifier ? `-${identifier}` : ``}`
-}
-
-function shouldUpdate(tourRoot: Element, target: HTMLElement, targetPosition: Coords, rerenderTolerance: number): boolean {
-  if (!tourRoot || (!target && !targetPosition)) {
-    return false;
-  }
-
-  if ((!target && targetPosition) || (target && !targetPosition)) {
-    return true;
-  }
-
-  const currentTargetPosition: Coords = getTargetPosition(tourRoot, target);
-  return dist(currentTargetPosition, targetPosition) > rerenderTolerance;
-}
-
-function clearWatcher(watcherId: React.MutableRefObject<number>): void {
-  if (watcherId.current) {
-    window.clearInterval(watcherId.current);
-    watcherId.current = null;
-  }
-}
-
-function addListener(callback: () => void, setCustomListener?: (update: () => void) => void, defaultEvent: string = 'resize'): void {
-  if (setCustomListener) { 
-    setCustomListener(callback);
-  } else {
-    window.addEventListener(defaultEvent, callback)
-  }
-}
-
-function removeListener(callback: () => void, customRemoveListener?: (update: () => void) => void, defaultEvent: string = 'resize'): void {
-  if (customRemoveListener) {
-    customRemoveListener(callback);
-  } else {
-    window.removeEventListener(defaultEvent, callback);
-  }
-}

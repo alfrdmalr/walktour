@@ -31,6 +31,8 @@ And then include it somewhere in your render function:
  | _zIndex_ | number | z-index value to give the tour components. |
  | _rootSelector_ | string | CSS selector string specifying the container element that the tour should be injected into. Only necessary if trying to constrain the scope of the tour and it's masking/scrolling to a particular element which is distinct from where the tour is instantiated. |
  | _identifier_ | string | An id string to be suffixed to the default Walktour IDs. Only necessary if multiple tours are running on the same page. More commonly, this means different tours in different components who are active on the same page. |
+ | _setUpdateListener_ | (_update_: () => void) => void | Callback that is passed the tour's recalculate/update function. Can be used to set a window listener, or subscribe to some other event that needs to trigger a tour update. |
+| _removeUpdateListener_ | (_update_: () => void) => void | Callback that is passed the tour's recalculate/update function. This is the **exact** same function that is passed to `setUpdateListener`, so it can be used with the Window's `add` and `removeEventListener` functions. |
  | ... | [`WalktourOptions`](#options) | Any of the optional [`WalktourOptions`](#options) attributes can be included as props. | 
  
 
@@ -72,10 +74,11 @@ Step-level options will take precedence over global options, so take care when u
 | _customCloseFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'close' function. This is called each time that `close()` would normally be called. |
 | _disableAutoScroll_ | boolean | Disable automatically scrolling elements into view. |
 | _getPositionFromCandidates_ | (candidates: `OrientationCoords[]`) => Coords | Optional callback to specify how the tooltip position is chosen. Only use if positioning is more complex than can be achieved with `orientationPreferences`; for instance, the tooltip position could be based on proximity to the cursor position or some other factor that's not known ahead of time. |
-| _movingTarget_ | boolean | If true, the tour will watch the target element for position changes. If the position is sufficiently different (as specified by `renderTolerance`) from its initial position, the tooltip and mask will adjust themselves accordingly. This can also be used if a particular target element is hidden or does not yet exist at the time the tour arrives to it. |
-| _renderTolerance_ | number | Distance, in pixels, for the target element to have moved before triggering an update. For use with `movingTarget` option. Default is 2. |
+| _movingTarget_ | boolean | If true, the tour will watch the target element for position changes. If the position is sufficiently different (as specified by `renderTolerance`) from its initial position or size, the tooltip and mask will adjust themselves accordingly. This can also be used if a particular target element is hidden or does not yet exist at the time the tour arrives to it. |
+| _renderTolerance_ | number | Distance, in pixels, for the target element to have moved/resized before triggering an update. Applies to the `movingTarget` option as well as the default window resize recalculation. Default is 2. |
 | _updateInterval_ | number | Duration, in milliseconds, between polling for changes to a target's positioning. For use with `movingTarget` option. Default is 500. |
 | _disableMask_ | boolean | Determines whether the overlay/cutout should be disabled. Default is false. |
+
 
 
 ### WalktourLogic
