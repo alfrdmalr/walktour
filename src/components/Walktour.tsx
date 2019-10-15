@@ -232,22 +232,10 @@ export const Walktour = (props: WalktourProps) => {
     removeListener(updateRef.current, removeUpdateListener);
   }
 
-  const next = () => {
-    goToStep(currentStepIndex + 1);
-  }
-
-  const prev = () => {
-    goToStep(currentStepIndex - 1);
-  }
-
-  const close = () => {
-   cleanup();
-  }
-
   const baseLogic: WalktourLogic = {
-    next: next,
-    prev: prev,
-    close: close,
+    next: () => goToStep(currentStepIndex + 1),
+    prev: () => goToStep(currentStepIndex - 1),
+    close: () => cleanup(),
     goToStep: goToStep,
     stepContent: { ...options }, //pass options in as well to expose any defaults that aren't specified
     stepIndex: currentStepIndex,
