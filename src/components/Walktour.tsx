@@ -43,6 +43,7 @@ export interface WalktourOptions {
   updateInterval?: number;
   renderTolerance?: number;
   disableMask?: boolean;
+  disableListeners?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -91,6 +92,7 @@ export const Walktour = (props: WalktourProps) => {
   const tourRoot = React.useRef<Element>(undefined);
   const targetPosition = React.useRef<Coords>(undefined);
   const watcherId = React.useRef<number>(undefined);
+  const updateRef = React.useRef<() => void>(undefined);
 
   const currentStepContent: Step = steps[currentStepIndex];
 
@@ -124,7 +126,8 @@ export const Walktour = (props: WalktourProps) => {
     updateInterval,
     disableMask,
     setUpdateListener,
-    removeUpdateListener
+    removeUpdateListener,
+    disableListeners
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -143,21 +146,15 @@ export const Walktour = (props: WalktourProps) => {
 
     tourRoot.current = root;
 
-    const debouncedUpdate: () => void  = debounce(updateTour);
-
-    setUpdateListener && setUpdateListener(debouncedUpdate);
-
-    return () => {
-      clearWatcher(watcherId); //clear the target watcher on unmount
-      removeUpdateListener && removeUpdateListener(debouncedUpdate);
-    } 
+    return cleanup;
   }, []);
 
 
   // update tour when step changes
   React.useEffect(() => {
+    !disableListeners && refreshListeners();
     updateTour();
-  }, [currentStepIndex])
+  }, [currentStepIndex, currentStepContent])
 
   // update tooltip and target position in state
   const updateTour = () => {
@@ -217,11 +214,41 @@ export const Walktour = (props: WalktourProps) => {
     }
   }
 
+  const addListener = (update: () => void, defaultEvent: string = 'resize'): void => {
+    if (setUpdateListener && removeUpdateListener) { 
+      setUpdateListener(update);
+    } else {
+      window.addEventListener(defaultEvent, update)
+    }
+  }
+  
+  const removeListener = (update: () => void, defaultEvent: string = 'resize'): void => {
+    if (removeUpdateListener) {
+      removeUpdateListener(update);
+    } else {
+      window.removeEventListener(defaultEvent, update);
+    }
+  }
+
+  const refreshListeners = () => {
+    removeListener(updateRef.current);
+    const debouncedUpdate = debounce(updateTour);
+    addListener(debouncedUpdate);
+    updateRef.current = debouncedUpdate;
+  }
+
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= steps.length || stepIndex < 0) {
       return;
     }
     setCurrentStepIndex(stepIndex);
+  }
+
+  const cleanup = () => {
+    goToStep(0);
+    setVisible(false);
+    clearWatcher(watcherId);
+    removeListener(updateRef.current);
   }
 
   const next = () => {
@@ -233,9 +260,7 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   const close = () => {
-    goToStep(0);
-    setVisible(false);
-    clearWatcher(watcherId);
+   cleanup();
   }
 
   const baseLogic: WalktourLogic = {

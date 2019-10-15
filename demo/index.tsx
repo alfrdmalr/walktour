@@ -14,7 +14,7 @@ const steps: Step[] = [
     selector: '#eight', title: 'Access the Tour API...', description: "return the to first step", customDescriptionRenderer: (description: string, logic: WalktourLogic) =>
       <div>...from inside your custom content<button onClick={() => logic.goToStep(0)}>{description}</button></div>
   },
-  { selector: '#three', title: 'Smart Positioning', description: 'The tooltip is automatically positioned within view' },
+  { selector: '#three', title: 'Smart Positioning', description: 'The tooltip is automatically positioned within view. Try resizing the window!' },
   { selector: '#six', title: "Explicit Positioning", description: 'East!', orientationPreferences: [CardinalOrientation.EAST] },
   { selector: '#six', title: "Explicit Positioning", description: 'South!', orientationPreferences: [CardinalOrientation.SOUTH] },
   { selector: '#six', title: "Get More Specific!", description: 'North with West alignment!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
@@ -62,10 +62,10 @@ const App = () => (
       <div id='twoTwo' style={{...twoStyle}} />
       <div id='threeTwo' style={threeStyle} />
 
-      <Walktour steps={stepsPartTwo} identifier={"2"} />
+      <Walktour steps={stepsPartTwo} identifier={"2"} disableListeners />
     </div>
 
-    <Walktour disableCloseOnClick steps={steps} identifier={"1"} />
+    <Walktour steps={steps} identifier={"1"}  disableCloseOnClick />
   </>
 )
 
@@ -94,5 +94,4 @@ function CustomTooltip(props: CustomTooltipProps) {
     <p>More info about customizability and usage <a style={{ color: 'cyan' }} href="http://www.github.com/alfrdmalr/walktour">on Github.</a></p>
     <button onClick={props.close}>close</button>
   </div>
-
 }
