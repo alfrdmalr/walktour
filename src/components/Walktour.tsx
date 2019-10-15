@@ -170,15 +170,12 @@ export const Walktour = (props: WalktourProps) => {
       return;
     }
 
-    // If the tooltip is custom and absolutely positioned/floated, the container will not adopt those dimensions.
-    // So we use the first child of the container (the tooltip itself) and fall back to the container if something goes wrong.
-    const tangibleTooltip = tooltipContainer;
     const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
     const target: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, target);
     const tooltipPosition: Coords = getTooltipPosition({
       target,
-      tooltip: tangibleTooltip,
+      tooltip: tooltipContainer,
       padding: maskPadding,
       tooltipSeparation,
       orientationPreferences,
@@ -193,7 +190,7 @@ export const Walktour = (props: WalktourProps) => {
     tooltipContainer.focus();
 
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
-    if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tangibleTooltip, tooltipPosition))) {
+    if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
       scrollToElement(root, target);
     }
 
@@ -214,26 +211,10 @@ export const Walktour = (props: WalktourProps) => {
     }
   }
 
-  const addListener = (update: () => void, defaultEvent: string = 'resize'): void => {
-    if (setUpdateListener && removeUpdateListener) { 
-      setUpdateListener(update);
-    } else {
-      window.addEventListener(defaultEvent, update)
-    }
-  }
-  
-  const removeListener = (update: () => void, defaultEvent: string = 'resize'): void => {
-    if (removeUpdateListener) {
-      removeUpdateListener(update);
-    } else {
-      window.removeEventListener(defaultEvent, update);
-    }
-  }
-
   const refreshListeners = () => {
-    removeListener(updateRef.current);
+    removeListener(updateRef.current, removeUpdateListener);
     const debouncedUpdate = debounce(updateTour);
-    addListener(debouncedUpdate);
+    addListener(debouncedUpdate, setUpdateListener);
     updateRef.current = debouncedUpdate;
   }
 
@@ -248,7 +229,7 @@ export const Walktour = (props: WalktourProps) => {
     goToStep(0);
     setVisible(false);
     clearWatcher(watcherId);
-    removeListener(updateRef.current);
+    removeListener(updateRef.current, removeUpdateListener);
   }
 
   const next = () => {
@@ -387,5 +368,21 @@ function clearWatcher(watcherId: React.MutableRefObject<number>): void {
   if (watcherId.current) {
     window.clearInterval(watcherId.current);
     watcherId.current = null;
+  }
+}
+
+function addListener(callback: () => void, setCustomListener?: (update: () => void) => void, defaultEvent: string = 'resize'): void {
+  if (setCustomListener) { 
+    setCustomListener(callback);
+  } else {
+    window.addEventListener(defaultEvent, callback)
+  }
+}
+
+function removeListener(callback: () => void, customRemoveListener?: (update: () => void) => void, defaultEvent: string = 'resize'): void {
+  if (customRemoveListener) {
+    customRemoveListener(callback);
+  } else {
+    window.removeEventListener(defaultEvent, callback);
   }
 }
