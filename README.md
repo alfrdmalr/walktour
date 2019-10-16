@@ -156,13 +156,10 @@ An orientation can also be specified at either level with its corresponding stri
 `{... orientationPreferences: ["south-east", "east-south", "south", "east"] ...}`
 
 
-*_Center_ places the tooltip at the current center of the viewport. As such, it may have odd behavior when used with scrolling.
-It also serves as the default position when the element targeted by a `Step`'s `selector` property cannot be found. 
-If a content agnostic, centered tooltip is desired, it's generally best to **not** request it using the `orientationPreferences` option. 
-Instead, specifiy that `Step`'s `selector` property value to `null` or `undefined`, or simply omit the property altogether. 
-It is also currently recommended that `disableAutoScroll: false` be included to combat any scrolling inconsistencies:
+*_CENTER_ centers the tooltip relative to the target. Because it's placed on top of the target element (and thus obscures content, particularly with large tooltips and/or small targets),
+ this position is usually ignored when choosing where to place the tooltip. If this behavior is desired, specify an `orientationPreferences` that _only_ includes `CardinalOrientation.CENTER` and no other values, or implement a custom `getPositionFromCandidates` function.
 
-`{... selector: null, description: "This tooltip is centered, disableAutoScroll: true, ...}`
+If a content agnostic, centered tooltip is desired instead, specifiy that `Step`'s `selector` property value to `null` or `undefined`, or simply omit the property altogether.
 
 ### Examples
 

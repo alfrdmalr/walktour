@@ -1,4 +1,4 @@
-import { Coords, getElementCoords, Dims, isDefaultScrollingElement } from "./dom";
+import { Coords, getElementCoords, Dims, isDefaultScrollingElement, getCombinedData, getElementDims } from "./dom";
 import { getViewportStart, getViewportDims } from "./viewport";
 
 export function getCurrentScrollOffset(root: Element): Coords {
@@ -43,13 +43,29 @@ export function applyCenterOffset(aCoords: Coords, aDims: Dims, b: Dims): Coords
   }
 }
 
+// provided coords should be already adjusted to their absolute positions
+export function centerViewportAroundElements(root: Element, a: HTMLElement, b: HTMLElement, aPosition?: Coords, bPosition?: Coords): Coords {
+  if (!root || !a || !b) {
+    return;
+  }
+  const aCoords = aPosition || addAppropriateOffset(root, getElementCoords(a));
+  const bCoords = bPosition || addAppropriateOffset(root, getElementCoords(b));
+  const aDims = getElementDims(a);
+  const bDims = getElementDims(b);
+  const {coords, dims} = getCombinedData(aCoords, aDims, bCoords, bDims);
+  return centerInViewport(root, coords, dims);
+}
+
+export function centerInViewport(root: Element, coords: Coords, dims: Dims): Coords {
+  return applyCenterOffset(coords, dims, getViewportDims(root));
+}
+
 // get the coordinates the viewport would need to be placed for the element to be centered
-export function centerElementInViewport(root: Element, element: HTMLElement): Coords {
-  const elementData: ClientRect = element.getBoundingClientRect();
-  const elementDims: Dims = {width: elementData.width, height: elementData.height}
+export function centerViewportAroundElement(root: Element, element: HTMLElement): Coords {
+  const elementDims: Dims = getElementDims(element);
   const elementCoords: Coords = getElementCoords(element);
 
-  return applyCenterOffset(elementCoords, elementDims, getViewportDims(root))
+  return centerInViewport(root, elementCoords, elementDims);
 }
 
 // get the center coord of the viewport. If element is provided, the return value is the origin 

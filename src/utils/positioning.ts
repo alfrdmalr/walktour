@@ -1,5 +1,6 @@
-import { Coords, getElementCoords, dist } from "./dom";
-import { getViewportCenter, addAppropriateOffset } from "./offset";
+
+import { Coords, getElementCoords, dist, getElementDims, Dims } from "./dom";
+import { getViewportCenter, addAppropriateOffset, applyCenterOffset } from "./offset";
 
 export enum CardinalOrientation {
   EAST = 'east',
@@ -32,26 +33,26 @@ interface GetTooltipPositionArgs {
   getPositionFromCandidates?: (candidates: OrientationCoords[]) => Coords;
 }
 
-function getTooltipPositionCandidates(root: Element, target: HTMLElement, tooltip: HTMLElement, padding: number, tooltipDistance: number, includeAllPositions?: boolean): OrientationCoords[] {
-  const targetData: ClientRect = target.getBoundingClientRect();
-  const tooltipData: ClientRect = tooltip.getBoundingClientRect();
-  if (!targetData || !tooltipData) {
+function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement, padding: number, tooltipDistance: number, includeAllPositions?: boolean): OrientationCoords[] {
+  if (!target || !tooltip) {
     return;
   }
 
-  const coords: Coords = getElementCoords(target);
-  const centerX: number = coords.x - ((tooltipData.width - targetData.width) / 2);
-  const centerY: number = coords.y - ((tooltipData.height - targetData.height) / 2);
-  const eastOffset: number = coords.x + targetData.width + padding + tooltipDistance;
-  const southOffset: number = coords.y + targetData.height + padding + tooltipDistance;
-  const westOffset: number = coords.x - tooltipData.width - padding - tooltipDistance;
-  const northOffset: number = coords.y - tooltipData.height - padding - tooltipDistance;
+  const tooltipDims: Dims = getElementDims(tooltip);
+  const targetCoords: Coords = getElementCoords(target);
+  const targetDims: Dims = getElementDims(target);
+  const centerX: number = targetCoords.x - ((tooltipDims.width - targetDims.width) / 2);
+  const centerY: number = targetCoords.y - ((tooltipDims.height - targetDims.height) / 2);
+  const eastOffset: number = targetCoords.x + targetDims.width + padding + tooltipDistance;
+  const southOffset: number = targetCoords.y + targetDims.height + padding + tooltipDistance;
+  const westOffset: number = targetCoords.x - tooltipDims.width - padding - tooltipDistance;
+  const northOffset: number = targetCoords.y - tooltipDims.height - padding - tooltipDistance;
 
   const east: Coords = { x: eastOffset, y: centerY }
   const south: Coords = { x: centerX, y: southOffset }
   const west: Coords = { x: westOffset, y: centerY };
   const north: Coords = { x: centerX, y: northOffset };
-  const center: Coords = getViewportCenter(root, tooltip);
+  const center: Coords = applyCenterOffset(targetCoords, targetDims, tooltipDims);
 
   const standardPositions = [
     { orientation: CardinalOrientation.EAST, coords: east },
@@ -62,10 +63,10 @@ function getTooltipPositionCandidates(root: Element, target: HTMLElement, toolti
 
   let additionalPositions: OrientationCoords[];
   if (includeAllPositions) {
-    const eastAlign: number = coords.x - (tooltipData.width - targetData.width) + padding;
-    const southAlign: number = coords.y - (tooltipData.height - targetData.height) + padding;
-    const westAlign: number = coords.x - padding;
-    const northAlign: number = coords.y - padding;
+    const eastAlign: number = targetCoords.x - (tooltipDims.width - targetDims.width) + padding;
+    const southAlign: number = targetCoords.y - (tooltipDims.height - targetDims.height) + padding;
+    const westAlign: number = targetCoords.x - padding;
+    const northAlign: number = targetCoords.y - padding;
 
     const eastNorth: Coords = { x: eastOffset, y: northAlign }
     const eastSouth: Coords = { x: eastOffset, y: southAlign }
@@ -137,7 +138,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     return defaultPosition;
   }
 
-  const candidates: OrientationCoords[] = getTooltipPositionCandidates(tourRoot, target, tooltip, padding, tooltipSeparation, true);
+  const candidates: OrientationCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipSeparation, true);
   const choosePosition = getPositionFromCandidates || ((candidates: OrientationCoords[]) => candidates.reduce(getCenterReducer(tourRoot, tooltip), undefined));
 
   const rawPosition: Coords = choosePosition(filterPreferredCandidates(candidates, orientationPreferences)); //position relative to current viewport
