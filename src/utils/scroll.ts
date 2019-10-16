@@ -1,28 +1,12 @@
-import { Coords, getElementCoords, getElementDims, Dims } from "./dom";
-import { addAppropriateOffset, centerElementInViewport } from "./offset";
-import { getViewportStart, getViewportEnd } from "./viewport";
-
-export function isElementInView(root: Element, element: HTMLElement, atPosition?: Coords, needsAdjusting?: boolean): boolean {
-  if (!root || !element) {
-    return false;
-  }
-  const explicitPosition: Coords = atPosition && (needsAdjusting ? addAppropriateOffset(root, atPosition) : atPosition)
-  const position: Coords = explicitPosition || addAppropriateOffset(root, getElementCoords(element));
-  const elementDims: Dims = getElementDims(element);
-  const startCoords: Coords = addAppropriateOffset(root, getViewportStart(root));
-  const endCoords: Coords = addAppropriateOffset(root, getViewportEnd(root));
-  const xVisibility: boolean = (position.x >= startCoords.x) && ((position.x + elementDims.width) <= endCoords.x);
-  const yVisibility: boolean = (position.y >= startCoords.y) && ((position.y + elementDims.height) <= endCoords.y);
-
-  return xVisibility && yVisibility;
-}
+import { Coords } from "./dom";
+import { addAppropriateOffset, centerViewportAroundElement } from "./offset";
 
 export function scrollToElement(root: Element, element: HTMLElement): void {
   if (!root || !element) {
     return;
   }
 
-  const coords = addAppropriateOffset(root, centerElementInViewport(root, element));
+  const coords = addAppropriateOffset(root, centerViewportAroundElement(root, element));
 
   scrollToDestination(root, coords);
 }

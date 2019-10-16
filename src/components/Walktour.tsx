@@ -4,8 +4,9 @@ import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
 import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot } from '../utils/dom';
-import { isElementInView, scrollToElement, scrollToDestination } from '../utils/scroll';
-import { centerElementsInViewport } from '../utils/offset';
+import { scrollToDestination } from '../utils/scroll';
+import { centerViewportAroundElements } from '../utils/offset';
+import { isElementInView } from '../utils/viewport';
 
 export interface WalktourLogic {
   next: () => void;
@@ -184,7 +185,7 @@ export const Walktour = (props: WalktourProps) => {
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
     if (!disableAutoScroll && target && (!isElementInView(root, target) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
       // scrollToElement(root, target);
-      scrollToDestination(root, centerElementsInViewport(root, tooltipContainer, target, tooltipPosition, currentTargetPosition))
+      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, target, tooltipPosition, currentTargetPosition))
     }
 
     // if the user requests a watcher and there's supposed to be a target

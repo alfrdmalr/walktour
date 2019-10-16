@@ -43,7 +43,8 @@ export function applyCenterOffset(aCoords: Coords, aDims: Dims, b: Dims): Coords
   }
 }
 
-export function centerElementsInViewport(root: Element, a: HTMLElement, b: HTMLElement, aPosition?: Coords, bPosition?: Coords): Coords {
+// provided coords should be already adjusted to their absolute positions
+export function centerViewportAroundElements(root: Element, a: HTMLElement, b: HTMLElement, aPosition?: Coords, bPosition?: Coords): Coords {
   if (!root || !a || !b) {
     return;
   }
@@ -60,7 +61,7 @@ export function centerInViewport(root: Element, coords: Coords, dims: Dims): Coo
 }
 
 // get the coordinates the viewport would need to be placed for the element to be centered
-export function centerElementInViewport(root: Element, element: HTMLElement): Coords {
+export function centerViewportAroundElement(root: Element, element: HTMLElement): Coords {
   const elementDims: Dims = getElementDims(element);
   const elementCoords: Coords = getElementCoords(element);
 
