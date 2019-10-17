@@ -43,20 +43,20 @@ export function applyCenterOffset(aCoords: Coords, aDims: Dims, b: Dims): Coords
   }
 }
 
-// provided coords should be already adjusted to their absolute positions
 export function centerViewportAroundElements(root: Element, a: HTMLElement, b: HTMLElement, aPosition?: Coords, bPosition?: Coords): Coords {
   if (!root || !a || !b) {
     return;
   }
-  const aCoords = aPosition || addAppropriateOffset(root, getElementCoords(a));
-  const bCoords = bPosition || addAppropriateOffset(root, getElementCoords(b));
+
+  const aCoords = aPosition || getElementCoords(a);
+  const bCoords = bPosition || getElementCoords(b);
   const aDims = getElementDims(a);
   const bDims = getElementDims(b);
   const {coords, dims} = getCombinedData(aCoords, aDims, bCoords, bDims);
-  return centerInViewport(root, coords, dims);
+  return centerViewportAround(root, coords, dims);
 }
 
-export function centerInViewport(root: Element, coords: Coords, dims: Dims): Coords {
+export function centerViewportAround(root: Element, coords: Coords, dims: Dims): Coords {
   return applyCenterOffset(coords, dims, getViewportDims(root));
 }
 
@@ -65,21 +65,20 @@ export function centerViewportAroundElement(root: Element, element: HTMLElement)
   const elementDims: Dims = getElementDims(element);
   const elementCoords: Coords = getElementCoords(element);
 
-  return centerInViewport(root, elementCoords, elementDims);
+  return centerViewportAround(root, elementCoords, elementDims);
 }
 
 // get the center coord of the viewport. If element is provided, the return value is the origin 
-// which would align that element's center with the viewport center
-export function getViewportCenter(root: Element, element?: HTMLElement): Coords {
+// which would align that element's center with the viewport center. If atViewportPosition is provided,
+// gets the viewport's center at that position
+export function getViewportCenter(root: Element, element?: HTMLElement, atViewportPosition?: Coords): Coords {
   if (!root) {
     return;
   }
-  const elementData: ClientRect = element && element.getBoundingClientRect();
-  const startCoords: Coords = getViewportStart(root);
+  const startCoords: Coords = atViewportPosition || getViewportStart(root);
   const viewportDims: Dims = getViewportDims(root);
-  const elementDims: Dims = elementData
-    ? { width: elementData.width, height: elementData.height }
-    : {width: 0, height: 0}
+  const elementDims: Dims = element ? getElementDims(element) : {height: 0, width: 0}
 
   return applyCenterOffset(startCoords, viewportDims, elementDims);
 }
+
