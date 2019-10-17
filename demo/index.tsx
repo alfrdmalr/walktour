@@ -6,8 +6,8 @@ import { CardinalOrientation } from '../src/utils/positioning'
 
 const steps: Step[] = [
   { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
-  { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
-  { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements', movingTarget: true,  updateInterval: 200 },
+  { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button'},
+  { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements'},
   { selector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
   { selector: '#eight', title: 'Supply Custom HTML Content', description: null, customDescriptionRenderer: () => <><h1>H1 Element</h1><p>Paragraph Element</p><input type='text' placeholder={'text input element'} /></> },
   {
@@ -26,10 +26,9 @@ const steps: Step[] = [
 
 const stepsPartTwo: Step[] = [
   { selector: '#oneTwo', description: '...you can also have scoped tours'},
-  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it', movingTarget: false},
-  { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', 
-  orientationPreferences: [CardinalOrientation.SOUTH]},
-]
+  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
+  { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', },
+];
 
 const containerStyle: React.CSSProperties = { position: 'absolute', left: 1800, top: 1800, height: 600, width: 600, overflow: 'auto', padding: '2rem' }
 const oneStyle: React.CSSProperties = { background: 'grey', width: 200, height: 100, }
