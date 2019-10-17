@@ -65,7 +65,7 @@ export interface WalktourProps extends WalktourOptions {
 const walktourDefaultProps: Partial<WalktourProps> = {
   maskPadding: 5,
   tooltipSeparation: 10,
-  transition: 'top 200ms ease, left 200ms ease',
+  transition: 'top 300ms ease, left 300ms ease',
   disableMaskInteraction: false,
   disableCloseOnClick: false,
   zIndex: 9999,
