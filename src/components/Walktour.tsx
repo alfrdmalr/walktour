@@ -173,8 +173,7 @@ export const Walktour = (props: WalktourProps) => {
       tooltipSeparation,
       orientationPreferences,
       tourRoot: root,
-      getPositionFromCandidates,
-      scrollDisabled: disableAutoScroll
+      getPositionFromCandidates
     });
 
     setTarget(target);

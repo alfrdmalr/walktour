@@ -1,7 +1,6 @@
 
-import { Coords, getElementCoords, dist, getElementDims, Dims, getCombinedData } from "./dom";
-import { getViewportCenter, addAppropriateOffset, applyCenterOffset, centerViewportAroundElements } from "./offset";
-import { getViewportStart, getViewportDims, getViewportScrollEnd, getScrolledViewportPosition, getViewportScrollStart, isElementInView } from "./viewport";
+import { Coords, getElementCoords, dist, getElementDims, Dims } from "./dom";
+import { getViewportCenter, addAppropriateOffset, applyCenterOffset } from "./offset";
 
 export enum CardinalOrientation {
   EAST = 'east',
@@ -32,7 +31,6 @@ interface GetTooltipPositionArgs {
   tourRoot: Element;
   orientationPreferences?: CardinalOrientation[];
   getPositionFromCandidates?: (candidates: OrientationCoords[]) => Coords;
-  scrollDisabled?: boolean;
 }
 
 function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement, padding: number, tooltipDistance: number, includeAllPositions?: boolean): OrientationCoords[] {
@@ -99,24 +97,8 @@ function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement,
 }
 
 // simple reducer who selects for coordinates closest to the current center of the viewport
-function getCenterReducer(root: Element, tooltip: HTMLElement, target: HTMLElement, predictViewport?: boolean):
-  ((acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords) {
-  const currentCenter: Coords = getViewportCenter(root, tooltip);
-
-  // store the center of the predicted viewport location with the tooltip at acc
-  // to have a meaningful distance comparison
-  let accCenter: Coords = currentCenter;
-
-  const getCenter = (coords: Coords) => {
-    if (predictViewport && (!isElementInView(root, target) || !isElementInView(root, tooltip, coords, true))) {
-      const centerAround = centerViewportAroundElements(root, tooltip, target, coords)
-      const scrollBound = getScrolledViewportPosition(root, centerAround);
-      const viewportCenter = getViewportCenter(root, tooltip, scrollBound);
-      return viewportCenter;
-    } else {
-      return currentCenter;
-    }
-  }
+function getCenterReducer(root: Element, tooltip: HTMLElement): ((acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]) => Coords) {
+  const center: Coords = getViewportCenter(root, tooltip);
 
   return (acc: Coords, cur: OrientationCoords, ind: number, arr: OrientationCoords[]): Coords => {
     if (cur.orientation === CardinalOrientation.CENTER) { //ignore centered coords since those will always be closest to the center
@@ -126,116 +108,28 @@ function getCenterReducer(root: Element, tooltip: HTMLElement, target: HTMLEleme
         return acc;
       }
     } else if (acc === undefined) {
-      accCenter = getCenter(cur.coords);
       return cur.coords;
     } else {
-      const center: Coords = getCenter(cur.coords);
-
-      if (dist(center, cur.coords) > dist(accCenter, acc)) {
+      if (dist(center, cur.coords) > dist(center, acc)) {
         return acc;
       } else {
-        accCenter = center;
         return cur.coords;
       }
     }
   }
 }
 
-// complex candidate reducer function that tries to place the tooltip as close to the center of the 
-// screen as possible, even after the screen has scrolled to a particular location.
-function chooseBestTooltipPosition(preferredCandidates: OrientationCoords[], root: Element, tooltip: HTMLElement, target: HTMLElement, scrollDisabled: boolean): Coords {
-  if (preferredCandidates.length === 1) {
-    //if there's only a single pref candidate, use that
-    return preferredCandidates[0].coords;
-  } else if (scrollDisabled) {
-    // if scrolling is disabled, there's not much we can do except use the naive center reducer
-    return preferredCandidates.reduce(getCenterReducer(root, tooltip, target, false), undefined);
-  } else {
-    // scrolling is allowed, which means we have to figure out:
-    // 1: where the window might be
-    // 2: if both elements fit on screen at the same time
-    // 3: if (2), what coordinates fulfil that possibility
-    // 4: if (2), which of them does (3) the _best_
-
-    // steps to accomplish:
-    // filter candidates (c0) down to their viable options (c1)
-    // filterInBoundsCandidates(root, tooltip, c0)
-    // filter (c1) down to those that allow  tooltip/target on screen at same time (c2)
-    // filterCompatibleCandidates(root, tooltip, target, c1)
-    // reduce c2 based on center proximity. "center" refers not to the current center but the
-    // c2.reduce(centerReducer);
-    // coordinates of the center once the viewport has scrolled
-
-
-    const viewportDims: Dims = getViewportDims(root);
-    const viewportScrollStart: Coords = getViewportScrollStart(root);
-    const viewportScrollEnd: Coords = getViewportScrollEnd(root);
-    const tooltipDims: Dims = getElementDims(tooltip);
-    const targetDims: Dims = getElementDims(target);
-    const targetCoords: Coords = getElementCoords(target);
-
-
-    const inbounds = preferredCandidates.filter(getInBoundsFilter(tooltipDims, viewportScrollStart, viewportScrollEnd));
-    console.log('inbounds', inbounds);
-    const compatible = inbounds.filter(getCompatibleArrangementFilter(tooltipDims, targetCoords, targetDims, viewportDims));
-    console.log("compatible", compatible);
-    const reduced = compatible.reduce(getCenterReducer(root, tooltip, target, true), undefined);
-    console.log('reduced', reduced);
-    return reduced;
-    // return preferredCandidates.
-    //   filter(getInBoundsFilter(tooltipDims, viewportStart, viewportScrollEnd)).
-    //   filter(getCompatibleArrangementFilter(tooltipDims, targetCoords, targetDims, viewportDims)).
-    //   reduce(getCenterReducer(root, tooltip, target), undefined);
-  }
-}
-
-// filter out any positions which would have the tooltip be out of the bounds of the root container 
-// (i.e. in a position) that the viewport can't "reach"/scroll to
-function getInBoundsFilter(tooltipDims: Dims, viewportScrollStart: Coords, viewportScrollEnd: Coords): (oc: OrientationCoords) => boolean {
-  return (oc: OrientationCoords): boolean => {
-    const coords: Coords = oc.coords;
-    return !(coords.x < viewportScrollStart.x || coords.y < viewportScrollStart.y ||
-      (coords.x + tooltipDims.width) > viewportScrollEnd.x || (coords.y + tooltipDims.height) > viewportScrollEnd.y)
-  }
-
-}
-
-// filters out any positions which would cause the target/tooltip to not fit within the viewport
-function getCompatibleArrangementFilter(tooltipDims: Dims, targetCoords: Coords, targetDims: Dims, viewportDims: Dims): (oc: OrientationCoords) => boolean {
-  return (oc: OrientationCoords): boolean => {
-    const coords: Coords = oc.coords;
-    // we only care about the resultant dims but the input coords are critical here
-    const { dims: combinedDims } = getCombinedData(coords, tooltipDims, targetCoords, targetDims);
-
-    return combinedDims.width <= viewportDims.width && combinedDims.height <= viewportDims.height
-  }
-
-
-}
-
-function getPreferredCandidates(candidates: OrientationCoords[], orientationPreferences?: CardinalOrientation[]): OrientationCoords[] {
+function filterPreferredCandidates(candidates: OrientationCoords[], orientationPreferences?: CardinalOrientation[]): OrientationCoords[] {
   if (!orientationPreferences || orientationPreferences.length === 0) {
-    console.log('no prefs, use all candidates')
     return candidates;
-  } else if (orientationPreferences.length === 1) {
-    console.log('only one pref, use that')
-    const specifiedCandidate = candidates.find((oc: OrientationCoords) => oc.orientation === orientationPreferences[0])
-    if (specifiedCandidate) {
-      return [specifiedCandidate];
-    } else {
-      console.log('specified orientation not found for some reason. Defaulting to automatic behavior.');
-      return candidates;
-    }
   } else {
     const preferenceFilter = (cc: OrientationCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
-    const returns = candidates.filter(preferenceFilter);
-    console.log('preferred', returns)
-    return returns;
+    return candidates.filter(preferenceFilter);
   }
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, getPositionFromCandidates, tourRoot, scrollDisabled } = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, getPositionFromCandidates, tourRoot } = args;
   const defaultPosition: Coords = addAppropriateOffset(tourRoot, getViewportCenter(tourRoot, tooltip));
 
   if (!tooltip || !tourRoot) {
@@ -244,13 +138,10 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     return defaultPosition;
   }
 
-
-  console.log('target', target);
   const candidates: OrientationCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipSeparation, true);
-  console.log('candidates', candidates);
-  const choosePosition = getPositionFromCandidates || ((cans: OrientationCoords[]) => chooseBestTooltipPosition(cans, tourRoot, tooltip, target, scrollDisabled ));
+  const choosePosition = getPositionFromCandidates || ((candidates: OrientationCoords[]) => candidates.reduce(getCenterReducer(tourRoot, tooltip), undefined));
 
-  const rawPosition: Coords = choosePosition(getPreferredCandidates(candidates, orientationPreferences)); //position relative to current viewport
+  const rawPosition: Coords = choosePosition(filterPreferredCandidates(candidates, orientationPreferences)); //position relative to current viewport
 
   if (!rawPosition) {
     return defaultPosition;
@@ -262,4 +153,3 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
 export function getTargetPosition(root: Element, target: HTMLElement): Coords {
   return addAppropriateOffset(root, getElementCoords(target));
 }
-
