@@ -1,6 +1,6 @@
 
 import { Coords, getElementCoords, dist, getElementDims, Dims, getCombinedData } from "./dom";
-import { getViewportCenter, addAppropriateOffset, applyCenterOffset, centerViewportAroundElements } from "./offset";
+import { getViewportCenter, addAppropriateOffset, applyCenterOffset, centerViewportAroundElements, centerViewportAroundElement } from "./offset";
 import { getViewportDims, getViewportScrollEnd, getScrolledViewportPosition, getViewportScrollStart, isElementInView } from "./viewport";
 
 export enum CardinalOrientation {
@@ -207,7 +207,8 @@ function getPreferredCandidates(candidates: OrientationCoords[], orientationPref
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
   const { target, tooltip, padding, tooltipSeparation, orientationPreferences, getPositionFromCandidates, tourRoot, scrollDisabled } = args;
-  const defaultPosition: Coords = addAppropriateOffset(tourRoot, getViewportCenter(tourRoot, tooltip));
+  const center: Coords = target ? getViewportCenter(tourRoot, tooltip, getScrolledViewportPosition(tourRoot, centerViewportAroundElement(tourRoot, target))) : getViewportCenter(tourRoot, tooltip)
+  const defaultPosition: Coords = addAppropriateOffset(tourRoot, center);
 
   if (!tooltip || !tourRoot) {
     return;

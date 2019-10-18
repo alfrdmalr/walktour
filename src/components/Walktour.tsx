@@ -187,7 +187,6 @@ export const Walktour = (props: WalktourProps) => {
 
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
     if (!disableAutoScroll && target && (!isElementInView(root, target) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
-      // scrollToElement(root, target);
       scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, target, tooltipPosition, currentTargetPosition), disableSmoothScrolling)
     }
 
