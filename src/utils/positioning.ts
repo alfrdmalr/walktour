@@ -200,8 +200,8 @@ function getPreferredCandidates(candidates: OrientationCoords[], orientationPref
     }
   } else {
     const preferenceFilter = (cc: OrientationCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
-    const returns = candidates.filter(preferenceFilter);
-    return returns;
+    return candidates.filter(preferenceFilter);
+    
   }
 }
 
