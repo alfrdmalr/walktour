@@ -44,6 +44,7 @@ export interface WalktourOptions {
   updateInterval?: number;
   renderTolerance?: number;
   disableMask?: boolean;
+  disableSmoothScrolling?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -122,6 +123,7 @@ export const Walktour = (props: WalktourProps) => {
     renderTolerance,
     updateInterval,
     disableMask,
+    disableSmoothScrolling,
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -186,7 +188,7 @@ export const Walktour = (props: WalktourProps) => {
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
     if (!disableAutoScroll && target && (!isElementInView(root, target) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
       // scrollToElement(root, target);
-      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, target, tooltipPosition, currentTargetPosition))
+      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, target, tooltipPosition, currentTargetPosition), disableSmoothScrolling)
     }
 
     // if the user requests a watcher and there's supposed to be a target
