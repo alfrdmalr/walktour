@@ -70,12 +70,13 @@ Step-level options will take precedence over global options, so take care when u
 | _customNextFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'next' function. This is called each time that `next()` would normally be called. |
 | _customPrevFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'prev' function. This is called each time that `prev()` would normally be called. |
 | _customCloseFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'close' function. This is called each time that `close()` would normally be called. |
-| _disableAutoScroll_ | boolean | Disable automatically scrolling elements into view. |
+| _disableAutoScroll_ | boolean | Disable automatically scrolling elements into view. Default is false. |
 | _getPositionFromCandidates_ | (candidates: `OrientationCoords[]`) => Coords | Optional callback to specify how the tooltip position is chosen. Only use if positioning is more complex than can be achieved with `orientationPreferences`; for instance, the tooltip position could be based on proximity to the cursor position or some other factor that's not known ahead of time. |
 | _movingTarget_ | boolean | If true, the tour will watch the target element for position changes. If the position is sufficiently different (as specified by `renderTolerance`) from its initial position, the tooltip and mask will adjust themselves accordingly. This can also be used if a particular target element is hidden or does not yet exist at the time the tour arrives to it. |
 | _renderTolerance_ | number | Distance, in pixels, for the target element to have moved before triggering an update. For use with `movingTarget` option. Default is 2. |
 | _updateInterval_ | number | Duration, in milliseconds, between polling for changes to a target's positioning. For use with `movingTarget` option. Default is 500. |
-| _disableMask_ | boolean | Determines whether the overlay/cutout should be disabled. Default is false. |
+| _disableMask_ | boolean | Disable the overlay and cutout. Default is false. |
+| _disableSmoothScrolling_ | boolean | Disable supporting browsers scrolling smoothly to offscreen elements. Default is false. |
 
 
 ### WalktourLogic
