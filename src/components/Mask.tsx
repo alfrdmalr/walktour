@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Coords } from '../utils/dom';
+import { Coords, Dims, getElementDims } from '../utils/dom';
 import { getTargetPosition } from '../utils/positioning';
 import { getViewportScrollDims } from '../utils/viewport';
 
@@ -26,13 +26,13 @@ export function Mask(props: MaskProps): JSX.Element {
       return;
     }
 
-    const targetData: ClientRect = target.getBoundingClientRect();
+    const targetDims: Dims = getElementDims(target);
     const coords: Coords = getTargetPosition(tourRoot, target);
 
     const cutoutTop: number = coords.y - padding;
     const cutoutLeft: number = coords.x - padding;
-    const cutoutRight: number = coords.x + targetData.width + padding;
-    const cutoutBottom: number = coords.y + targetData.height + padding;
+    const cutoutRight: number = coords.x + targetDims.width + padding;
+    const cutoutBottom: number = coords.y + targetDims.height + padding;
 
     return `0 0, 
             0 ${containerHeight}, 

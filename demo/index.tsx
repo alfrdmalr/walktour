@@ -19,16 +19,23 @@ const steps: Step[] = [
   { selector: '#six', title: "Explicit Positioning", description: 'South!', orientationPreferences: [CardinalOrientation.SOUTH] },
   { selector: '#six', title: "Get More Specific!", description: 'North with West alignment!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { selector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
-  { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
-  { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} /> },
+  { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view'},
+  { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, },
   { selector: '#demo-container', title: "Encapsulated Tours", description: 'Not only can you have multiple tours on a page...' }
 ]
 
 const stepsPartTwo: Step[] = [
   { selector: '#oneTwo', description: '...you can also have scoped tours'},
+<<<<<<< HEAD
   { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
   { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', },
 ];
+=======
+  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it', movingTarget: false, },
+  { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', 
+  },
+]
+>>>>>>> master
 
 const containerStyle: React.CSSProperties = { position: 'absolute', left: 1800, top: 1800, height: 600, width: 600, overflow: 'auto', padding: '2rem' }
 const oneStyle: React.CSSProperties = { background: 'grey', width: 200, height: 100, }

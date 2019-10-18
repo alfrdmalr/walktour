@@ -1,6 +1,6 @@
 import { Coords, dist, Dims, areaDiff } from "./dom";
 import { getTargetPosition } from "./positioning";
-import { isElementInView } from "./scroll";
+import { isElementInView } from "./viewport";
 
 //miscellaneous tour utilities
 

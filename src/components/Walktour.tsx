@@ -3,9 +3,12 @@ import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
-import { Coords, getNearestScrollAncestor,  getValidPortalRoot, Dims } from '../utils/dom';
-import { isElementInView, scrollToElement } from '../utils/scroll';
-import { debounce, getIdString, clearWatcher, shouldUpdate, removeListener, addListener, refreshListeners } from '../utils/tour';
+import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot, Dims } from '../utils/dom';
+import { scrollToDestination } from '../utils/scroll';
+import { centerViewportAroundElements } from '../utils/offset';
+import { isElementInView } from '../utils/viewport';
+import { debounce, getIdString, clearWatcher, shouldUpdate, removeListener, refreshListeners } from '../utils/tour';
+
 
 export interface WalktourLogic {
   next: () => void;
@@ -43,6 +46,7 @@ export interface WalktourOptions {
   updateInterval?: number;
   renderTolerance?: number;
   disableMask?: boolean;
+  disableSmoothScrolling?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -130,7 +134,8 @@ export const Walktour = (props: WalktourProps) => {
     disableMask,
     setUpdateListener,
     removeUpdateListener,
-    disableListeners
+    disableListeners,
+    disableSmoothScrolling,
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -186,7 +191,8 @@ export const Walktour = (props: WalktourProps) => {
       tooltipSeparation,
       orientationPreferences,
       tourRoot: root,
-      getPositionFromCandidates
+      getPositionFromCandidates,
+      scrollDisabled: disableAutoScroll
     });
 
     setTarget(target);
@@ -197,8 +203,8 @@ export const Walktour = (props: WalktourProps) => {
     tooltipContainer.focus();
 
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
-    if (!disableAutoScroll && (!isElementInView(root, target) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
-      scrollToElement(root, target);
+    if (!disableAutoScroll && target && (!isElementInView(root, target) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
+      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, target, tooltipPosition, currentTargetPosition), disableSmoothScrolling)
     }
 
     const debouncedUpdate = debounce(() => {
