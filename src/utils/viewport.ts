@@ -1,5 +1,5 @@
 import { Dims, Coords, getElementCoords, isDefaultScrollingElement, getElementDims } from "./dom";
-import { addAppropriateOffset } from "./offset";
+import { addAppropriateOffset, getCurrentScrollOffset } from "./offset";
 
 export function getViewportHeight(root: Element): number {
   return root.clientHeight;
@@ -50,6 +50,25 @@ export function getViewportEnd(root: Element): Coords {
 }
 
 
+export function getViewportScrollStart(root: Element): Coords {
+  const curScrollOffset: Coords = getCurrentScrollOffset(root);
+  const start: Coords = getViewportStart(root);
+
+  return {
+    x: start.x - curScrollOffset.x,
+    y: start.y - curScrollOffset.y
+  }
+}
+
+export function getViewportScrollEnd(root: Element): Coords {
+  const startCoords: Coords = getViewportScrollStart(root);
+  const {width, height} = getViewportScrollDims(root);
+  return {
+    x: startCoords.x + width,
+    y: startCoords.y + height
+  };
+}
+
 export function isElementInView(root: Element, element: HTMLElement, atPosition?: Coords, needsAdjusting?: boolean): boolean {
   if (!root || !element) {
     return false;
@@ -63,4 +82,36 @@ export function isElementInView(root: Element, element: HTMLElement, atPosition?
   const yVisibility: boolean = (position.y >= startCoords.y) && ((position.y + elementDims.height) <= endCoords.y);
 
   return xVisibility && yVisibility;
+}
+
+// if directed to scroll to a position which is outside the bounds of the scrolling container, the 
+// viewport will stop at the edges of that container. We want to get the coords that the viewport
+// will end up when given certain coords
+export function getScrolledViewportPosition(root: Element, scrollDestination: Coords) {
+  const dims = getViewportDims(root);
+  const startCoords = getViewportScrollStart(root);
+  const endCoords = getViewportScrollEnd(root);
+
+  const rightmost = endCoords.x - dims.width;
+  const bottommost = endCoords.y - dims.height;
+
+  let coords: Coords = scrollDestination;
+
+  if (scrollDestination.x < startCoords.x) {
+    coords.x = startCoords.x;
+  } else if (scrollDestination.x > rightmost) {
+    coords.x = rightmost;
+  } else {
+    coords.x = scrollDestination.x;
+  }
+
+  if (scrollDestination.y < startCoords.y) {
+    coords.y = startCoords.y;
+  } else if (scrollDestination.y > bottommost) {
+    coords.y = bottommost;
+  } else {
+    coords.y = scrollDestination.y;
+  }
+
+  return coords;
 }
