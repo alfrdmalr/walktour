@@ -5,7 +5,7 @@ import { Walktour, Step, WalktourLogic } from '../src/components/Walktour'
 import { CardinalOrientation } from '../src/utils/positioning'
 
 const steps: Step[] = [
-  { selector: null, title: 'Guided Tour Component', description: 'Welcome to the tour!'},
+  { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
   { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button', orientationPreferences: [CardinalOrientation.EAST] },
   { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements', movingTarget: true,  updateInterval: 20 },
   { selector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
@@ -19,16 +19,16 @@ const steps: Step[] = [
   { selector: '#six', title: "Explicit Positioning", description: 'South!', orientationPreferences: [CardinalOrientation.SOUTH] },
   { selector: '#six', title: "Get More Specific!", description: 'North with West alignment!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { selector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
-  { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view', orientationPreferences: [CardinalOrientation.NORTHWEST] },
-  { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} /> },
+  { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view'},
+  { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, },
   { selector: '#demo-container', title: "Encapsulated Tours", description: 'Not only can you have multiple tours on a page...' }
 ]
 
 const stepsPartTwo: Step[] = [
   { selector: '#oneTwo', description: '...you can also have scoped tours'},
-  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it', movingTarget: false, orientationPreferences: [CardinalOrientation.CENTER]},
+  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it', movingTarget: false, },
   { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', 
-  orientationPreferences: [CardinalOrientation.SOUTH]},
+  },
 ]
 
 const containerStyle: React.CSSProperties = { position: 'absolute', left: 1800, top: 1800, height: 600, width: 600, overflow: 'auto', padding: '2rem' }
