@@ -43,9 +43,10 @@ export function getViewportStart(root: Element): Coords {
 }
 
 export function getViewportEnd(root: Element): Coords {
+  const startCoords: Coords = getViewportStart(root);
   return {
-    x: getViewportWidth(root),
-    y: getViewportHeight(root)
+    x: startCoords.x + getViewportWidth(root),
+    y: startCoords.y + getViewportHeight(root)
   }
 }
 
