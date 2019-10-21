@@ -1,5 +1,5 @@
 
-import { Coords, getElementCoords, dist, getElementDims, Dims, getCombinedData } from "./dom";
+import { Coords, getElementCoords, dist, getElementDims, Dims, getCombinedData, fitsWithin } from "./dom";
 import { getViewportCenter, addAppropriateOffset, applyCenterOffset, centerViewportAroundElements, centerViewportAroundElement } from "./offset";
 import { getViewportDims, getViewportScrollEnd, getScrolledViewportPosition, getViewportScrollStart, isElementInView } from "./viewport";
 
@@ -160,10 +160,13 @@ function chooseBestTooltipPosition(preferredCandidates: OrientationCoords[], roo
     const targetDims: Dims = getElementDims(target);
     const targetCoords: Coords = getElementCoords(target);
 
-    return preferredCandidates.
-      filter(getInBoundsFilter(tooltipDims, viewportScrollStart, viewportScrollEnd)). // (1)
-      filter(getCompatibleArrangementFilter(tooltipDims, targetCoords, targetDims, viewportDims)). // (2)
-      reduce(getCenterReducer(root, tooltip, target), undefined); // (3)
+    const validPositions: OrientationCoords[] = preferredCandidates.filter(getInBoundsFilter(tooltipDims, viewportScrollStart, viewportScrollEnd));
+    const compatiblePositions: OrientationCoords[] = validPositions.filter(getCompatibleArrangementFilter(tooltipDims, targetCoords, targetDims, viewportDims));
+
+    // if there are NO compatible positions, the viewport is too small to accomodate both the target/tooltip, in any arrangement.
+    // we default to our valid positions, even if that means placing the elements slightly off screen.
+    const filteredList = compatiblePositions.length > 0 ? compatiblePositions : validPositions;
+    return filteredList.reduce(getCenterReducer(root, tooltip, target, true), undefined);
   }
 }
 
@@ -184,7 +187,7 @@ function getCompatibleArrangementFilter(tooltipDims: Dims, targetCoords: Coords,
     // we only care about the resultant dims but the input coords are critical here
     const { dims: combinedDims } = getCombinedData(coords, tooltipDims, targetCoords, targetDims);
 
-    return combinedDims.width <= viewportDims.width && combinedDims.height <= viewportDims.height
+    return fitsWithin(combinedDims, viewportDims);
   }
 }
 
@@ -201,7 +204,6 @@ function getPreferredCandidates(candidates: OrientationCoords[], orientationPref
   } else {
     const preferenceFilter = (cc: OrientationCoords) => orientationPreferences.indexOf(cc.orientation) !== -1;
     return candidates.filter(preferenceFilter);
-    
   }
 }
 

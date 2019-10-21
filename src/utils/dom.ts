@@ -18,6 +18,14 @@ export function dist(a: Coords, b: Coords): number {
     Math.pow((Math.abs(a.y - b.y)), 2))
 }
 
+export function areaDiff(a: Dims, b: Dims): number {
+  if (!a || !b) {
+    return;
+  }
+
+  return Math.abs((a.height * a.width) - (b.height * b.width));
+}
+
 export function getElementCoords(element: Element): Coords {
   if (!element) {
     return;
@@ -30,6 +38,9 @@ export function getElementCoords(element: Element): Coords {
 }
 
 export function getElementDims(element: Element): Dims {
+  if (!element) {
+    return;
+  }
   const elementData = element.getBoundingClientRect();
   return {
     width: elementData.width,
@@ -124,8 +135,11 @@ export function getCombinedData(aCoords: Coords, aDims: Dims, bCoords: Coords, b
       width: right - left
     }
   }
+}
 
-
+// determines if a can fit within b
+export function fitsWithin(aDims: Dims, bDims: Dims) {
+  return aDims.height <= bDims.height && aDims.width <= bDims.width;
 }
 
 

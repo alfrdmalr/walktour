@@ -3,10 +3,12 @@ import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
-import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot } from '../utils/dom';
+import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { isElementInView } from '../utils/viewport';
+import { debounce, getIdString, clearWatcher, shouldUpdate, removeListener, refreshListeners } from '../utils/tour';
+
 
 export interface WalktourLogic {
   next: () => void;
@@ -59,12 +61,15 @@ export interface WalktourProps extends WalktourOptions {
   zIndex?: number;
   rootSelector?: string;
   identifier?: string;
+  setUpdateListener?: (update: () => void) => void;
+  removeUpdateListener?: (update: () => void) => void;
+  disableListeners?: boolean;
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
   maskPadding: 5,
   tooltipSeparation: 10,
-  transition: 'top 200ms ease, left 200ms ease',
+  transition: 'top 300ms ease, left 300ms ease',
   disableMaskInteraction: false,
   disableCloseOnClick: false,
   zIndex: 9999,
@@ -90,7 +95,11 @@ export const Walktour = (props: WalktourProps) => {
 
   const tourRoot = React.useRef<Element>(undefined);
   const targetPosition = React.useRef<Coords>(undefined);
+  const targetSize = React.useRef<Dims>(undefined);
   const watcherId = React.useRef<number>(undefined);
+  // we use this ref to store a particular (debounced) version of the updateTour function, so that 
+  // we can remove it using removeEventListener even when called from a different step 
+  const updateRef = React.useRef<() => void>(undefined);
 
   const currentStepContent: Step = steps[currentStepIndex];
 
@@ -123,6 +132,9 @@ export const Walktour = (props: WalktourProps) => {
     renderTolerance,
     updateInterval,
     disableMask,
+    setUpdateListener,
+    removeUpdateListener,
+    disableListeners,
     disableSmoothScrolling,
   } = {
     ...walktourDefaultProps,
@@ -130,7 +142,11 @@ export const Walktour = (props: WalktourProps) => {
     ...currentStepContent
   };
 
-  // after first render(s), set the tour root and initial position of target/tooltip
+  React.useEffect(() => {
+    return cleanup;
+  }, []);
+
+  // set/reset the tour root 
   React.useEffect(() => {
     let root: Element;
     if (rootSelector) {
@@ -141,15 +157,13 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     tourRoot.current = root;
-
-    return () => clearWatcher(watcherId) //clear the target watcher on unmount
-  }, []);
+  }, [rootSelector, identifier])
 
 
   // update tour when step changes
   React.useEffect(() => {
     updateTour();
-  }, [currentStepIndex])
+  }, [currentStepIndex, currentStepContent])
 
   // update tooltip and target position in state
   const updateTour = () => {
@@ -162,12 +176,14 @@ export const Walktour = (props: WalktourProps) => {
       setTarget(null);
       setTooltipPosition(null);
       targetPosition.current = null;
+      targetSize.current = null;
       return;
     }
 
     const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
     const target: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, target);
+    const currentTargetDims: Dims = getElementDims(target);
     const tooltipPosition: Coords = getTooltipPosition({
       target,
       tooltip: tooltipContainer,
@@ -182,6 +198,7 @@ export const Walktour = (props: WalktourProps) => {
     setTarget(target);
     setTooltipPosition(tooltipPosition);
     targetPosition.current = currentTargetPosition;
+    targetSize.current = currentTargetDims;
 
     tooltipContainer.focus();
 
@@ -190,21 +207,19 @@ export const Walktour = (props: WalktourProps) => {
       scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, target, tooltipPosition, currentTargetPosition), disableSmoothScrolling)
     }
 
+    const debouncedUpdate = debounce(() => {
+      const currentTarget = getTarget();
+      if (shouldUpdate(root, tooltipContainer, currentTarget, targetPosition.current, targetSize.current, renderTolerance)) {
+        updateTour();
+      }
+    })
+
     // if the user requests a watcher and there's supposed to be a target
     if (movingTarget && (target || currentStepContent.selector)) {
-      const updateWithTarget = () => {
-        // target might currently be undefined (missing/loading)
-        // presumably, since the user specified a selector, the element exists somewhere, so if we 
-        // don't have it yet we poll for it at the same interval that we check for updates
-        const currentTarget = getTarget();
-        if (shouldUpdate(root, currentTarget, targetPosition.current, renderTolerance)) {
-          updateTour();
-        }
-      };
-
-      // set the watcher
-      watcherId.current = window.setInterval(updateWithTarget, updateInterval)
+      watcherId.current = window.setInterval(debouncedUpdate, updateInterval)
     }
+
+    !disableListeners && refreshListeners(debouncedUpdate, updateRef, setUpdateListener, removeUpdateListener);
   }
 
   const goToStep = (stepIndex: number) => {
@@ -214,24 +229,17 @@ export const Walktour = (props: WalktourProps) => {
     setCurrentStepIndex(stepIndex);
   }
 
-  const next = () => {
-    goToStep(currentStepIndex + 1);
-  }
-
-  const prev = () => {
-    goToStep(currentStepIndex - 1);
-  }
-
-  const close = () => {
+  const cleanup = () => {
     goToStep(0);
     setVisible(false);
     clearWatcher(watcherId);
+    removeListener(updateRef.current, removeUpdateListener);
   }
 
   const baseLogic: WalktourLogic = {
-    next: next,
-    prev: prev,
-    close: close,
+    next: () => goToStep(currentStepIndex + 1),
+    prev: () => goToStep(currentStepIndex - 1),
+    close: () => cleanup(),
     goToStep: goToStep,
     stepContent: { ...options }, //pass options in as well to expose any defaults that aren't specified
     stepIndex: currentStepIndex,
@@ -331,26 +339,3 @@ export const Walktour = (props: WalktourProps) => {
   }
 }
 
-function getIdString(base: string, identifier?: string): string {
-  return `${base}${identifier ? `-${identifier}` : ``}`
-}
-
-function shouldUpdate(tourRoot: Element, target: HTMLElement, targetPosition: Coords, rerenderTolerance: number): boolean {
-  if (!tourRoot || (!target && !targetPosition)) {
-    return false;
-  }
-
-  if ((!target && targetPosition) || (target && !targetPosition)) {
-    return true;
-  }
-
-  const currentTargetPosition: Coords = getTargetPosition(tourRoot, target);
-  return dist(currentTargetPosition, targetPosition) > rerenderTolerance;
-}
-
-function clearWatcher(watcherId: React.MutableRefObject<number>): void {
-  if (watcherId.current) {
-    window.clearInterval(watcherId.current);
-    watcherId.current = null;
-  }
-}
