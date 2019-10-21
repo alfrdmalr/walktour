@@ -38,6 +38,9 @@ export function getElementCoords(element: Element): Coords {
 }
 
 export function getElementDims(element: Element): Dims {
+  if (!element) {
+    return;
+  }
   const elementData = element.getBoundingClientRect();
   return {
     width: elementData.width,
@@ -132,8 +135,11 @@ export function getCombinedData(aCoords: Coords, aDims: Dims, bCoords: Coords, b
       width: right - left
     }
   }
+}
 
-
+// determines if a can fit within b
+export function fitsWithin(aDims: Dims, bDims: Dims) {
+  return aDims.height <= bDims.height && aDims.width <= bDims.width;
 }
 
 
