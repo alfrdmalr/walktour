@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
-import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot, Dims } from '../utils/dom';
+import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { isElementInView } from '../utils/viewport';
@@ -183,7 +183,7 @@ export const Walktour = (props: WalktourProps) => {
     const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
     const target: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, target);
-    const currentTargetDims: Dims = {width: target.getBoundingClientRect().width, height: target.getBoundingClientRect().height}; //TODO getelementdims
+    const currentTargetDims: Dims = getElementDims(target);
     const tooltipPosition: Coords = getTooltipPosition({
       target,
       tooltip: tooltipContainer,
