@@ -160,8 +160,10 @@ export const Walktour = (props: WalktourProps) => {
       root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
     }
 
-    tourRoot.current = root;
-  }, [rootSelector, identifier])
+    if (isOpen !== false) {
+      tourRoot.current = root;
+    }
+  }, [rootSelector, identifier, isOpen])
 
 
   // update tour when step changes
