@@ -40,7 +40,11 @@ const sixStyle: React.CSSProperties = { background: 'aquamarine', width: 200, he
 const sevenStyle: React.CSSProperties = { background: 'linear-gradient(to right, red, white, blue)', width: 200, height: 100, left: 169, top: 1776, position: 'absolute', }
 const eightStyle: React.CSSProperties = { background: 'transparent', width: 200, height: 100, left: 10, top: 650, position: 'absolute', border: '5px dotted black', borderRadius: '5px' }
 
-const App = () => (
+const App = () => {
+  
+  const [tourOpen, setTourOpen] = React.useState<boolean>(true);
+  
+  return (
   <>
     <div id={'one'} style={oneStyle} />
     <div id={'two'} style={twoStyle} />
@@ -48,9 +52,9 @@ const App = () => (
     <div className={'four'} style={fourStyle} />
     <button
       style={fiveStyle} id="five"
-      onClick={() => alert('Button has been clicked.')}
+      onClick={() => setTourOpen(!tourOpen)}
     >
-      Try Clicking Me!
+      Toggle Tour
     </button>
     <div id='six' style={sixStyle} />
     <div id='seven' style={sevenStyle} />
@@ -61,12 +65,12 @@ const App = () => (
       <div id='twoTwo' style={{...twoStyle}} />
       <div id='threeTwo' style={threeStyle} />
 
-      <Walktour steps={stepsPartTwo} identifier={"2"} disableListeners />
+      {/* <Walktour steps={stepsPartTwo} identifier={"2"} disableListeners /> */}
     </div>
 
-    <Walktour steps={steps} identifier={"1"}  disableCloseOnClick />
+    <Walktour steps={steps} identifier={"1"} isOpen={tourOpen} customCloseFunc={(logic: WalktourLogic) => {setTourOpen(false); logic.close();}} disableCloseOnClick />
   </>
-)
+)}
 
 ReactDOM.render(<App />, document.getElementById('app'))
 
