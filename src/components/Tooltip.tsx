@@ -64,7 +64,7 @@ export function Tooltip(props: TooltipProps) {
         : (
           <div style={styles.footer}>
             <button 
-            onClick={close} 
+            onClick={() => close()} 
             style={styles.tertiaryButton}
             disabled={disableClose}
             >
