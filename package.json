@@ -46,6 +46,6 @@
     "rollup-plugin-typescript2": "^0.24.0",
     "source-map-loader": "^0.2.4",
     "ts-jest": "^24.1.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.4"
   }
 }
