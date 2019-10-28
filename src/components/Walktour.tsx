@@ -193,7 +193,7 @@ export const Walktour = (props: WalktourProps) => {
     const tooltipPosition: Coords = getTooltipPosition({
       target,
       tooltip: tooltipContainer,
-      padding: maskPadding,
+      padding: disableMask ? 0 : maskPadding,
       tooltipSeparation,
       orientationPreferences,
       tourRoot: root,

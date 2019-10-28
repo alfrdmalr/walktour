@@ -68,7 +68,7 @@ const App = () => {
       <Walktour steps={stepsPartTwo} identifier={"2"} disableListeners />
     </div>
 
-    <Walktour steps={steps} identifier={"1"} isOpen={tourOpen} customCloseFunc={(logic: WalktourLogic) => {setTourOpen(false); logic.close();}} disableCloseOnClick />
+    <Walktour steps={steps} identifier={"1"} isOpen={tourOpen} customCloseFunc={(logic: WalktourLogic) => {setTourOpen(false); logic.close();}} />
   </>
 )}
 
