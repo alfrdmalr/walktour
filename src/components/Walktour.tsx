@@ -46,7 +46,7 @@ export interface WalktourOptions {
   updateInterval?: number;
   renderTolerance?: number;
   disableMask?: boolean;
-  disableSmoothScrolling?: boolean;
+  disableSmoothScroll?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -139,7 +139,7 @@ export const Walktour = (props: WalktourProps) => {
     setUpdateListener,
     removeUpdateListener,
     disableListeners,
-    disableSmoothScrolling,
+    disableSmoothScroll,
   } = {
     ...walktourDefaultProps,
     ...props,
@@ -210,7 +210,7 @@ export const Walktour = (props: WalktourProps) => {
 
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
     if (!disableAutoScroll && target && (!isElementInView(root, target) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
-      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, target, tooltipPosition, currentTargetPosition), disableSmoothScrolling)
+      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, target, tooltipPosition, currentTargetPosition), disableSmoothScroll)
     }
 
     const debouncedUpdate = debounce(() => {

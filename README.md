@@ -83,7 +83,7 @@ Step-level options will take precedence over global options, so take care when u
 | _renderTolerance_ | number | Distance, in pixels, for the target element to have moved/resized before triggering an update. Applies to the `movingTarget` option as well as the default window resize recalculation. Default is 2. |
 | _updateInterval_ | number | Duration, in milliseconds, between polling for changes to a target's positioning. For use with `movingTarget` option. Default is 500. |
 | _disableMask_ | boolean | Disable the overlay and cutout. Default is false. |
-| _disableSmoothScrolling_ | boolean | Disable supporting browsers scrolling smoothly to offscreen elements. Default is false. |
+| _disableSmoothScroll_ | boolean | Disable supporting browsers scrolling smoothly to offscreen elements. Default is false. |
 
 
 
