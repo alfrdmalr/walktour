@@ -13,7 +13,7 @@ import { debounce, getIdString, clearWatcher, shouldUpdate, removeListener, refr
 export interface WalktourLogic {
   next: () => void;
   prev: () => void;
-  close: () => void;
+  close: (reset?: boolean) => void;
   goToStep: (stepNumber: number) => void;
   stepContent: Step;
   stepIndex: number;
@@ -64,6 +64,7 @@ export interface WalktourProps extends WalktourOptions {
   setUpdateListener?: (update: () => void) => void;
   removeUpdateListener?: (update: () => void) => void;
   disableListeners?: boolean;
+  isOpen?: boolean;
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
@@ -85,10 +86,12 @@ export const Walktour = (props: WalktourProps) => {
 
   const {
     steps,
-    initialStepIndex
+    initialStepIndex,
+    isOpen
   } = props;
 
-  const [isVisible, setVisible] = React.useState<boolean>(true);
+  const controlled = isOpen !== undefined;
+  const [isOpenState, setIsOpenState] = React.useState<boolean>(true);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
@@ -102,6 +105,7 @@ export const Walktour = (props: WalktourProps) => {
   const updateRef = React.useRef<() => void>(undefined);
 
   const currentStepContent: Step = steps[currentStepIndex];
+  const tourOpen: boolean = controlled ? isOpen : isOpenState;
 
   const options: WalktourOptions & WalktourProps & Step = {
     ...walktourDefaultProps,
@@ -156,14 +160,16 @@ export const Walktour = (props: WalktourProps) => {
       root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
     }
 
-    tourRoot.current = root;
-  }, [rootSelector, identifier])
+    if (isOpen !== false) {
+      tourRoot.current = root;
+    }
+  }, [rootSelector, identifier, isOpen])
 
 
   // update tour when step changes
   React.useEffect(() => {
     updateTour();
-  }, [currentStepIndex, currentStepContent])
+  }, [currentStepIndex, currentStepContent, isOpen])
 
   // update tooltip and target position in state
   const updateTour = () => {
@@ -229,9 +235,9 @@ export const Walktour = (props: WalktourProps) => {
     setCurrentStepIndex(stepIndex);
   }
 
-  const cleanup = () => {
-    goToStep(0);
-    setVisible(false);
+  const cleanup = (reset?: boolean) => {
+    reset && goToStep(0);
+    !controlled && setIsOpenState(false);
     clearWatcher(watcherId);
     removeListener(updateRef.current, removeUpdateListener);
   }
@@ -239,7 +245,7 @@ export const Walktour = (props: WalktourProps) => {
   const baseLogic: WalktourLogic = {
     next: () => goToStep(currentStepIndex + 1),
     prev: () => goToStep(currentStepIndex - 1),
-    close: () => cleanup(),
+    close: (reset?: boolean) => cleanup(reset),
     goToStep: goToStep,
     stepContent: { ...options }, //pass options in as well to expose any defaults that aren't specified
     stepIndex: currentStepIndex,
@@ -277,7 +283,7 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   //don't render if the tour is hidden or if there's no step data
-  if (!isVisible || !currentStepContent) {
+  if (!tourOpen || !currentStepContent) {
     return null;
   };
 

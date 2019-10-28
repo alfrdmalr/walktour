@@ -8,6 +8,8 @@ Guided tour/walkthrough component for react projects.
 [See the demo](https://alfrdmalr.github.io/walktour-demo)
 
 ### Installation
+* `npm i walktour`
+or, if you prefer yarn: 
 * `yarn add walktour`
 
 ### How To Use
@@ -18,15 +20,18 @@ Import the Walktour component:
 
 And then include it somewhere in your render function:
 
-`<Walktour 
+```
+<Walktour 
    steps={mySteps}
-/>`
+/>
+```
 
 ### Props
 
  | **Attribute** | **Type** | **Description** |
  | ------------- | -------- | --------------- |
  | steps | Array<`Step`> | All the `Step` objects defining stops along the tour. |
+ | _isOpen_ | boolean | Determines whether the tour should be shown or not. If this is set, the tour will become controlled, and the user needs to manually handle closing the tour with `customCloseFunc`. |
  | _initialStepIndex_ | number | Start the tour on a particular step when opened. Default is 0. |
  | _zIndex_ | number | z-index value to give the tour components. |
  | _rootSelector_ | string | CSS selector string specifying the container element that the tour should be injected into. Only necessary if trying to constrain the scope of the tour and it's masking/scrolling to a particular element which is distinct from where the tour is instantiated. |
@@ -58,7 +63,6 @@ Step-level options will take precedence over global options, so take care when u
 | _orientationPreferences_ | Array<`CardinalOrientation`> | A subset of all tooltip alignments from which to automatically select the tooltip position. Manual positioning can be achieved by providing an array with only a single orientation. |
 | _maskPadding_ | number | Distance between the targeted element and the mask (determines the size of the cutout). |
 | _tooltipSeparation_ | number | Distance between the targeted element and the tooltip. |
-| _tooltipWidth_ | number | Width, in pixels, of the tooltip. |
 | _transition_ | string | String representing the value of CSS transition shorthand property. |
 | _nextLabel_ | string | Text to be injected into the `next` button in the tooltip footer. Default is "next". |
 | _prevLabel_ | string | Text to be injected into the `back` button in the tooltip footer. Default is "prev". |
@@ -92,7 +96,7 @@ All custom renderers are responsible for implementing the various `WalktourOptio
 | goToStep | (stepNumber: number) => void | Tells the tour to jump to the specified step index. |
 | next* | () => void | Advances the tour by a single step. |
 | prev* | () => void | Returns the tour to the previous step. |
-| close* | () => void | Closes the tour. |
+| close* | (_reset_: boolean) => void | Closes the tour. The optional `reset` argument controls whether or not the tour should be set back to its initial state, or remain on the current step. |
 | stepContent** | `Step` | `Step` object associated with the current step index. |
 | stepIndex | number | Current step index. |
 | allSteps | Array<`Step`> | Collection of every `Step` in the tour. |
@@ -112,7 +116,7 @@ function myCustomNext(logic: WalktourLogic): void {
 ```
 It's especially important to call `close()` if providing _customCloseFunc_, since there are cleanup events which are handled by the default `close()` call.
 
-**All options available for a `Step` object will be provided in the `WalktourLogic` object, even if those options haven't been specified for a particular step. For instance, if the `tooltipWidth` option is passed to `Walktour` itself, but not to any individual step, each step's `WalktourObject` will still have the most relevant value for `tooltipWidth` as part of its `stepContent`.
+**All options available for a `Step` object will be provided in the `WalktourLogic` object, even if those options haven't been specified for a particular step. For instance, if the `maskPadding` option is passed to `Walktour` itself, but not to any individual step, each step's `WalktourObject` will still have the most relevant value for `maskPadding` as part of its `stepContent`.
 
 ### Orientation And Alignment
 The tooltip can be positioned at various locations around the targeted element. There are five simple positions:
