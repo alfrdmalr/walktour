@@ -140,11 +140,7 @@ export const Walktour = (props: WalktourProps) => {
     removeUpdateListener,
     disableListeners,
     disableSmoothScroll,
-  } = {
-    ...walktourDefaultProps,
-    ...props,
-    ...currentStepContent
-  };
+  } = options;
 
   React.useEffect(() => {
     return cleanup;
