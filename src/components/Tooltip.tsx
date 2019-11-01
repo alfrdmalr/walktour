@@ -65,7 +65,7 @@ export function Tooltip(props: TooltipProps) {
           <div style={styles.footer}>
             <button 
             onClick={() => close()} 
-            style={styles.tertiaryButton}
+            style={{...styles.tertiaryButton, ...disableClose && styles.disabledButton}}
             disabled={disableClose}
             >
               {closeLabel || "close"}
@@ -73,14 +73,14 @@ export function Tooltip(props: TooltipProps) {
             <button
               onClick={prev}
               disabled={prevDisabled}
-              style={prevDisabled ? styles.disabledButton : styles.secondaryButton}
+              style={{...styles.secondaryButton, ...prevDisabled && styles.disabledButton}}
             >
               {prevLabel || "prev"}
             </button>
             <button
               onClick={next}
               disabled={nextDisabled}
-              style={nextDisabled ? styles.disabledButton : styles.primaryButton}
+              style={{...styles.primaryButton, ...nextDisabled && styles.disabledButton}}
             >
               {nextLabel || "next"}
             </button>
