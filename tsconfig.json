@@ -2,20 +2,24 @@
   "compilerOptions": {
     "sourceMap": true,
     "noImplicitAny": true,
+    "noImplicitReturns": false,
     "strictNullChecks": false,
-    "rootDir": "src",
+    "rootDirs": ["src", "stories"],
     "outDir": "dist",
     "module": "es6",
     "jsx": "react",
     "target": "es5",
-    "lib": ["es2018", "dom"],
+    "lib": ["es5", "es6", "es7", "es2017", "es2018", "dom"],
     "strict": true,
     "moduleResolution": "node",
     "declaration": true,
-    "declarationDir": "./dist"
+    "declarationDir": "dist",
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "forceConsistentCasingInFileNames": true,
   },
   "include": [
     "src/**/*"
   ],
-  "exclude": ["node_modules, demo"]
+  "exclude": ["node_modules", "demo", "dist", "test"]
 }
