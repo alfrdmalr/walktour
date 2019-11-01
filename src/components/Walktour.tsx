@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
-import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
+import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { isElementInView } from '../utils/viewport';
