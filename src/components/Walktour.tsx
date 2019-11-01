@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
-import { Coords, getNearestScrollAncestor, dist, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
+import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { isElementInView } from '../utils/viewport';
@@ -95,8 +95,8 @@ export const Walktour = (props: WalktourProps) => {
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
+  const [tourRoot, setTourRoot] = React.useState<Element>(undefined);
 
-  const tourRoot = React.useRef<Element>(undefined);
   const targetPosition = React.useRef<Coords>(undefined);
   const targetSize = React.useRef<Dims>(undefined);
   const watcherId = React.useRef<number>(undefined);
@@ -156,20 +156,20 @@ export const Walktour = (props: WalktourProps) => {
       root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
     }
 
-    if (isOpen !== false) {
-      tourRoot.current = root;
+    if (tourOpen !== false && root !== tourRoot) {
+      setTourRoot(root);
     }
-  }, [rootSelector, identifier, isOpen])
+  }, [rootSelector, identifier, tourOpen])
 
 
   // update tour when step changes
   React.useEffect(() => {
     updateTour();
-  }, [currentStepIndex, currentStepContent, isOpen])
+  }, [currentStepIndex, currentStepContent, tourOpen, tourRoot])
 
   // update tooltip and target position in state
   const updateTour = () => {
-    const root: Element = tourRoot.current;
+    const root: Element = tourRoot;
     const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
 
     clearWatcher(watcherId);
@@ -306,36 +306,39 @@ export const Walktour = (props: WalktourProps) => {
       id={getIdString(basePortalString, identifier)}
       style={portalStyle}
     >
-      {tourRoot.current &&
-        <Mask
-          maskId={getIdString(baseMaskString, identifier)}
-          target={target}
-          disableMaskInteraction={disableMaskInteraction}
-          disableCloseOnClick={disableCloseOnClick}
-          disableMask={disableMask}
-          padding={maskPadding}
-          tourRoot={tourRoot.current}
-          close={tourLogic.close}
-        />}
-
-      <div
-        id={getIdString(baseTooltipContainerString, identifier)}
-        style={tooltipContainerStyle}
-        onKeyDown={keyPressHandler}
-        tabIndex={0}>
-        {customTooltipRenderer
-          ? customTooltipRenderer(tourLogic)
-          : <Tooltip
-            {...tourLogic}
+      {tourRoot &&
+        <>
+          <Mask
+            maskId={getIdString(baseMaskString, identifier)}
+            target={target}
+            disableMaskInteraction={disableMaskInteraction}
+            disableCloseOnClick={disableCloseOnClick}
+            disableMask={disableMask}
+            padding={maskPadding}
+            tourRoot={tourRoot}
+            close={tourLogic.close}
           />
-        }
-      </div>
+
+          <div
+            id={getIdString(baseTooltipContainerString, identifier)}
+            style={tooltipContainerStyle}
+            onKeyDown={keyPressHandler}
+            tabIndex={0}>
+            {customTooltipRenderer
+              ? customTooltipRenderer(tourLogic)
+              : <Tooltip
+                {...tourLogic}
+              />
+            }
+          </div>
+        </>
+      }
     </div>);
 
   // on first render, put everything in its normal context.
   // after first render (once we've determined the tour root) spawn a portal there for rendering.
-  if (tourRoot.current) {
-    return ReactDOM.createPortal(render(), getValidPortalRoot(tourRoot.current));
+  if (tourRoot) {
+    return ReactDOM.createPortal(render(), getValidPortalRoot(tourRoot));
   } else {
     return render();
   }
