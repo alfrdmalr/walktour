@@ -11,10 +11,9 @@
   "scripts": {
     "start": "parcel demo/index.html",
     "build": "rollup -c",
-    "watch": "rollup -cw",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook -c .storybook -o docs"
   },
   "repository": {
     "type": "git",
