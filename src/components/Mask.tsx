@@ -23,7 +23,7 @@ export function Mask(props: MaskProps): JSX.Element {
 
   const getCutoutPoints = (target: HTMLElement): string => {
     if (!target) {
-      return;
+      return '';
     }
 
     const targetDims: Dims = getElementDims(target);
@@ -65,7 +65,7 @@ export function Mask(props: MaskProps): JSX.Element {
       }
 
       <rect
-        onClick={disableCloseOnClick ? null : close}
+        onClick={disableCloseOnClick ? undefined : close}
         x={0}
         y={0}
         width={containerWidth}
@@ -73,7 +73,7 @@ export function Mask(props: MaskProps): JSX.Element {
         fill='black'
         fillOpacity={0.3}
         pointerEvents='auto'
-        clipPath={target ? `url(#${pathId})` : null}
+        clipPath={target ? `url(#${pathId})` : undefined}
       />
     </svg>
   );
