@@ -66,7 +66,7 @@ function CustomTooltip(props: CustomTooltipProps) {
   </div>
 }
 
-export const primarySteps: Step[] = [
+export const primarySteps = (): Step[] => [
   { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
   { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button'},
   { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements'},
@@ -85,15 +85,13 @@ export const primarySteps: Step[] = [
   { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, },
 ]
 
-export const primaryIntoSecondary: Step[] = [
-  ...primarySteps,
+export const primaryIntoSecondary = (): Step[] => [
+  ...primarySteps(),
   { selector: '#demo-container', title: "Encapsulated Tours", description: 'Not only can you have multiple tours on a page...' }
 ]
 
-export const secondarySteps: Step[] = [
+export const secondarySteps = (): Step[] => [
   { selector: '#oneTwo', description: '...you can also have scoped tours'},
   { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
   { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', },
 ];
-
-
