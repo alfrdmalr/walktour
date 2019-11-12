@@ -20,8 +20,8 @@ export default {
 export const buttonLabels = () => (
   <Walktour
     steps={primarySteps()}
-    nextLabel={text("Next Label", "next")}
-    prevLabel={text("Prev Label", "prev")}
-    closeLabel={text("Close Label", "close")}
+    nextLabel={text("nextLabel", "next")}
+    prevLabel={text("prevLabel", "prev")}
+    closeLabel={text("closeLabel", "close")}
   />
 )

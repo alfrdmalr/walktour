@@ -20,6 +20,15 @@ export default {
   ]
 }
 
+export const all = () => (
+  <Walktour
+    customCloseFunc={() => actions('close')}
+    steps={scrollingSteps("Adjust the scrolling-related options from the Knobs tab to see how they might interact.")}
+    disableAutoScroll={boolean('disableAutoScroll', true)}
+    disableSmoothScroll={boolean('disableSmoothScroll', true)}
+  />
+)
+
 export const disableAutoScroll = () => (
   <Walktour
     customCloseFunc={() => actions('close')}

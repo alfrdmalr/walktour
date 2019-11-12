@@ -11,10 +11,18 @@ const playgroundDecorator = (storyFunction: () => Node) => <>
 </>
 
 
+export const all = () => (
+  <SingleStepTour
+    steps={singleTargetSteps("Adjust the visibility options from the Knobs tab.")}
+    isOpen={boolean('isOpen', true)}
+    disableMask={boolean('disableMask', true)}
+  />
+)
+
 export const isOpen = () => (
-  <SingleStepTour 
-  steps={singleTargetSteps("Toggle the tour by changing 'isOpen' in the Knobs tab")}
-  isOpen={boolean('isOpen', true)}
+  <SingleStepTour
+    steps={singleTargetSteps("Toggle the tour by changing 'isOpen' in the Knobs tab")}
+    isOpen={boolean('isOpen', true)}
   />
 )
 
