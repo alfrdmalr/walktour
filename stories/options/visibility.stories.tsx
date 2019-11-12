@@ -21,7 +21,7 @@ export const isOpen = () => (
 export const disableMask = () => (
   <SingleStepTour
     steps={singleTargetSteps("Toggle the mask by changing the 'disableMask' in the Knobs tab")}
-    disableMask={boolean('disableMask', false)}
+    disableMask={boolean('disableMask', true)}
   />
 )
 

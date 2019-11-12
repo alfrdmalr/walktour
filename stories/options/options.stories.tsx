@@ -19,5 +19,5 @@ export default {
 }
 
 export const all = () => (
-  <Walktour steps={primarySteps} />
+  <Walktour steps={primarySteps()} />
 )

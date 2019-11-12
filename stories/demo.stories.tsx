@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { playgroundSetup, primarySteps, secondarySteps } from '../demo/setup';
+import { playgroundSetup, primarySteps, secondarySteps, primaryIntoSecondary } from '../demo/setup';
 import { Step, Walktour } from '../src/components/Walktour';
 
 export default {
@@ -8,12 +8,11 @@ export default {
 }
 
 const steps: { [index: string]: () => Step[] } = {
-  default: () => primarySteps,
-  defaultSecondary: () => secondarySteps,
-
+  default: () => primarySteps(),
+  defaultSecondary: () => secondarySteps(),
 }
 
-const basicTour = (open?: boolean, close?: () => void) => <Walktour identifier="1" customCloseFunc={() => {console.log('closing'); close()}} isOpen={open} steps={steps.default()} />
+const basicTour = (open?: boolean, close?: () => void, stepsOverride?: Step[]) => <Walktour identifier="1" customCloseFunc={close} isOpen={open} steps={stepsOverride || steps.default()} />
 const scopedTour = (rootSelector: string) => <Walktour rootSelector={rootSelector} identifier="2" steps={steps.defaultSecondary()} />
 
 export const full = () => {
@@ -21,8 +20,8 @@ export const full = () => {
 
   return (
     <>
-      {playgroundSetup({ buttonText: "ToggleTour", onButtonClick: () => setTourOpen(!tourOpen) })}
-      {basicTour(tourOpen, () => setTourOpen(false))}
+      {playgroundSetup({ buttonText: "Toggle Tour", onButtonClick: () => setTourOpen(!tourOpen) })}
+      {basicTour(tourOpen, () => setTourOpen(false), primaryIntoSecondary())}
       {scopedTour("#demo-container")}
     </>
   )

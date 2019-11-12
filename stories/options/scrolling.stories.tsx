@@ -24,7 +24,7 @@ export const disableAutoScroll = () => (
   <Walktour
     customCloseFunc={() => actions('close')}
     steps={scrollingSteps("Disable automatic scrolling by changing the value of 'disableAutoScroll' in the Knobs tab.")}
-    disableAutoScroll={boolean('disableAutoScroll', false)}
+    disableAutoScroll={boolean('disableAutoScroll', true)}
   />
 )
 
@@ -32,6 +32,6 @@ export const disableSmoothScroll = () => (
   <Walktour
     customCloseFunc={() => actions('close')} 
     steps={scrollingSteps("Disable smooth scrolling by changing the value of 'disableSmoothScroll' from the Knobs tab.")}
-    disableSmoothScroll={boolean('disableSmoothScroll', false)}
+    disableSmoothScroll={boolean('disableSmoothScroll', true)}
   />
 )

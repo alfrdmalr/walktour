@@ -25,7 +25,7 @@ const options = {
   "CardinalOrientation.NORTHEAST": [CardinalOrientation.NORTHEAST],
   "CardinalOrientation.SOUTHWEST": [CardinalOrientation.SOUTHWEST],
   "CardinalOrientation.SOUTHEAST": [CardinalOrientation.SOUTHEAST],
-  "Auto": undefined as [CardinalOrientation]
+  "Auto": undefined as [CardinalOrientation],
 
 }
 
@@ -50,6 +50,12 @@ export const spacing = () => (
   />
 );
 
+export const missingTarget = () => (
+  <SingleStepTour
+    steps={[{ selector: null, title: "Missing Target", description: "The tour tooltip will center itself in the viewport if the target cannot be found." }]}
+    disableCloseOnClick
+  />
+);
 
 export default {
   title: "Walktour|Options/Positioning",
