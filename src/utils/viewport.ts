@@ -1,4 +1,4 @@
-import { Dims, Coords, getElementCoords, isDefaultScrollingElement, getElementDims } from "./dom";
+import { Dims, Coords, getElementCoords, isDefaultScrollingElement, getElementDims, isWithinAt } from "./dom";
 import { addAppropriateOffset, getCurrentScrollOffset } from "./offset";
 
 export function getViewportHeight(root: Element): number {
@@ -78,11 +78,9 @@ export function isElementInView(root: Element, element: HTMLElement, atPosition?
   const position: Coords = explicitPosition || addAppropriateOffset(root, getElementCoords(element));
   const elementDims: Dims = getElementDims(element);
   const startCoords: Coords = addAppropriateOffset(root, getViewportStart(root));
-  const endCoords: Coords = addAppropriateOffset(root, getViewportEnd(root));
-  const xVisibility: boolean = (position.x >= startCoords.x) && ((position.x + elementDims.width) <= endCoords.x);
-  const yVisibility: boolean = (position.y >= startCoords.y) && ((position.y + elementDims.height) <= endCoords.y);
-
-  return xVisibility && yVisibility;
+  const viewportDims: Dims = getViewportDims(root);
+  
+  return isWithinAt(elementDims, viewportDims, position, startCoords);
 }
 
 // if directed to scroll to a position which is outside the bounds of the scrolling container, the 
