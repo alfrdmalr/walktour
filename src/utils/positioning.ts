@@ -1,7 +1,7 @@
 
-import { Coords, getElementCoords, dist, getElementDims, Dims, getCombinedData, fitsWithin, isWithinAt } from "./dom";
+import { Coords, getElementCoords, dist, getElementDims, Dims, getCombinedData, fitsWithin } from "./dom";
 import { getViewportCenter, addAppropriateOffset, applyCenterOffset, centerViewportAroundElements, centerViewportAroundElement } from "./offset";
-import { getViewportDims, getViewportScrollEnd, getScrolledViewportPosition, getViewportScrollStart, isElementInView, getViewportStart } from "./viewport";
+import { getViewportDims, getViewportScrollEnd, getScrolledViewportPosition, getViewportScrollStart, isElementInView } from "./viewport";
 
 export enum CardinalOrientation {
   EAST = 'east',
@@ -149,31 +149,23 @@ function chooseBestTooltipPosition(preferredCandidates: OrientationCoords[], roo
     return preferredCandidates.reduce(getCenterReducer(root, tooltip, target, false), undefined);
   } else {
     // scrolling is allowed, which means we have to figure out:
-    // 1. what candidates are valid positions (not out of the scrolling root's bounds)
-    // 2. which positions are absolutely compatible (allow both target & tooltip to fit within the viewport at the same time)
-    // 3. which positions are currently compatible (allow both target & tooltip to fit with the CURRENT viewport)
-    // 4. which of those positions is *best* - use same closest-to-center heuristic.
-    // priority is 3 > 2 > 1 for the pool of positions from which 4 is chosen
+    // 1. what candidates are even valid positions (not out of the scrolling root's bounds)
+    // 2. which positions allow both target & tooltip to fit within the viewport at the same time
+    // 3. which of those positions is *best* - use same closest-to-center heuristic
 
     const viewportDims: Dims = getViewportDims(root);
     const viewportScrollStart: Coords = getViewportScrollStart(root);
-    const viewportCurrentStart: Coords = getViewportStart(root);
     const viewportScrollEnd: Coords = getViewportScrollEnd(root);
     const tooltipDims: Dims = getElementDims(tooltip);
     const targetDims: Dims = getElementDims(target);
     const targetCoords: Coords = getElementCoords(target);
 
     const validPositions: OrientationCoords[] = preferredCandidates.filter(getInBoundsFilter(tooltipDims, viewportScrollStart, viewportScrollEnd));
-    const absoluteCompatiblePositions: OrientationCoords[] = validPositions.filter(getAbsoluteCompatibleArrangementFilter(tooltipDims, targetCoords, targetDims, viewportDims));
-    const currentCompatiblePositions: OrientationCoords[] = absoluteCompatiblePositions.filter(getCurrentInViewFilter(tooltipDims, targetCoords, targetDims, viewportDims, viewportCurrentStart));
-
-    // // if possible, use only those positions which don't force a scroll. Default back to those which can fit in the viewport, even if that means scrolling
-    const compatiblePositions: OrientationCoords[] = currentCompatiblePositions.length > 0 ? currentCompatiblePositions : absoluteCompatiblePositions;
+    const compatiblePositions: OrientationCoords[] = validPositions.filter(getCompatibleArrangementFilter(tooltipDims, targetCoords, targetDims, viewportDims));
 
     // if there are NO compatible positions, the viewport is too small to accomodate both the target/tooltip, in any arrangement.
     // we default to our valid positions, even if that means placing the elements slightly off screen.
     const filteredList = compatiblePositions.length > 0 ? compatiblePositions : validPositions;
-
     return filteredList.reduce(getCenterReducer(root, tooltip, target, true), undefined);
   }
 }
@@ -189,25 +181,13 @@ function getInBoundsFilter(tooltipDims: Dims, viewportScrollStart: Coords, viewp
 }
 
 // filters out any positions which would cause the target/tooltip to not fit within the viewport
-function getAbsoluteCompatibleArrangementFilter(tooltipDims: Dims, targetCoords: Coords, targetDims: Dims, viewportDims: Dims): (oc: OrientationCoords) => boolean {
+function getCompatibleArrangementFilter(tooltipDims: Dims, targetCoords: Coords, targetDims: Dims, viewportDims: Dims): (oc: OrientationCoords) => boolean {
   return (oc: OrientationCoords): boolean => {
     const coords: Coords = oc.coords;
     // we only care about the resultant dims but the input coords are critical here
     const { dims: combinedDims } = getCombinedData(coords, tooltipDims, targetCoords, targetDims);
 
     return fitsWithin(combinedDims, viewportDims);
-  }
-}
-
-// make function that curries getCombinedData to only need coords TODO
-
-function getCurrentInViewFilter(tooltipDims: Dims, targetCoords: Coords, targetDims: Dims, viewportDims: Dims, viewportCurrentStart: Coords): (oc: OrientationCoords) => boolean {
-  return (oc: OrientationCoords): boolean => {
-    const coords: Coords = oc.coords;
-
-    const {dims: combinedDims, coords: combinedCoords} = getCombinedData(coords, tooltipDims, targetCoords, targetDims);
-
-    return isWithinAt(combinedDims, viewportDims, combinedCoords, viewportCurrentStart);
   }
 }
 
