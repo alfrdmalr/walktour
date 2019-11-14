@@ -9,11 +9,13 @@
     "dist"
   ],
   "scripts": {
-    "start": "parcel demo/index.html",
+    "start": "parcel demo/index.html --open",
+    "build-demo": "parcel build demo/index.html --out-dir docs --out-file demo.html --public-url /wakltour/demo",
     "build": "rollup -c",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook -c .storybook -o docs"
+    "build-storybook": "build-storybook -c .storybook -o docs",
+    "build-docs": "yarn build-storybook && yarn build-demo"
   },
   "repository": {
     "type": "git",
