@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "start": "parcel demo/index.html --open",
-    "build-demo": "parcel build demo/index.html --out-dir docs --out-file demo.html --public-url /wakltour/demo",
+    "build-demo": "parcel build demo/index.html --out-dir docs --out-file demo.html --public-url /walktour/",
     "build": "rollup -c",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
