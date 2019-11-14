@@ -8,8 +8,30 @@ export interface Dims {
   height: number;
 }
 
+export function isValidCoords(coords: Coords): boolean {
+  if (!coords) {
+    return false;
+  } else if ((!coords.x && coords.x !== 0) || (!coords.y && coords.y !== 0)) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export function isValidDims(dims: Dims): boolean {
+  if (!dims) {
+    return false;
+  } else if ((!dims.height && dims.height !== 0) || (!dims.width && dims.height !== 0)) {
+    return false;
+  } else if (dims.height < 0 || dims.width < 0) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 export function dist(a: Coords, b: Coords): number {
-  if (!a || !b) {
+  if (!isValidCoords(a) || !isValidCoords(b)) {
     return;
   }
 
@@ -19,7 +41,7 @@ export function dist(a: Coords, b: Coords): number {
 }
 
 export function areaDiff(a: Dims, b: Dims): number {
-  if (!a || !b) {
+  if (!isValidDims(a) || !isValidDims(b)) {
     return;
   }
 
@@ -139,16 +161,24 @@ export function getCombinedData(aCoords: Coords, aDims: Dims, bCoords: Coords, b
 
 // determines if a can fit within b
 export function fitsWithin(aDims: Dims, bDims: Dims) {
+  if (!isValidDims(aDims) || !isValidDims(bDims)) {
+    return false;
+  }
+
   return aDims.height <= bDims.height && aDims.width <= bDims.width;
 }
 
 // determines if a does fit within b at the given coords
 export function isWithinAt(aDims: Dims, bDims: Dims, aCoords?: Coords, bCoords?: Coords) {
-  const coordsA: Coords = aCoords || { x: 0, y: 0 };
-  const coordsB: Coords = bCoords || { x: 0, y: 0 };
+  if (!isValidDims(aDims) || !isValidDims(bDims)) {
+    return false;
+  }
+
+  const validCoordsA: Coords = isValidCoords(aCoords) ? aCoords : { x: 0, y: 0 };
+  const validCoordsB: Coords = isValidCoords(bCoords) ? bCoords : { x: 0, y: 0 };
   const fitsDims: boolean = fitsWithin(aDims, bDims);
-  const fitsHorizontally: boolean = (coordsA.x >= coordsB.x) && (coordsA.x + aDims.width <= bCoords.x + bDims.width);
-  const fitsVertically: boolean = (coordsA.y >= coordsB.y) && (coordsA.y + aDims.height <= bCoords.y + bDims.height);
+  const fitsHorizontally: boolean = (validCoordsA.x >= validCoordsB.x) && (validCoordsA.x + aDims.width <= validCoordsB.x + bDims.width);
+  const fitsVertically: boolean = (validCoordsA.y >= validCoordsB.y) && (validCoordsA.y + aDims.height <= validCoordsB.y + bDims.height);
 
   return fitsDims && fitsHorizontally && fitsVertically;
 }
