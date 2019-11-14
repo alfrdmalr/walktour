@@ -1,21 +1,102 @@
-import { dist, Coords, getElementCoords, getNearestScrollAncestor } from '../../src/utils/dom';
+import { dist, Coords, getElementCoords, getNearestScrollAncestor, Dims, fitsWithin, isWithinAt, isValidCoords, isValidDims } from '../../src/utils/dom';
 import { shallow, mount } from 'enzyme';
 import * as React from 'react';
 import { mockGBCR } from '../mocks';
 
+// casting undefined as number to bypass noImplicitAny, which stops the tests from running 
+const mockDataGen = () => ({
+  coordsOrigin: { x: 0, y: 0 },
+  coords100: { x: 100, y: 100 },
+  coordsTop: { x: 100, y: 0 },
+  coordsLeft: { x: 0, y: 100 },
+  coords100Negative: { x: -100, y: -100 },
+  coordsTopNegative: { x: -100, y: 0 },
+  coordsLeftNegative: { x: 0, y: -100 },
+  coordsUgly1: { x: 65.2, y: 155.6 },
+  coordsUgly2: { x: 0.003, y: 51.5 },
+  coordsUgly3: { x: 678.12, y: -399 },
+  coordsUndefY: { x: 34, y: undefined as number },
+  coordsUndefX: { x: undefined as number, y: 45 },
+  coordsUndef: undefined as Coords,
+  dimsUndef: undefined as Dims,
+  dimsEmpty: { height: 0, width: 0 },
+  dimsSmall: { height: 10, width: 10 },
+  dimsSmallCopy: { height: 10, width: 10 },
+  dimsLarge: { height: 100, width: 100 },
+  dimsNegative: { height: -50, width: -50 },
+  dimsNegativeH: {height: -25, width: 30},
+  dimsNegativeW: {height: 49, width: -280},
+  dimsDecimal: {height: 233.33, width: 100.1}
+
+})
+
+
+describe('isValidCoords', () => {
+  const { coordsOrigin, coords100, coords100Negative, coordsUndef,
+    coordsUgly2, coordsUndefX, coordsUndefY, coordsUgly3 } = mockDataGen();
+
+  test('undefined is invalid', () => {
+    expect(isValidCoords(coordsUndef)).toBe(false)
+  })
+
+  test("(0, 0) is valid", () => {
+    expect(isValidCoords(coordsOrigin)).toBe(true);
+  })
+
+  test('negative is valid', () => {
+    expect(isValidCoords(coords100Negative)).toBe(true);
+  })
+
+  test('individual undefined properties is invalid', () => {
+    expect(isValidCoords(coordsUndefX)).toBe(false);
+    expect(isValidCoords(coordsUndefY)).toBe(false);
+  })
+
+  test('normal is valid', () => {
+    expect(isValidCoords(coords100)).toBe(true);
+  })
+
+  test('decimals are valid', () => {
+    expect(isValidCoords(coordsUgly2)).toBe(true);
+  })
+
+  test('pos/neg split is valid', () => {
+    expect(isValidCoords(coordsUgly3)).toBe(true);
+  })
+})
+
+describe('isValidDims', () => {
+  const { dimsEmpty, dimsNegative, dimsUndef, dimsSmall,
+  dimsNegativeH, dimsNegativeW, dimsDecimal } = mockDataGen();
+
+  test('undefined is invalid', () => {
+    expect(isValidDims(dimsUndef)).toBe(false);
+  })
+
+  test('(0x0) is valid', () => {
+    expect(isValidDims(dimsEmpty)).toBe(true);
+  })
+
+  test('normal is valid', () => {
+    expect(isValidDims(dimsSmall)).toBe(true);
+  })
+
+  test('negative is invalid', () => {
+    expect(isValidDims(dimsNegative)).toBe(false);
+    expect(isValidDims(dimsNegativeH)).toBe(false);
+    expect(isValidDims(dimsNegativeW)).toBe(false);
+  })
+
+  test('decimal is valid', () => {
+    expect(isValidDims(dimsDecimal)).toBe(true);
+  })
+})
+
 // Testing "dist" function, which calculates the distance between two points
 describe('dist', () => {
-  const coordsOrigin: Coords = { x: 0, y: 0 }
-  const coords100: Coords = { x: 100, y: 100 }
-  const coordsTop: Coords = { x: 100, y: 0 }
-  const coordsLeft: Coords = { x: 0, y: 100 }
-  const coords100Negative: Coords = { x: -100, y: -100 }
-  const coordsTopNegative: Coords = { x: -100, y: 0 }
-  const coordsLeftNegative: Coords = { x: 0, y: -100 }
-  const coordsUgly1: Coords = { x: 65.2, y: 155.6 }
-  const coordsUgly2: Coords = { x: 0.003, y: 51.5 }
-  const coordsUgly3: Coords = { x: 678.12, y: -399 }
-  const coordsUndef: Coords = undefined;
+  const { coordsOrigin, coords100, coordsTop, coordsLeft,
+    coords100Negative, coordsTopNegative, coordsLeftNegative, coordsUgly1,
+    coordsUgly2, coordsUgly3, coordsUndef } = mockDataGen();
 
   test('base case', () => {
     expect(dist(coordsUndef, coordsOrigin)).toBe(undefined);
@@ -67,7 +148,7 @@ describe('getNearestScrollAncestor', () => {
     <div id='child-2' style={{ overflow: 'scroll' }}>
       <div id='grandchild'>
         <div id='great-grandchild'>
-          <div id='great-great-grandchild' style={{overflow: 'visible'}}>
+          <div id='great-great-grandchild' style={{ overflow: 'visible' }}>
             <div id="great-great-great-grandchild"></div>
           </div>
         </div>
@@ -104,7 +185,7 @@ describe('getNearestScrollAncestor', () => {
     const gggc = page.find('#great-great-grandchild').getDOMNode();
     expect(getNearestScrollAncestor(g3gc)).not.toBe(gggc);
     expect(getNearestScrollAncestor(g3gc)).toBe(getNearestScrollAncestor(gggc)); //they should have the same ancestor, whatever it may be
-  }) 
+  })
 
   test('direct descendant returns parent', () => {
     const grandchild = page.find('#grandchild').getDOMNode()
@@ -133,5 +214,64 @@ describe('getNearestScrollAncestor', () => {
     const c3 = page.find('#child-3').getDOMNode();
 
     expect(getNearestScrollAncestor(gc4)).toBe(c3);
+  })
+})
+
+// describe("getCombinedData", () => {
+
+// })
+
+describe("fitsWithin", () => {
+
+  const { dimsEmpty, dimsSmall, dimsSmallCopy, dimsNegative, dimsLarge, dimsUndef,
+  dimsNegativeH, dimsNegativeW } = mockDataGen();
+
+
+  test("base case", () => {
+    expect(fitsWithin(dimsEmpty, dimsEmpty)).toBe(true);
+    expect(fitsWithin(dimsUndef, dimsLarge)).toBe(false);
+    expect(fitsWithin(dimsEmpty, dimsUndef)).toBe(false);
+  })
+
+  test("small fits within large", () => {
+    expect(fitsWithin(dimsSmall, dimsLarge)).toBe(true);
+  })
+
+  test("large does not fit within small", () => {
+    expect(fitsWithin(dimsLarge, dimsSmall)).toBe(false)
+  })
+
+  test("fits within same size", () => {
+    expect(fitsWithin(dimsLarge, dimsLarge)).toBe(true);
+    // same size, different object
+    expect(fitsWithin(dimsSmall, dimsSmallCopy)).toBe(true)
+  })
+
+  test("negative dims fail", () => {
+    expect(fitsWithin(dimsEmpty, dimsNegative)).toBe(false);
+    expect(fitsWithin(dimsSmall, dimsNegative)).toBe(false);
+    expect(fitsWithin(dimsNegative, dimsLarge)).toBe(false);
+    expect(fitsWithin(dimsNegativeH, dimsLarge)).toBe(false);
+    expect(fitsWithin(dimsNegativeW, dimsLarge)).toBe(false);
+  }) 
+})
+
+describe("isWithinAt", () => {
+  const { dimsEmpty, dimsSmall, dimsLarge,
+    coordsOrigin, coordsUgly2, coords100, coordsTop
+  } = mockDataGen();
+
+  test('not specifying coords has same behavior as fitsWithin', () => {
+    expect(isWithinAt(dimsEmpty, dimsEmpty)).toEqual(fitsWithin(dimsEmpty, dimsEmpty));
+    expect(isWithinAt(dimsSmall, dimsLarge)).toEqual(fitsWithin(dimsSmall, dimsLarge));
+    expect(isWithinAt(dimsLarge, dimsSmall)).toEqual(fitsWithin(dimsLarge, dimsSmall));
+  })
+
+  test('coordinates allow fit', () => {
+    expect(fitsWithin(dimsSmall, dimsLarge)); //confirm that other tests take coords into account
+    expect(isWithinAt(dimsSmall, dimsLarge, coordsOrigin, coordsOrigin)).toBe(true);
+    expect(isWithinAt(dimsSmall, dimsLarge, coordsUgly2, coordsOrigin)).toBe(true);
+    expect(isWithinAt(dimsSmall, dimsLarge, coords100, coordsTop)).toBe(false);
+    expect(isWithinAt(dimsLarge, dimsSmall, coordsOrigin, coords100)).toBe(false);
   })
 })
