@@ -101,7 +101,7 @@ export function getValidPortalRoot(root: Element) {
 export function getCombinedData(aCoords: Coords, aDims: Dims, bCoords: Coords, bDims: Dims): { coords: Coords, dims: Dims } {
 
   // generates similar data as getBoundingClientRect but using hypothetical positions
-  const generateBounds = (coords: Coords, dims: Dims): {left: number, right: number, top: number, bottom: number} => {
+  const generateBounds = (coords: Coords, dims: Dims): { left: number, right: number, top: number, bottom: number } => {
     return {
       left: coords.x,
       right: coords.x + dims.width,
@@ -119,7 +119,7 @@ export function getCombinedData(aCoords: Coords, aDims: Dims, bCoords: Coords, b
   const aBounds = generateBounds(aCoords, aDims);
   const bBounds = generateBounds(bCoords, bDims);
 
-  
+
   const left: number = mostExtreme(aBounds.left, bBounds.left, false);
   const right: number = mostExtreme(aBounds.right, bBounds.right, true);
   const top: number = mostExtreme(aBounds.top, bBounds.top, false);
@@ -140,6 +140,17 @@ export function getCombinedData(aCoords: Coords, aDims: Dims, bCoords: Coords, b
 // determines if a can fit within b
 export function fitsWithin(aDims: Dims, bDims: Dims) {
   return aDims.height <= bDims.height && aDims.width <= bDims.width;
+}
+
+// determines if a does fit within b at the given coords
+export function isWithinAt(aDims: Dims, bDims: Dims, aCoords?: Coords, bCoords?: Coords) {
+  const coordsA: Coords = aCoords || { x: 0, y: 0 };
+  const coordsB: Coords = bCoords || { x: 0, y: 0 };
+  const fitsDims: boolean = fitsWithin(aDims, bDims);
+  const fitsHorizontally: boolean = (coordsA.x >= coordsB.x) && (coordsA.x + aDims.width <= bCoords.x + bDims.width);
+  const fitsVertically: boolean = (coordsA.y >= coordsB.y) && (coordsA.y + aDims.height <= bCoords.y + bDims.height);
+
+  return fitsDims && fitsHorizontally && fitsVertically;
 }
 
 
