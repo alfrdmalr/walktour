@@ -1,4 +1,4 @@
-import { dist, Coords, getElementCoords, getNearestScrollAncestor, Dims, fitsWithin, isWithinAt, isValidCoords, isValidDims } from '../../src/utils/dom';
+import { dist, Coords, getElementCoords, getNearestScrollAncestor, Dims, fitsWithin, isWithinAt, isValidCoords, isValidDims, areaDiff } from '../../src/utils/dom';
 import { shallow, mount } from 'enzyme';
 import * as React from 'react';
 import { mockGBCR } from '../mocks';
@@ -124,6 +124,30 @@ describe('dist', () => {
     expect(dist(coordsLeftNegative, coords100Negative)).toBeCloseTo(100);
     expect(dist(coordsUgly3, coordsUgly1)).toBeCloseTo(826.6, 1)
   })
+})
+
+describe('areaDiff', () => {
+  const {dimsUndef, dimsEmpty, dimsLarge, dimsSmall, dimsNegative} = mockDataGen();
+
+  test('no diff with self', () => {
+    expect(areaDiff(dimsEmpty, dimsEmpty)).toBe(0);
+    expect(areaDiff(dimsLarge, dimsLarge)).toBe(0);
+  })
+
+  test('diff with empty is self', () => {
+    expect(areaDiff(dimsEmpty, dimsSmall)).toBe(dimsSmall.height * dimsSmall.width)
+    expect(areaDiff(dimsEmpty, dimsSmall)).toBe(100); //validate area
+    expect(areaDiff(dimsSmall, dimsEmpty)).toBe(dimsSmall.height * dimsSmall.width);
+  })
+
+  test('normal diff', () => {
+    expect(areaDiff(dimsSmall, dimsLarge)).toBe(9900);
+  })
+
+  // test('invalid dims throw error' () => {
+
+  // })
+
 })
 
 // testing "getElementCoords", which returns the coordinates of the element on the screen.

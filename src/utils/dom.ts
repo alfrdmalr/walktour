@@ -31,7 +31,7 @@ export function isValidDims(dims: Dims): boolean {
 }
 
 export function dist(a: Coords, b: Coords): number {
-  if (!a || !b) {
+  if (!isValidCoords(a) || !isValidCoords(b)) {
     return;
   }
 
@@ -41,7 +41,7 @@ export function dist(a: Coords, b: Coords): number {
 }
 
 export function areaDiff(a: Dims, b: Dims): number {
-  if (!a || !b) {
+  if (!isValidDims(a) || !isValidDims(b)) {
     return;
   }
 
