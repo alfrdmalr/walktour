@@ -15,7 +15,8 @@
     "test": "jest",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -c .storybook -o docs",
-    "build-docs": "yarn build-storybook && yarn build-demo"
+    "build-docs": "yarn build-storybook && yarn build-demo",
+    "prepublishOnly": "rm -rf dist && yarn build"
   },
   "repository": {
     "type": "git",
