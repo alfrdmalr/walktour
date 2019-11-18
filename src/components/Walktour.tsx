@@ -65,6 +65,7 @@ export interface WalktourProps extends WalktourOptions {
   removeUpdateListener?: (update: () => void) => void;
   disableListeners?: boolean;
   isOpen?: boolean;
+  debug?: boolean;
 }
 
 const walktourDefaultProps: Partial<WalktourProps> = {
@@ -91,7 +92,7 @@ export const Walktour = (props: WalktourProps) => {
   } = props;
 
   const controlled = isOpen !== undefined;
-  const [isOpenState, setIsOpenState] = React.useState<boolean>(true);
+  const [isOpenState, setIsOpenState] = React.useState<boolean>(isOpen == undefined);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
   const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
@@ -140,6 +141,7 @@ export const Walktour = (props: WalktourProps) => {
     removeUpdateListener,
     disableListeners,
     disableSmoothScroll,
+    debug,
   } = options;
 
   React.useEffect(() => {
@@ -164,6 +166,23 @@ export const Walktour = (props: WalktourProps) => {
 
   // update tour when step changes
   React.useEffect(() => {
+    if (debug) {
+      console.log(`walktour debug (${identifier ? `${identifier}, ` : ""}${currentStepIndex}):`, {
+        "options:": options,
+        "tour logic:": tourLogic,
+        "previous state/vars:": {
+          isOpenState,
+          tourRoot,
+          target,
+          tooltipPosition,
+          targetPosition,
+          currentStepIndex,
+          watcherId,
+          updateRef,
+          targetSize,
+        }
+      })
+    }
     updateTour();
   }, [currentStepIndex, currentStepContent, tourOpen, tourRoot])
 
