@@ -1,6 +1,7 @@
-import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims } from "./dom";
+import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getFocusableElements } from "./dom";
 import { getTargetPosition } from "./positioning";
 import { isElementInView, getViewportDims } from "./viewport";
+import { TAB_KEYCODE } from "./constants";
 
 //miscellaneous tour utilities
 
@@ -60,9 +61,78 @@ export function removeListener(callback: () => void, customRemoveListener?: (upd
 }
 
 export const refreshListeners = (callback: () => void, callbackRef: React.MutableRefObject<() => void>,
-  customSetListener?: (update: () => void) => void, customRemoveListener?: (update: () => void) => void) => {
+  customSetListener?: (update: () => void) => void, customRemoveListener?: (update: () => void) => void): void => {
   removeListener(callbackRef.current, customRemoveListener);
 
   addListener(callback, customSetListener);
   callbackRef.current = callback;
+}
+
+interface FocusTrapArgs {
+  start: HTMLElement;
+  end: HTMLElement;
+  beforeStart?: HTMLElement;
+  afterEnd?: HTMLElement;
+  // element that should be excluded from the focus trap but may obtain focus.
+  // any focus changes from this element will be directed back to the trap.
+  // behavior is based on "verify address" example from https://www.w3.org/TR/wai-aria-practices/examples/dialog-modal/dialog.html
+  lightningRod?: HTMLElement;
+}
+
+// helper function to create a keyboard focus trap, potentially including multiple elements
+function getFocusTrapHandler(args: FocusTrapArgs): (e: KeyboardEvent) => void {
+  const { start, end, beforeStart, afterEnd, lightningRod } = args;
+  return (e: KeyboardEvent) => {
+    if (e.keyCode === TAB_KEYCODE) {
+      if (e.shiftKey && e.target === start) {
+        e.preventDefault();
+        beforeStart ? beforeStart.focus() : end.focus();
+      } else if (!e.shiftKey && e.target === end) {
+        e.preventDefault();
+        afterEnd ? afterEnd.focus() : start.focus();
+      } else if (e.target === lightningRod) {
+        e.preventDefault();
+        start.focus();
+      }
+    }
+  }
+}
+
+// helper function to get 
+const getEdgeFocusables = (defaultElement: HTMLElement, container?: HTMLElement, includeSelf?: boolean): { start: HTMLElement, end: HTMLElement } => {
+  if (container) {
+    const containerFocusables: HTMLElement[] = getFocusableElements(container, includeSelf);
+    if (containerFocusables.length > 0) {
+      return {
+        start: containerFocusables[0],
+        end: containerFocusables[containerFocusables.length - 1]
+      }
+    }
+  }
+
+  return {
+    start: defaultElement,
+    end: defaultElement
+  }
+}
+
+export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement): ({targetCallback: (e: KeyboardEvent) => void, tooltipCallback: (e: KeyboardEvent) => void}) => {
+  if (!tooltipContainer) {
+    return;
+  }
+
+  const { start: tooltipFirst, end: tooltipLast } = getEdgeFocusables(tooltipContainer, tooltipContainer);
+  const { start: targetFirst, end: targetLast } = getEdgeFocusables(undefined, target, true);
+
+  const targetTrapHandler = target && getFocusTrapHandler({ start: targetFirst, end: targetLast, beforeStart: tooltipLast, afterEnd: tooltipFirst })
+  const tooltipTrapHandler = getFocusTrapHandler({ start: tooltipFirst, end: tooltipLast, beforeStart: targetLast, afterEnd: targetFirst, lightningRod: tooltipContainer });
+
+  target && target.addEventListener('keydown', targetTrapHandler);
+  tooltipContainer.addEventListener('keydown', tooltipTrapHandler);
+
+  return {
+    targetCallback: targetTrapHandler,
+    tooltipCallback: tooltipTrapHandler
+  }
+
 }
