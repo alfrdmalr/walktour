@@ -11,13 +11,19 @@ const App = () => {
   return (
     <>
       {playgroundSetup({ buttonText: "Toggle Tour", onButtonClick: () => setTourOpen(!tourOpen) })}
-      <Walktour steps={secondarySteps()} identifier={"2"} rootSelector={"#demo-container"} disableListeners />
+      <Walktour
+        steps={secondarySteps()}
+        identifier={"2"}
+        rootSelector={"#demo-container"}
+        disableListeners
+      />
       <Walktour
         steps={primaryIntoSecondary()}
         identifier={"1"}
         isOpen={tourOpen}
         customCloseFunc={(logic: WalktourLogic) => { setTourOpen(false); logic.close(); }}
         disableCloseOnClick
+        debug
       />
     </>
   )
