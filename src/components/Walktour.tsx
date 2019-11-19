@@ -219,7 +219,7 @@ export const Walktour = (props: WalktourProps) => {
     tooltipContainer.focus();
 
     //focus trap subroutine
-    const { targetCallback, tooltipCallback } = setFocusTrap(tooltipContainer, currentTarget);
+    const { targetCallback, tooltipCallback } = setFocusTrap(tooltipContainer, currentTarget, disableMaskInteraction);
     targetTrapRef.current = targetCallback;
     tooltipTrapRef.current = tooltipCallback;
 
