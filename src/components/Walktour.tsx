@@ -212,7 +212,7 @@ export const Walktour = (props: WalktourProps) => {
     const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
     const currentTarget: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, currentTarget);
-    const currentTargetDims: Dims = getElementDims(target);
+    const currentTargetDims: Dims = getElementDims(currentTarget);
     const tooltipPosition: Coords = getTooltipPosition({
       target: currentTarget,
       tooltip: tooltipContainer,
