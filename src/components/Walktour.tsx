@@ -180,9 +180,11 @@ export const Walktour = (props: WalktourProps) => {
     clearWatcher(watcherId);
     if (target && targetTrapRef.current) {
       target.removeEventListener('keydown', targetTrapRef.current);
+      targetTrapRef.current = null;
     }
     if (tooltipContainer && tooltipTrapRef.current) {
       tooltipContainer.removeEventListener('keydown', tooltipTrapRef.current);
+      tooltipTrapRef.current = null;
     }
 
     if (!root || !tooltipContainer) {
