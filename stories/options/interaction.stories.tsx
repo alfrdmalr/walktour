@@ -2,6 +2,7 @@ import * as React from 'react';
 import { playgroundSetup, primarySteps } from '../../demo/setup';
 import { Walktour } from '../../src/components/Walktour';
 import { withKnobs, boolean } from '@storybook/addon-knobs';
+import { buttonStepIndex } from '../utils/setup';
 
 const playgroundDecorator = (storyFunction: () => Node) => <>
   {playgroundSetup({ buttonText: "Click Me", onButtonClick: () => alert("Thanks!") })}
@@ -30,7 +31,7 @@ export const all = () => (
 
 export const disableCloseOnClick = () => (
   <Walktour
-    initialStepIndex={7}
+    initialStepIndex={buttonStepIndex}
     steps={primarySteps()}
     disableCloseOnClick={boolean('disableCloseOnClick', true)}
   />
@@ -38,7 +39,7 @@ export const disableCloseOnClick = () => (
 
 export const disableMaskInteraction = () => (
   <Walktour
-    initialStepIndex={3}
+    initialStepIndex={buttonStepIndex}
     steps={primarySteps()}
     disableMaskInteraction={boolean('disableMaskInteraction', true)}
   />

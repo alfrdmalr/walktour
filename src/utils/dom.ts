@@ -1,3 +1,5 @@
+import { focusableSelector } from "./constants";
+
 export interface Coords {
   x: number;
   y: number;
@@ -183,4 +185,34 @@ export function isWithinAt(aDims: Dims, bDims: Dims, aCoords?: Coords, bCoords?:
   return fitsDims && fitsHorizontally && fitsVertically;
 }
 
+export function getFocusableElements(root: Element, includeSelf?: boolean): HTMLElement[] {
 
+  const focusableChildren = root.querySelectorAll(focusableSelector)
+  let array: HTMLElement[] = [];
+  if (includeSelf && root.matches(focusableSelector)) {
+    array.push(root as HTMLElement);
+  }
+  if (focusableChildren.length > 0) {
+    focusableChildren.forEach(el => array.push(el as HTMLElement));
+  } 
+
+  return array;
+}
+
+// helper function to get first/last focusable elements if possible
+export const getEdgeFocusables = (defaultElement: HTMLElement, container?: HTMLElement, includeSelf?: boolean): { start: HTMLElement, end: HTMLElement } => {
+  if (container) {
+    const containerFocusables: HTMLElement[] = getFocusableElements(container, includeSelf);
+    if (containerFocusables.length > 0) {
+      return {
+        start: containerFocusables[0],
+        end: containerFocusables[containerFocusables.length - 1]
+      }
+    }
+  }
+
+  return {
+    start: defaultElement,
+    end: defaultElement
+  }
+}

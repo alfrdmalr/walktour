@@ -7,7 +7,7 @@ import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementD
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { isElementInView } from '../utils/viewport';
-import { debounce, getIdString, clearWatcher, shouldUpdate, removeListener, refreshListeners } from '../utils/tour';
+import { debounce, getIdString, clearWatcher, shouldUpdate, removeListener, refreshListeners, setFocusTrap, removeFocusTrap } from '../utils/tour';
 
 
 export interface WalktourLogic {
@@ -104,6 +104,10 @@ export const Walktour = (props: WalktourProps) => {
   // we use this ref to store a particular (debounced) version of the updateTour function, so that 
   // we can remove it using removeEventListener even when called from a different step 
   const updateRef = React.useRef<() => void>(undefined);
+  // similarly, we store the focus trap keyboard handlers here to be cleared when the step changes
+  const targetTrapRef = React.useRef<(e: KeyboardEvent) => void>(undefined);
+  const tooltipTrapRef = React.useRef<(e: KeyboardEvent) => void>(undefined);
+
 
   const currentStepContent: Step = steps[currentStepIndex];
   const tourOpen: boolean = controlled ? isOpen : isOpenState;
@@ -191,7 +195,10 @@ export const Walktour = (props: WalktourProps) => {
     const root: Element = tourRoot;
     const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
 
+    // clean up existing listeners
     clearWatcher(watcherId);
+    removeFocusTrap(target, targetTrapRef);
+    removeFocusTrap(tooltipContainer, tooltipTrapRef);
 
     if (!root || !tooltipContainer) {
       setTarget(null);
@@ -201,12 +208,13 @@ export const Walktour = (props: WalktourProps) => {
       return;
     }
 
+
     const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
-    const target: HTMLElement = getTarget();
-    const currentTargetPosition: Coords = getTargetPosition(root, target);
-    const currentTargetDims: Dims = getElementDims(target);
+    const currentTarget: HTMLElement = getTarget();
+    const currentTargetPosition: Coords = getTargetPosition(root, currentTarget);
+    const currentTargetDims: Dims = getElementDims(currentTarget);
     const tooltipPosition: Coords = getTooltipPosition({
-      target,
+      target: currentTarget,
       tooltip: tooltipContainer,
       padding: disableMask ? 0 : maskPadding,
       tooltipSeparation,
@@ -216,27 +224,32 @@ export const Walktour = (props: WalktourProps) => {
       scrollDisabled: disableAutoScroll
     });
 
-    setTarget(target);
+    setTarget(currentTarget);
     setTooltipPosition(tooltipPosition);
     targetPosition.current = currentTargetPosition;
     targetSize.current = currentTargetDims;
 
     tooltipContainer.focus();
 
+    //focus trap subroutine
+    const { targetCallback, tooltipCallback } = setFocusTrap(tooltipContainer, currentTarget, disableMaskInteraction);
+    targetTrapRef.current = targetCallback;
+    tooltipTrapRef.current = tooltipCallback;
+
     // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
-    if (!disableAutoScroll && target && (!isElementInView(root, target) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
-      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, target, tooltipPosition, currentTargetPosition), disableSmoothScroll)
+    if (!disableAutoScroll && currentTarget && (!isElementInView(root, currentTarget) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
+      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, currentTarget, tooltipPosition, currentTargetPosition), disableSmoothScroll)
     }
 
     const debouncedUpdate = debounce(() => {
-      const currentTarget = getTarget();
-      if (shouldUpdate(root, tooltipContainer, currentTarget, targetPosition.current, targetSize.current, renderTolerance)) {
+      const availableTarget = getTarget();
+      if (shouldUpdate(root, tooltipContainer, availableTarget, targetPosition.current, targetSize.current, renderTolerance)) {
         updateTour();
       }
     })
 
     // if the user requests a watcher and there's supposed to be a target
-    if (movingTarget && (target || currentStepContent.selector)) {
+    if (movingTarget && (currentTarget || currentStepContent.selector)) {
       watcherId.current = window.setInterval(debouncedUpdate, updateInterval)
     }
 
@@ -255,6 +268,8 @@ export const Walktour = (props: WalktourProps) => {
     !controlled && setIsOpenState(false);
     clearWatcher(watcherId);
     removeListener(updateRef.current, removeUpdateListener);
+    removeFocusTrap(target, targetTrapRef);
+    target && target.focus(); // return focus to last target when closed
   }
 
   const baseLogic: WalktourLogic = {

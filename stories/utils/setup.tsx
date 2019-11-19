@@ -15,3 +15,5 @@ export const scrollingSteps = (description: string): Step[] => [
   {selector: '#two', description: description},
   {selector: '#seven', description: description}
 ]
+
+export const buttonStepIndex: number = 4; // this should align with the step in primarySteps that focuses the button

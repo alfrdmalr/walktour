@@ -16,6 +16,7 @@ export const playgroundSetup = (args: demoOptions) => {
   const sixStyle: React.CSSProperties = { background: 'aquamarine', width: 200, height: 100, left: 450, top: 450, position: 'absolute' }
   const sevenStyle: React.CSSProperties = { background: 'linear-gradient(to right, red, white, blue)', width: 200, height: 100, left: 169, top: 1776, position: 'absolute', }
   const eightStyle: React.CSSProperties = { background: 'transparent', width: 200, height: 100, left: 10, top: 650, position: 'absolute', border: '5px dotted black', borderRadius: '5px' }
+  const formStyle: React.CSSProperties = {position: 'absolute', left: 450, top: 200, border: 'solid black 1px', display: 'flex', flexDirection: "column", padding: '1rem'}
   return (
     <>
       <div id={'one'} style={oneStyle} />
@@ -28,6 +29,15 @@ export const playgroundSetup = (args: demoOptions) => {
       >
         {args.buttonText}
       </button>
+      <div id="nine" tabIndex={0} style={formStyle}>
+        <button onClick={() => alert('No mouse required')} >
+          Focusable Button
+        </button>
+        <input type="text" placeholder="focusable text box" />
+        <button disabled>
+          Disabled (not focusable)
+        </button>
+      </div>
       <div id='six' style={sixStyle} />
       <div id='seven' style={sevenStyle} />
       <div id='eight' style={eightStyle} />
@@ -69,6 +79,7 @@ function CustomTooltip(props: CustomTooltipProps) {
 export const primarySteps = (): Step[] => [
   { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
   { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button'},
+  {selector: "#nine", title: "Accessibility!", description: "The tooltip traps focus for keyboard users. The trap includes the target element(s)!"},
   { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements'},
   { selector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
   { selector: '#eight', title: 'Supply Custom HTML Content', description: null, customDescriptionRenderer: () => <><h1>H1 Element</h1><p>Paragraph Element</p><input type='text' placeholder={'text input element'} /></> },
