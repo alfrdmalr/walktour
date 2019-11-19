@@ -1,4 +1,4 @@
-import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getFocusableElements } from "./dom";
+import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getEdgeFocusables } from "./dom";
 import { getTargetPosition } from "./positioning";
 import { isElementInView, getViewportDims } from "./viewport";
 import { TAB_KEYCODE } from "./constants";
@@ -98,24 +98,6 @@ function getFocusTrapHandler(args: FocusTrapArgs): (e: KeyboardEvent) => void {
   }
 }
 
-// helper function to get 
-const getEdgeFocusables = (defaultElement: HTMLElement, container?: HTMLElement, includeSelf?: boolean): { start: HTMLElement, end: HTMLElement } => {
-  if (container) {
-    const containerFocusables: HTMLElement[] = getFocusableElements(container, includeSelf);
-    if (containerFocusables.length > 0) {
-      return {
-        start: containerFocusables[0],
-        end: containerFocusables[containerFocusables.length - 1]
-      }
-    }
-  }
-
-  return {
-    start: defaultElement,
-    end: defaultElement
-  }
-}
-
 export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement): ({targetCallback: (e: KeyboardEvent) => void, tooltipCallback: (e: KeyboardEvent) => void}) => {
   if (!tooltipContainer) {
     return;
@@ -134,5 +116,4 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
     targetCallback: targetTrapHandler,
     tooltipCallback: tooltipTrapHandler
   }
-
 }

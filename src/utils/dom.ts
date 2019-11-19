@@ -1,3 +1,5 @@
+import { focusableSelector } from "./constants";
+
 export interface Coords {
   x: number;
   y: number;
@@ -183,8 +185,6 @@ export function isWithinAt(aDims: Dims, bDims: Dims, aCoords?: Coords, bCoords?:
   return fitsDims && fitsHorizontally && fitsVertically;
 }
 
-//  selector from https://gist.github.com/r3lk3r/0030bab99347a2326334e00b23188cab#file-focusloopingutil-js
-const focusableSelector: string = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, [tabindex="0"], [contenteditable]';
 export function getFocusableElements(root: Element, includeSelf?: boolean): HTMLElement[] {
 
   const focusableChildren = root.querySelectorAll(focusableSelector)
@@ -197,4 +197,22 @@ export function getFocusableElements(root: Element, includeSelf?: boolean): HTML
   } 
 
   return array;
+}
+
+// helper function to get first/last focusable elements if possible
+export const getEdgeFocusables = (defaultElement: HTMLElement, container?: HTMLElement, includeSelf?: boolean): { start: HTMLElement, end: HTMLElement } => {
+  if (container) {
+    const containerFocusables: HTMLElement[] = getFocusableElements(container, includeSelf);
+    if (containerFocusables.length > 0) {
+      return {
+        start: containerFocusables[0],
+        end: containerFocusables[containerFocusables.length - 1]
+      }
+    }
+  }
+
+  return {
+    start: defaultElement,
+    end: defaultElement
+  }
 }
