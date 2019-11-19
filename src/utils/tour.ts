@@ -110,7 +110,7 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
   let tooltipAfterEnd: HTMLElement;
   let targetTrapHandler: (e: KeyboardEvent) => void;
 
-  if (target && !disableMaskInteraction) {
+  if (target && !disableMaskInteraction && targetFirst && targetLast) {
     tooltipAfterEnd = targetFirst;
     tooltipBeforeStart = targetLast;
     targetTrapHandler = getFocusTrapHandler({ start: targetFirst, end: targetLast, beforeStart: tooltipLast, afterEnd: tooltipFirst })
@@ -123,5 +123,14 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
   return {
     targetCallback: targetTrapHandler,
     tooltipCallback: tooltipTrapHandler
+  }
+}
+
+export const removeFocusTrap = (container: HTMLElement, callbackRef: React.MutableRefObject<(e: KeyboardEvent) => void>): void => {
+  if (!container || !callbackRef.current) {
+    return;
+  } else {
+    container.removeEventListener('keydown', callbackRef.current);
+    callbackRef.current = null;
   }
 }

@@ -7,7 +7,7 @@ import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementD
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { isElementInView } from '../utils/viewport';
-import { debounce, getIdString, clearWatcher, shouldUpdate, removeListener, refreshListeners, setFocusTrap } from '../utils/tour';
+import { debounce, getIdString, clearWatcher, shouldUpdate, removeListener, refreshListeners, setFocusTrap, removeFocusTrap } from '../utils/tour';
 
 
 export interface WalktourLogic {
@@ -197,14 +197,8 @@ export const Walktour = (props: WalktourProps) => {
 
     // clean up existing listeners
     clearWatcher(watcherId);
-    if (target && targetTrapRef.current) {
-      target.removeEventListener('keydown', targetTrapRef.current);
-      targetTrapRef.current = null;
-    }
-    if (tooltipContainer && tooltipTrapRef.current) {
-      tooltipContainer.removeEventListener('keydown', tooltipTrapRef.current);
-      tooltipTrapRef.current = null;
-    }
+    removeFocusTrap(target, targetTrapRef);
+    removeFocusTrap(tooltipContainer, tooltipTrapRef);
 
     if (!root || !tooltipContainer) {
       setTarget(null);
@@ -274,6 +268,7 @@ export const Walktour = (props: WalktourProps) => {
     !controlled && setIsOpenState(false);
     clearWatcher(watcherId);
     removeListener(updateRef.current, removeUpdateListener);
+    removeFocusTrap(target, targetTrapRef);
     target && target.focus(); // return focus to last target when closed
   }
 
