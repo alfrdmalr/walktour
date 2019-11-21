@@ -1,4 +1,4 @@
-import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getEdgeFocusables } from "./dom";
+import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getEdgeFocusables, getFocusableElements } from "./dom";
 import { getTargetPosition } from "./positioning";
 import { isElementInView, getViewportDims } from "./viewport";
 import { TAB_KEYCODE } from "./constants";
@@ -98,7 +98,7 @@ function getFocusTrapHandler(args: FocusTrapArgs): (e: KeyboardEvent) => void {
   }
 }
 
-export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement, disableMaskInteraction?: boolean): ({targetCallback: (e: KeyboardEvent) => void, tooltipCallback: (e: KeyboardEvent) => void}) => {
+export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement, disableMaskInteraction?: boolean): (() => void) => {
   if (!tooltipContainer) {
     return;
   }
@@ -108,21 +108,60 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
 
   let tooltipBeforeStart: HTMLElement;
   let tooltipAfterEnd: HTMLElement;
-  let targetTrapHandler: (e: KeyboardEvent) => void;
+  let removeTargetTrap: () => void = () => {};
 
   if (target && !disableMaskInteraction && targetFirst && targetLast) {
     tooltipAfterEnd = targetFirst;
     tooltipBeforeStart = targetLast;
-    targetTrapHandler = getFocusTrapHandler({ start: targetFirst, end: targetLast, beforeStart: tooltipLast, afterEnd: tooltipFirst })
-    target.addEventListener('keydown', targetTrapHandler);
+    
+    let tabPressed: boolean = false;
+    let shiftPressed: boolean = false;
+    const targetFocusables = getFocusableElements(target);
+
+    const tabDown = (e: KeyboardEvent) => {
+      if (e.keyCode === TAB_KEYCODE) {
+        tabPressed = true;
+        shiftPressed = e.shiftKey
+      }
+    }
+    
+    const tabUp = (e: KeyboardEvent) => {
+      if (e.keyCode === TAB_KEYCODE) {
+        tabPressed = false;
+      }
+    }
+
+    const focusOut = (e: FocusEvent) => {
+      if (targetFocusables.indexOf(e.relatedTarget as HTMLElement) < 0) {
+        if (tabPressed) { 
+          if (shiftPressed) {
+            tooltipLast.focus();
+          } else {
+            tooltipFirst.focus();
+          }
+        }
+      } 
+    }
+
+    // watch for target blur (not traditional blur or focusout - we want to know when the focus leaves the tree of target/its children, but don't care about
+    // lost focus if we stay within that tree). When that happens, we set the focus back to the tooltip
+    target.addEventListener('keydown', tabDown)
+    target.addEventListener('focusout', focusOut);
+    target.addEventListener('keyup', tabUp)
+
+    removeTargetTrap = () => {
+      target.removeEventListener('keydown', tabDown);
+      target.removeEventListener('keyup', tabUp);
+      target.removeEventListener('focusout', focusOut);
+    }
   }
 
   const tooltipTrapHandler = getFocusTrapHandler({ start: tooltipFirst, end: tooltipLast, beforeStart: tooltipBeforeStart, afterEnd: tooltipAfterEnd, lightningRod: tooltipContainer });
   tooltipContainer.addEventListener('keydown', tooltipTrapHandler);
 
-  return {
-    targetCallback: targetTrapHandler,
-    tooltipCallback: tooltipTrapHandler
+  return () => {
+    tooltipContainer.removeEventListener('keydown', tooltipTrapHandler);
+    removeTargetTrap();
   }
 }
 

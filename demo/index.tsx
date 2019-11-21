@@ -23,7 +23,6 @@ const App = () => {
         isOpen={tourOpen}
         customCloseFunc={(logic: WalktourLogic) => { setTourOpen(false); logic.close(); }}
         disableCloseOnClick
-        debug
       />
     </>
   )
