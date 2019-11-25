@@ -243,7 +243,7 @@ export const Walktour = (props: WalktourProps) => {
 
     const debouncedUpdate = debounce(() => {
       const availableTarget = getTarget();
-      if (shouldUpdate(root, tooltipContainer, availableTarget, targetPosition.current, targetSize.current, renderTolerance)) {
+      if (shouldUpdate(root, tooltipContainer, availableTarget, disableAutoScroll, targetPosition.current, targetSize.current, renderTolerance)) {
         updateTour();
       }
     })
