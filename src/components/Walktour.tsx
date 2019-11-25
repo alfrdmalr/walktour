@@ -98,6 +98,8 @@ export const Walktour = (props: WalktourProps) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined);
 
+  const tooltipContainer = React.useRef<HTMLElement>(undefined);
+  const portal = React.useRef<HTMLElement>(undefined);
   const targetPosition = React.useRef<Coords>(undefined);
   const targetSize = React.useRef<Dims>(undefined);
   const watcherId = React.useRef<number>(undefined);
@@ -158,7 +160,7 @@ export const Walktour = (props: WalktourProps) => {
       root = document.querySelector(rootSelector);
     }
     if (!root) {
-      root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
+      root = getNearestScrollAncestor(portal.current);
     }
 
     if (tourOpen !== false && root !== tourRoot) {
@@ -186,13 +188,15 @@ export const Walktour = (props: WalktourProps) => {
         }
       })
     }
-    updateTour();
-  }, [currentStepIndex, currentStepContent, tourOpen, tourRoot])
+    if (tooltipContainer.current && tourOpen) {
+      tooltipContainer.current.focus();
+      updateTour(tooltipContainer.current);
+    }
+  }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltipContainer.current])
 
   // update tooltip and target position in state
-  const updateTour = () => {
+  const updateTour = (tooltipContainer: HTMLElement) => {
     const root: Element = tourRoot;
-    const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
 
     // clean up existing listeners
     clearWatcher(watcherId);
@@ -200,7 +204,7 @@ export const Walktour = (props: WalktourProps) => {
 
     if (!root || !tooltipContainer) {
       setTarget(null);
-      setTooltipPosition(null);
+      setTooltipPosition(null);         
       targetPosition.current = null;
       targetSize.current = null;
       return;
@@ -226,8 +230,6 @@ export const Walktour = (props: WalktourProps) => {
     targetPosition.current = currentTargetPosition;
     targetSize.current = currentTargetDims;
 
-    tooltipContainer.focus();
-
     //focus trap subroutine
     removeTrapRef.current = setFocusTrap(tooltipContainer, currentTarget, disableMaskInteraction);
 
@@ -238,8 +240,8 @@ export const Walktour = (props: WalktourProps) => {
 
     const debouncedUpdate = debounce(() => {
       const availableTarget = getTarget();
-      if (shouldUpdate(root, tooltipContainer, availableTarget, targetPosition.current, targetSize.current, renderTolerance)) {
-        updateTour();
+      if (shouldUpdate(root, tooltipContainer, availableTarget, disableAutoScroll, targetPosition.current, targetSize.current, renderTolerance)) {
+        updateTour(tooltipContainer);
       }
     })
 
@@ -332,6 +334,7 @@ export const Walktour = (props: WalktourProps) => {
   // render mask, tooltip, and their shared "portal" container
   const render = () => (
     <div
+      ref={ref => portal.current = ref}
       id={getIdString(basePortalString, identifier)}
       style={portalStyle}
     >
@@ -349,6 +352,7 @@ export const Walktour = (props: WalktourProps) => {
           />
 
           <div
+            ref={ref => tooltipContainer.current = ref}
             id={getIdString(baseTooltipContainerString, identifier)}
             style={tooltipContainerStyle}
             onKeyDown={keyPressHandler}

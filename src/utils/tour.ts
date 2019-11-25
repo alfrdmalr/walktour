@@ -19,7 +19,7 @@ export function getIdString(base: string, identifier?: string): string {
   return `${base}${identifier ? `-${identifier}` : ``}`
 }
 
-export function shouldUpdate(tourRoot: Element, tooltip: HTMLElement, target: HTMLElement, targetPosition: Coords, targetSize: Dims, rerenderTolerance: number): boolean {
+export function shouldUpdate(tourRoot: Element, tooltip: HTMLElement, target: HTMLElement, disableAutoScroll: boolean, targetPosition: Coords, targetSize: Dims, rerenderTolerance: number): boolean {
   if (!tourRoot || !tooltip) {
     return false; // bail if these aren't present; need them for calculations
   } else if (!isElementInView(tourRoot, tooltip)) {
@@ -28,7 +28,7 @@ export function shouldUpdate(tourRoot: Element, tooltip: HTMLElement, target: HT
     return false;  // if no target info exists, bail
   } else if ((!target && targetPosition) || (target && !targetPosition) ||
     (!isElementInView(tourRoot, target) && fitsWithin(getElementDims(target), getViewportDims(tourRoot)))) {
-    return true; // if the target appeared/disappeared or if the target is offscreen and can fit on the screen
+    return !disableAutoScroll; // if the target appeared/disappeared or if the target is offscreen and can fit on the screen
   } else {
     const currentTargetSize: Dims = { width: target.getBoundingClientRect().width, height: target.getBoundingClientRect().height }; //TODO getelementdims
     const currentTargetPosition: Coords = getTargetPosition(tourRoot, target);
@@ -90,7 +90,7 @@ function getFocusTrapHandler(args: FocusTrapArgs): (e: KeyboardEvent) => void {
       } else if (!e.shiftKey && e.target === end) {
         e.preventDefault();
         afterEnd ? afterEnd.focus() : start.focus();
-      } else if (e.target === lightningRod) {
+      } else if (e.target === lightningRod && start !== lightningRod) {
         e.preventDefault();
         start.focus();
       }
