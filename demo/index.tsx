@@ -7,16 +7,17 @@ import { playgroundSetup, secondarySteps, primaryIntoSecondary } from './setup'
 const App = () => {
 
   const [tourOpen, setTourOpen] = React.useState<boolean>(true);
+  const [showHiddenButton, setHiddenButton] = React.useState<boolean>(false);
 
   return (
     <>
-      {playgroundSetup({ buttonText: "Toggle Tour", onButtonClick: () => setTourOpen(!tourOpen) })}
-      <Walktour
+      {playgroundSetup({ buttonText: "Toggle Tour", onButtonClick: () => setTourOpen(!tourOpen), showHiddenButton: showHiddenButton, toggleHiddenButton: () => setHiddenButton(!showHiddenButton)})}
+      {/* <Walktour
         steps={secondarySteps()}
         identifier={"2"}
         rootSelector={"#demo-container"}
         disableListeners
-      />
+      /> */}
       <Walktour
         steps={primaryIntoSecondary()}
         identifier={"1"}

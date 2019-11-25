@@ -4,6 +4,9 @@ import { CardinalOrientation } from '../src/utils/positioning';
 interface demoOptions {
   buttonText: string;
   onButtonClick?: () => void;
+  showHiddenButton?: boolean;
+  toggleHiddenButton?: () => void;
+
 }
 
 export const playgroundSetup = (args: demoOptions) => {
@@ -16,7 +19,7 @@ export const playgroundSetup = (args: demoOptions) => {
   const sixStyle: React.CSSProperties = { background: 'aquamarine', width: 200, height: 100, left: 450, top: 450, position: 'absolute' }
   const sevenStyle: React.CSSProperties = { background: 'linear-gradient(to right, red, white, blue)', width: 200, height: 100, left: 169, top: 1776, position: 'absolute', }
   const eightStyle: React.CSSProperties = { background: 'transparent', width: 200, height: 100, left: 10, top: 650, position: 'absolute', border: '5px dotted black', borderRadius: '5px' }
-  const formStyle: React.CSSProperties = {position: 'absolute', left: 450, top: 200, border: 'solid black 1px', display: 'flex', flexDirection: "column", padding: '1rem'}
+  const formStyle: React.CSSProperties = { position: 'absolute', left: 450, top: 200, border: 'solid black 1px', display: 'flex', flexDirection: "column", padding: '1rem' }
   return (
     <>
       <div id={'one'} style={oneStyle} />
@@ -34,6 +37,13 @@ export const playgroundSetup = (args: demoOptions) => {
           Focusable Button
         </button>
         <input type="text" placeholder="focusable text box" />
+        <button onClick={args.toggleHiddenButton}>
+          Toggle Hidden Button
+        </button>
+        {args.showHiddenButton &&
+          <button onClick={() => alert("Now that I'm visible, I can be focused!")}>
+            I was hidden!
+        </button>}
         <button disabled>
           Disabled (not focusable)
         </button>
@@ -77,10 +87,10 @@ function CustomTooltip(props: CustomTooltipProps) {
 }
 
 export const primarySteps = (): Step[] => [
-  { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!'},
-  { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button'},
-  {selector: "#nine", title: "Accessibility!", description: "The tooltip traps focus for keyboard users. The trap includes the target element(s)!"},
-  { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements'},
+  { selector: '#one', title: 'Guided Tour Component', description: 'Welcome to the tour!' },
+  { selector: '#two', title: 'Keyboard Navigation', description: 'Use the arrow keys or tab to a specific button' },
+  { selector: "#nine", title: "Accessibility!", description: "The tooltip traps focus for keyboard users. The trap includes the target element(s)!" },
+  { selector: '.four', title: 'Full CSS Selector Support', description: 'Any valid query selector works for targeting elements' },
   { selector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
   { selector: '#eight', title: 'Supply Custom HTML Content', description: null, customDescriptionRenderer: () => <><h1>H1 Element</h1><p>Paragraph Element</p><input type='text' placeholder={'text input element'} /></> },
   {
@@ -88,11 +98,11 @@ export const primarySteps = (): Step[] => [
       <div>...from inside your custom content<button onClick={() => logic.goToStep(0)}>{description}</button></div>
   },
   { selector: '#three', title: 'Smart Positioning', description: 'The tooltip is automatically positioned within view. Try resizing the window!' },
-  { selector: '#six', title: "Explicit Positioning", description: 'East!',  orientationPreferences: [CardinalOrientation.EAST] },
+  { selector: '#six', title: "Explicit Positioning", description: 'East!', orientationPreferences: [CardinalOrientation.EAST] },
   { selector: '#six', title: "Explicit Positioning", description: 'South!', orientationPreferences: [CardinalOrientation.SOUTH] },
   { selector: '#six', title: "Get More Specific!", description: 'North with West alignment!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { selector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
-  { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view'},
+  { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view' },
   { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, },
 ]
 
@@ -102,7 +112,7 @@ export const primaryIntoSecondary = (): Step[] => [
 ]
 
 export const secondarySteps = (): Step[] => [
-  { selector: '#oneTwo', description: '...you can also have scoped tours'},
-  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
+  { selector: '#oneTwo', description: '...you can also have scoped tours' },
+  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it' },
   { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', },
 ];
