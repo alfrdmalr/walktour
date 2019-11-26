@@ -109,12 +109,12 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
 
   let tooltipBeforeStart: HTMLElement;
   let tooltipAfterEnd: HTMLElement;
-  let removeTargetTrap: () => void = () => {};
+  let removeTargetTrap: () => void = () => { };
 
   if (target && !disableMaskInteraction && targetFirst && targetLast) {
     tooltipAfterEnd = targetFirst;
     tooltipBeforeStart = targetLast;
-    
+
     let tabPressed: boolean = false;
     let shiftPressed: boolean = false;
     const targetFocusables = getFocusableElements(target);
@@ -125,7 +125,7 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
         shiftPressed = e.shiftKey
       }
     }
-    
+
     const tabUp = (e: KeyboardEvent) => {
       if (e.keyCode === TAB_KEYCODE) {
         tabPressed = false;
@@ -134,14 +134,14 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
 
     const focusOut = (e: FocusEvent) => {
       if (targetFocusables.indexOf(e.relatedTarget as HTMLElement) < 0) {
-        if (tabPressed) { 
+        if (tabPressed) {
           if (shiftPressed) {
             tooltipLast.focus();
           } else {
             tooltipFirst.focus();
           }
         }
-      } 
+      }
     }
 
     // watch for target blur (not traditional blur or focusout - we want to know when the focus leaves the tree of target/its children, but don't care about
@@ -163,14 +163,5 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
   return () => {
     tooltipContainer.removeEventListener('keydown', tooltipTrapHandler);
     removeTargetTrap();
-  }
-}
-
-export const removeFocusTrap = (container: HTMLElement, callbackRef: React.MutableRefObject<(e: KeyboardEvent) => void>): void => {
-  if (!container || !callbackRef.current) {
-    return;
-  } else {
-    container.removeEventListener('keydown', callbackRef.current);
-    callbackRef.current = null;
   }
 }
