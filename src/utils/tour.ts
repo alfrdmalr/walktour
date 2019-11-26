@@ -40,33 +40,28 @@ export function shouldUpdate(tourRoot: Element, tooltip: HTMLElement, target: HT
   }
 }
 
-export function clearWatcher(watcherId: React.MutableRefObject<number>): void {
-  window.clearInterval(watcherId.current);
-  watcherId.current = null;
+export function setTargetWatcher(callback: () => void, interval: number): (() => void) {
+  const intervalId: number = window.setInterval(callback, interval);
+
+  return () => window.clearInterval(intervalId);
 }
 
-export function addListener(callback: () => void, setCustomListener?: (update: () => void) => void, defaultEvent: string = 'resize'): void {
-  if (setCustomListener) {
-    setCustomListener(callback);
+export interface SetTourUpdateListenerArgs {
+  update: () => void;
+  customSetListener?: (update: () => void) => void;
+  customRemoveListener?: (update: () => void) => void;
+  event?: string; // default is resize event
+}
+
+export function setTourUpdateListener(args: SetTourUpdateListenerArgs) {
+  const {update, customSetListener, customRemoveListener, event } = {event: 'resize', ...args}
+  if (customSetListener && customRemoveListener) {
+    customSetListener(update);
+    return () => customRemoveListener(update);
   } else {
-    window.addEventListener(defaultEvent, callback)
+    window.addEventListener(event, update)
+    return () => window.removeEventListener(event, update);
   }
-}
-
-export function removeListener(callback: () => void, customRemoveListener?: (update: () => void) => void, defaultEvent: string = 'resize'): void {
-  if (customRemoveListener) {
-    customRemoveListener(callback);
-  } else {
-    window.removeEventListener(defaultEvent, callback);
-  }
-}
-
-export const refreshListeners = (callback: () => void, callbackRef: React.MutableRefObject<() => void>,
-  customSetListener?: (update: () => void) => void, customRemoveListener?: (update: () => void) => void): void => {
-  removeListener(callbackRef.current, customRemoveListener);
-
-  addListener(callback, customSetListener);
-  callbackRef.current = callback;
 }
 
 interface FocusTrapArgs {
@@ -99,7 +94,7 @@ function getFocusTrapHandler(args: FocusTrapArgs): (e: KeyboardEvent) => void {
   }
 }
 
-export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement, disableMaskInteraction?: boolean): ({targetCallback: (e: KeyboardEvent) => void, tooltipCallback: (e: KeyboardEvent) => void}) => {
+export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement, disableMaskInteraction?: boolean): (() => void) => {
   if (!tooltipContainer) {
     return;
   }
@@ -121,17 +116,8 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
   const tooltipTrapHandler = getFocusTrapHandler({ start: tooltipFirst, end: tooltipLast, beforeStart: tooltipBeforeStart, afterEnd: tooltipAfterEnd, lightningRod: tooltipContainer });
   tooltipContainer.addEventListener('keydown', tooltipTrapHandler);
 
-  return {
-    targetCallback: targetTrapHandler,
-    tooltipCallback: tooltipTrapHandler
-  }
-}
-
-export const removeFocusTrap = (container: HTMLElement, callbackRef: React.MutableRefObject<(e: KeyboardEvent) => void>): void => {
-  if (!container || !callbackRef.current) {
-    return;
-  } else {
-    container.removeEventListener('keydown', callbackRef.current);
-    callbackRef.current = null;
+  return () => {
+    target.removeEventListener('keydown', targetTrapHandler);
+    tooltipContainer.removeEventListener('keydown', tooltipTrapHandler);
   }
 }
