@@ -117,7 +117,10 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
   tooltipContainer.addEventListener('keydown', tooltipTrapHandler);
 
   return () => {
-    target.removeEventListener('keydown', targetTrapHandler);
+    if (target) {
+      target.removeEventListener('keydown', targetTrapHandler);
+    }
+    
     tooltipContainer.removeEventListener('keydown', tooltipTrapHandler);
   }
 }

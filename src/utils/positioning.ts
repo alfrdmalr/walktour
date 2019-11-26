@@ -233,7 +233,9 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
 
   if (!tooltip || !tourRoot) {
     return;
-  } else if (!target) {
+  } 
+  
+  if (!target) {
     return defaultPosition;
   }
 
