@@ -98,11 +98,11 @@ export const Walktour = (props: WalktourProps) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined);
 
+  const cleanupRefs = React.useRef<Array<() => void>>([]);
+  const tooltip = React.useRef<HTMLElement>(undefined);
+  const portal = React.useRef<HTMLElement>(undefined);
   const targetPosition = React.useRef<Coords>(undefined);
   const targetSize = React.useRef<Dims>(undefined);
-
-  const cleanupRefs = React.useRef<Array<() => void>>([]);
-
 
   const currentStepContent: Step = steps[currentStepIndex];
   const tourOpen: boolean = controlled ? isOpen : isOpenState;
@@ -154,13 +154,13 @@ export const Walktour = (props: WalktourProps) => {
       root = document.querySelector(rootSelector);
     }
     if (!root) {
-      root = getNearestScrollAncestor(document.getElementById(getIdString(basePortalString, identifier)));
+      root = getNearestScrollAncestor(portal.current);
     }
 
     if (tourOpen !== false && root !== tourRoot) {
       setTourRoot(root);
     }
-  }, [rootSelector, identifier, tourOpen])
+  }, [rootSelector, portal.current, tourOpen])
 
 
   // update tour when step changes
@@ -180,14 +180,16 @@ export const Walktour = (props: WalktourProps) => {
         }
       })
     }
-    cleanup();
-    updateTour();
-  }, [currentStepIndex, currentStepContent, tourOpen, tourRoot])
+    if (tooltip.current && tourOpen) {
+      cleanup();
+      updateTour();
+    }
+  }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current])
 
   // update tooltip and target position in state
   const updateTour = () => {
     const root: Element = tourRoot;
-    const tooltipContainer: HTMLElement = document.getElementById(getIdString(baseTooltipContainerString, identifier));
+    const tooltipContainer: HTMLElement = tooltip.current;
 
     if (!root || !tooltipContainer) {
       setTarget(null);
@@ -333,6 +335,7 @@ export const Walktour = (props: WalktourProps) => {
   // render mask, tooltip, and their shared "portal" container
   const render = () => (
     <div
+      ref={ref => portal.current = ref}
       id={getIdString(basePortalString, identifier)}
       style={portalStyle}
     >
@@ -350,10 +353,12 @@ export const Walktour = (props: WalktourProps) => {
           />
 
           <div
+            ref={ref => tooltip.current = ref}
             id={getIdString(baseTooltipContainerString, identifier)}
             style={tooltipContainerStyle}
             onKeyDown={keyPressHandler}
-            tabIndex={0}>
+            tabIndex={0}
+          >
             {customTooltipRenderer
               ? customTooltipRenderer(tourLogic)
               : <Tooltip
