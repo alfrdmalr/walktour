@@ -23,12 +23,19 @@ export function shouldUpdate(tourRoot: Element, tooltip: HTMLElement, target: HT
   if (!tourRoot || !tooltip) {
     return false; // bail if these aren't present; need them for calculations
   } else if (!isElementInView(tourRoot, tooltip)) {
-    return true; //if the tooltip is off screen, always update
+    return fitsWithin(getElementDims(tooltip), getViewportDims(tourRoot)); //if the tooltip is off screen, update if it CAN fit
   } else if (!target && !targetPosition && !targetSize) {
     return false;  // if no target info exists, bail
+<<<<<<< HEAD
   } else if ((!target && targetPosition) || (target && !targetPosition) ||
     (!isElementInView(tourRoot, target) && fitsWithin(getElementDims(target), getViewportDims(tourRoot)))) {
     return !disableAutoScroll; // if the target appeared/disappeared or if the target is offscreen and can fit on the screen
+=======
+  } else if ((!target && targetPosition) || (target && !targetPosition)) {
+    return true; // if the target appeared/disappeared 
+  } else if (!isElementInView(tourRoot, target) && fitsWithin(getElementDims(target), getViewportDims(tourRoot))) {
+    return !disableAutoScroll; // if the target is offscreen and can fit on the screen (and we're allowed to scroll)
+>>>>>>> master
   } else {
     const currentTargetSize: Dims = { width: target.getBoundingClientRect().width, height: target.getBoundingClientRect().height }; //TODO getelementdims
     const currentTargetPosition: Coords = getTargetPosition(tourRoot, target);
