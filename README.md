@@ -40,7 +40,7 @@ And then include it somewhere in your render function:
  | _identifier_ | string | An id string to be suffixed to the default Walktour IDs. Only necessary if multiple tours are running on the same page. More commonly, this means different tours in different components who are active on the same page. |
  | _setUpdateListener_ | (_update_: () => void) => void | Callback that is passed the tour's recalculate/update function. Can be used to set a window listener, or subscribe to some other event that needs to trigger a tour update. |
 | _removeUpdateListener_ | (_update_: () => void) => void | Callback that is passed the tour's recalculate/update function. This is the **exact** same function that is passed to `setUpdateListener`, so it can be used with the Window's `add` and `removeEventListener` functions. |
-| _disableListeners_ | boolean | Disables all intervals/listeners created by the tour. Should be used if multiple tours are running on the same page (only a single tour can have listeners), or if performance on slow machines is more important than watching for window resize/custom listener events. |
+| _disableListeners_ | boolean | Disables all intervals/listeners created by the tour. Should only use if performance on (really) slow machines is more important than watching for window resize/custom listener events. This will squash options like `movingTarget`, `setUpdateListener`, etc. |
 | _debug_ | boolean | If true, prints the logic used by Walktour (including props, state, calculated variables, etc.) to the console. |
  | ... | [`WalktourOptions`](#options) | Any of the optional [`WalktourOptions`](#options) attributes can be included as props. | 
  
