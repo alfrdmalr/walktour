@@ -105,4 +105,8 @@ export const secondarySteps = (): Step[] => [
   { selector: '#oneTwo', description: '...you can also have scoped tours'},
   { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it'},
   { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', },
+  { selector: '#three', title: 'Target Foreign Elements', disableAutoScroll: true, description: "This step is targeting the very first box on the page. It's way out of the scope of this tour, so it usually doesn't make sense to do this.", allowForeignTarget: true},
+  { selector: '#walktour-tooltip-container-1', title: 'Target Foreign Elements', disableAutoScroll: true,// orientationPreferences: ['east-south'],
+  description: "In some cases, the foreign element might be close enough to point to! We won't be able to highlight it using the mask, but we can still interact with it as normal.", allowForeignTarget: true, movingTarget: true}
+
 ];

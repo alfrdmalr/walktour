@@ -200,7 +200,7 @@ export function getFocusableElements(root: Element, includeSelf?: boolean): HTML
 }
 
 // helper function to get first/last focusable elements if possible
-export const getEdgeFocusables = (defaultElement: HTMLElement, container?: HTMLElement, includeSelf?: boolean): { start: HTMLElement, end: HTMLElement } => {
+export function getEdgeFocusables(defaultElement: HTMLElement, container?: HTMLElement, includeSelf?: boolean): { start: HTMLElement, end: HTMLElement } {
   if (container) {
     const containerFocusables: HTMLElement[] = getFocusableElements(container, includeSelf);
     if (containerFocusables.length > 0) {
@@ -215,4 +215,8 @@ export const getEdgeFocusables = (defaultElement: HTMLElement, container?: HTMLE
     start: defaultElement,
     end: defaultElement
   }
+}
+
+export function isForeignTarget(root: Element, selector: string): boolean {
+  return !root.querySelector(selector);
 }

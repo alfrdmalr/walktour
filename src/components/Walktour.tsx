@@ -8,7 +8,6 @@ import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { debounce, getIdString, shouldUpdate, setFocusTrap, setTargetWatcher, setTourUpdateListener, shouldScroll } from '../utils/tour';
 
-
 export interface WalktourLogic {
   next: () => void;
   prev: () => void;
@@ -46,6 +45,7 @@ export interface WalktourOptions {
   renderTolerance?: number;
   disableMask?: boolean;
   disableSmoothScroll?: boolean;
+  allowForeignTarget?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -141,6 +141,7 @@ export const Walktour = (props: WalktourProps) => {
     disableListeners,
     disableSmoothScroll,
     debug,
+    allowForeignTarget,
   } = options;
 
   React.useEffect(() => {
@@ -199,7 +200,8 @@ export const Walktour = (props: WalktourProps) => {
       return;
     }
 
-    const getTarget = (): HTMLElement => document.querySelector(selector);
+    const targetScope: Element | Document = allowForeignTarget ? document : root;
+    const getTarget = (): HTMLElement => targetScope.querySelector(selector);
     const currentTarget: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, currentTarget);
     const currentTargetDims: Dims = getElementDims(currentTarget);
@@ -211,7 +213,9 @@ export const Walktour = (props: WalktourProps) => {
       orientationPreferences,
       tourRoot: root,
       getPositionFromCandidates,
-      scrollDisabled: disableAutoScroll
+      scrollDisabled: disableAutoScroll,
+      allowForeignTarget,
+      selector
     });
 
     setTarget(currentTarget);
@@ -225,6 +229,8 @@ export const Walktour = (props: WalktourProps) => {
 
     if (shouldScroll({
       disableAutoScroll,
+      allowForeignTarget,
+      targetSelector: selector,
       root,
       target: currentTarget,
       tooltip: tooltipContainer,
@@ -246,6 +252,8 @@ export const Walktour = (props: WalktourProps) => {
           rerenderTolerance: renderTolerance,
           targetCoords: targetPosition.current,
           targetDims: targetSize.current,
+          allowForeignTarget,
+          targetSelector: selector
         })) {
           updateTour();
         }
