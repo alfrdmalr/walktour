@@ -5,8 +5,9 @@ Guided tour/walkthrough component for react projects.
 [npm](https://www.npmjs.com/package/walktour) |
 [GitHub](https://github.com/alfrdmalr/walktour)
 
-[See the demo](https://alfrdmalr.github.io/walktour/demo)
-[View the storybook](https://alfrdmalr.github.io/walktour)
+[Try the demo!](https://alfrdmalr.github.io/walktour/demo)
+
+[Options via Storybook](https://alfrdmalr.github.io/walktour)
 
 ### Installation
 * `npm i walktour`
