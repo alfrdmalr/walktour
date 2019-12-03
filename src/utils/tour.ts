@@ -5,39 +5,18 @@ import { TAB_KEYCODE } from "./constants";
 
 //miscellaneous tour utilities
 
-export function debounce<T extends any[]>(f: (...args: T) => void) {
-  let functionCall: number;
+export function debounce<T extends any[]>(f: (...args: T) => void, interval: number = 300) {
+  let timeoutId: number;
   return (...args: T) => {
-    if (functionCall) {
-      window.cancelAnimationFrame(functionCall);
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
     }
-    functionCall = window.requestAnimationFrame(() => f(...args));
+    timeoutId = window.setTimeout(() => f(...args), interval);
   }
 }
 
 export function getIdString(base: string, identifier?: string): string {
   return `${base}${identifier ? `-${identifier}` : ``}`
-}
-
-export function shouldUpdate(tourRoot: Element, tooltip: HTMLElement, target: HTMLElement, disableAutoScroll: boolean, targetPosition: Coords, targetSize: Dims, rerenderTolerance: number): boolean {
-  if (!tourRoot || !tooltip) {
-    return false; // bail if these aren't present; need them for calculations
-  } else if (!isElementInView(tourRoot, tooltip)) {
-    return fitsWithin(getElementDims(tooltip), getViewportDims(tourRoot)); //if the tooltip is off screen, update if it CAN fit
-  } else if (!target && !targetPosition && !targetSize) {
-    return false;  // if no target info exists, bail
-  } else if ((!target && targetPosition) || (target && !targetPosition)) {
-    return true; // if the target appeared/disappeared 
-  } else if (!isElementInView(tourRoot, target) && fitsWithin(getElementDims(target), getViewportDims(tourRoot))) {
-    return !disableAutoScroll; // if the target is offscreen and can fit on the screen (and we're allowed to scroll)
-  } else {
-    const currentTargetSize: Dims = { width: target.getBoundingClientRect().width, height: target.getBoundingClientRect().height }; //TODO getelementdims
-    const currentTargetPosition: Coords = getTargetPosition(tourRoot, target);
-    const sizeChanged: boolean = areaDiff(currentTargetSize, targetSize) > rerenderTolerance;
-    const positionChanged: boolean = dist(currentTargetPosition, targetPosition) > rerenderTolerance;
-
-    return sizeChanged || positionChanged;
-  }
 }
 
 export function setTargetWatcher(callback: () => void, interval: number): (() => void) {
@@ -54,7 +33,7 @@ export interface SetTourUpdateListenerArgs {
 }
 
 export function setTourUpdateListener(args: SetTourUpdateListenerArgs) {
-  const {update, customSetListener, customRemoveListener, event } = {event: 'resize', ...args}
+  const { update, customSetListener, customRemoveListener, event } = { event: 'resize', ...args }
   if (customSetListener && customRemoveListener) {
     customSetListener(update);
     return () => customRemoveListener(update);
@@ -120,7 +99,82 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
     if (target) {
       target.removeEventListener('keydown', targetTrapHandler);
     }
-    
+
     tooltipContainer.removeEventListener('keydown', tooltipTrapHandler);
   }
+}
+
+interface NaiveShouldScrollArgs {
+  root: Element;
+  tooltip: HTMLElement;
+  tooltipPosition?: Coords;
+  target: HTMLElement;
+}
+
+function naiveShouldScroll(args: NaiveShouldScrollArgs): boolean {
+  const { root, tooltip, tooltipPosition, target } = args;
+
+  if (!isElementInView(root, tooltip, tooltipPosition)) {
+    return true;
+  }
+
+  if (!isElementInView(root, target)) {
+    return fitsWithin(getElementDims(target), getViewportDims(root));
+  }
+
+  return false;
+}
+export interface ShouldScrollArgs extends NaiveShouldScrollArgs {
+  disableAutoScroll: boolean;
+}
+
+export function shouldScroll(args: ShouldScrollArgs): boolean {
+  const { root, tooltip, target, disableAutoScroll } = args;
+  if (!root || !tooltip || !target) {
+    return false;
+  }
+
+  if (disableAutoScroll) {
+    return false;
+  }
+
+  return naiveShouldScroll({ ...args });
+}
+
+export interface TargetChangedArgs {
+  root: Element;
+  target: HTMLElement;
+  targetCoords: Coords;
+  targetDims: Dims;
+  rerenderTolerance: number;
+}
+export function targetChanged(args: TargetChangedArgs): boolean {
+  const { root, target, targetCoords, targetDims, rerenderTolerance } = args;
+  if (!target && !targetCoords && !targetDims) {
+    return false;
+  }
+
+  // when the target / target data are out of sync. usually due to a movingTarget, i.e. the target arg is more up to date than the pos/dims args
+  if ((!target && targetCoords && targetDims) || (target && !targetCoords && !targetDims)) {
+    return true;
+  }
+
+  const currentTargetSize: Dims = getElementDims(target);
+  const currentTargetPosition: Coords = getTargetPosition(root, target);
+
+  const sizeChanged: boolean = areaDiff(currentTargetSize, targetDims) > rerenderTolerance;
+  const positionChanged: boolean = dist(currentTargetPosition, targetCoords) > rerenderTolerance;
+
+  return sizeChanged || positionChanged;
+}
+
+export interface ShouldUpdateArgs extends TargetChangedArgs, ShouldScrollArgs { }
+
+export function shouldUpdate(args: ShouldUpdateArgs): boolean {
+  const { root, tooltip } = args;
+  if (!root || !tooltip) {
+    return false; // bail if these aren't present; need them for calculations
+  }
+
+  return targetChanged({ ...args }) || shouldScroll({ ...args }); // future todo: if no target, check if tooltip is correctly positioned (null selector -> tooltip out of place)
 }

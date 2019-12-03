@@ -58,5 +58,6 @@ export const all = () => (
     disableMask={boolean('disableMask', true)}
     disableAutoScroll={boolean('disableAutoScroll', true)}
     disableSmoothScroll={boolean('disableSmoothScroll', true)}
+    movingTarget={boolean('movingTarget', false)}
   />
 )

@@ -6,8 +6,7 @@ import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPo
 import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
-import { isElementInView } from '../utils/viewport';
-import { debounce, getIdString, shouldUpdate, setFocusTrap, setTargetWatcher, setTourUpdateListener } from '../utils/tour';
+import { debounce, getIdString, shouldUpdate, setFocusTrap, setTargetWatcher, setTourUpdateListener, shouldScroll } from '../utils/tour';
 
 
 export interface WalktourLogic {
@@ -114,6 +113,7 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   const {
+    selector,
     maskPadding,
     disableMaskInteraction,
     disableCloseOnClick,
@@ -162,7 +162,6 @@ export const Walktour = (props: WalktourProps) => {
     }
   }, [rootSelector, portal.current, tourOpen])
 
-
   // update tour when step changes
   React.useEffect(() => {
     if (debug) {
@@ -181,13 +180,14 @@ export const Walktour = (props: WalktourProps) => {
       })
     }
     if (tooltip.current && tourOpen) {
-      cleanup();
+      tooltip.current.focus();
       updateTour();
     }
   }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current])
-
+  
   // update tooltip and target position in state
   const updateTour = () => {
+    cleanup();
     const root: Element = tourRoot;
     const tooltipContainer: HTMLElement = tooltip.current;
 
@@ -199,7 +199,7 @@ export const Walktour = (props: WalktourProps) => {
       return;
     }
 
-    const getTarget = (): HTMLElement => document.querySelector(currentStepContent.selector);
+    const getTarget = (): HTMLElement => document.querySelector(selector);
     const currentTarget: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, currentTarget);
     const currentTargetDims: Dims = getElementDims(currentTarget);
@@ -219,31 +219,44 @@ export const Walktour = (props: WalktourProps) => {
     targetPosition.current = currentTargetPosition;
     targetSize.current = currentTargetDims;
 
-    tooltipContainer.focus();
-
     //focus trap subroutine
     const cleanupFocusTrap = setFocusTrap(tooltipContainer, currentTarget, disableMaskInteraction);
     cleanupRefs.current.push(cleanupFocusTrap);
 
-    // if scroll is not disabled, scroll to target if it's out of view or if the tooltip would be placed out of the viewport
-    if (!disableAutoScroll && currentTarget && (!isElementInView(root, currentTarget) || !isElementInView(root, tooltipContainer, tooltipPosition))) {
+    if (shouldScroll({
+      disableAutoScroll,
+      root,
+      target: currentTarget,
+      tooltip: tooltipContainer,
+      tooltipPosition
+    })) {
       scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, currentTarget, tooltipPosition, currentTargetPosition), disableSmoothScroll)
     }
 
     if (!disableListeners) {
-      const debouncedUpdate = debounce(() => {
+      const conditionalUpdate = () => {
         const availableTarget = getTarget();
-        if (shouldUpdate(root, tooltipContainer, availableTarget, disableAutoScroll, targetPosition.current, targetSize.current, renderTolerance)) {
+
+        if (shouldUpdate({
+          root,
+          tooltipPosition,
+          tooltip: tooltipContainer,
+          target: availableTarget,
+          disableAutoScroll,
+          rerenderTolerance: renderTolerance,
+          targetCoords: targetPosition.current,
+          targetDims: targetSize.current,
+        })) {
           updateTour();
         }
-      })
+      }
 
-      const cleanupUpdateListener = setTourUpdateListener({ update: debouncedUpdate, customSetListener: setUpdateListener, customRemoveListener: removeUpdateListener });
+      const cleanupUpdateListener = setTourUpdateListener({ update: debounce(conditionalUpdate), customSetListener: setUpdateListener, customRemoveListener: removeUpdateListener });
       cleanupRefs.current.push(cleanupUpdateListener)
 
       // if the user requests a watcher and there's supposed to be a target
-      if (movingTarget && (currentTarget || currentStepContent.selector)) {
-        const cleanupWatcher = setTargetWatcher(debouncedUpdate, updateInterval)
+      if (movingTarget && (currentTarget || selector)) {
+        const cleanupWatcher = setTargetWatcher(conditionalUpdate, updateInterval)
         cleanupRefs.current.push(cleanupWatcher);
       }
     }
