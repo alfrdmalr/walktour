@@ -231,19 +231,19 @@ export const Walktour = (props: WalktourProps) => {
     }
 
     if (!disableListeners) {
-      const debouncedUpdate = debounce(() => {
+      const conditionalUpdate = () => {
         const availableTarget = getTarget();
         if (shouldUpdate(root, tooltipContainer, availableTarget, disableAutoScroll, targetPosition.current, targetSize.current, renderTolerance)) {
           updateTour();
         }
-      })
+      }
 
-      const cleanupUpdateListener = setTourUpdateListener({ update: debouncedUpdate, customSetListener: setUpdateListener, customRemoveListener: removeUpdateListener });
+      const cleanupUpdateListener = setTourUpdateListener({ update: debounce(conditionalUpdate), customSetListener: setUpdateListener, customRemoveListener: removeUpdateListener });
       cleanupRefs.current.push(cleanupUpdateListener)
 
       // if the user requests a watcher and there's supposed to be a target
       if (movingTarget && (currentTarget || currentStepContent.selector)) {
-        const cleanupWatcher = setTargetWatcher(debouncedUpdate, updateInterval)
+        const cleanupWatcher = setTargetWatcher(conditionalUpdate, updateInterval)
         cleanupRefs.current.push(cleanupWatcher);
       }
     }
