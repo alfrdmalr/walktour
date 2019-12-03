@@ -181,13 +181,13 @@ export const Walktour = (props: WalktourProps) => {
       })
     }
     if (tooltip.current && tourOpen) {
-      cleanup();
       updateTour();
     }
   }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current])
-
+  
   // update tooltip and target position in state
   const updateTour = () => {
+    cleanup();
     const root: Element = tourRoot;
     const tooltipContainer: HTMLElement = tooltip.current;
 
