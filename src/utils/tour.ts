@@ -5,13 +5,13 @@ import { TAB_KEYCODE } from "./constants";
 
 //miscellaneous tour utilities
 
-export function debounce<T extends any[]>(f: (...args: T) => void) {
-  let functionCall: number;
+export function debounce<T extends any[]>(f: (...args: T) => void, interval: number = 300) {
+  let timeoutId: number;
   return (...args: T) => {
-    if (functionCall) {
-      window.cancelAnimationFrame(functionCall);
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
     }
-    functionCall = window.requestAnimationFrame(() => f(...args));
+    timeoutId = window.setTimeout(() => f(...args), interval);
   }
 }
 
