@@ -181,6 +181,7 @@ export const Walktour = (props: WalktourProps) => {
       })
     }
     if (tooltip.current && tourOpen) {
+      tooltip.current.focus();
       updateTour();
     }
   }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current])
@@ -218,8 +219,6 @@ export const Walktour = (props: WalktourProps) => {
     setTooltipPosition(tooltipPosition);
     targetPosition.current = currentTargetPosition;
     targetSize.current = currentTargetDims;
-
-    tooltipContainer.focus();
 
     //focus trap subroutine
     const cleanupFocusTrap = setFocusTrap(tooltipContainer, currentTarget, disableMaskInteraction);
