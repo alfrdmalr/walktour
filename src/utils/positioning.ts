@@ -1,6 +1,6 @@
 
-import { Coords, getElementCoords, dist, getElementDims, Dims, getCombinedData, fitsWithin, isWithinAt } from "./dom";
-import { getViewportCenter, addAppropriateOffset, applyCenterOffset, centerViewportAroundElements, centerViewportAroundElement } from "./offset";
+import { Coords, getElementCoords, dist, getElementDims, Dims, getCombinedData, fitsWithin, isWithinAt, isForeignTarget } from "./dom";
+import { getViewportCenter, addAppropriateOffset, applyCenterOffset, centerViewportAroundElements, centerViewportAroundElement, getCurrentScrollOffset } from "./offset";
 import { getViewportDims, getViewportScrollEnd, getScrolledViewportPosition, getViewportScrollStart, isElementInView, getViewportStart } from "./viewport";
 
 export enum CardinalOrientation {
@@ -33,6 +33,8 @@ interface GetTooltipPositionArgs {
   orientationPreferences?: CardinalOrientation[];
   getPositionFromCandidates?: (candidates: OrientationCoords[]) => Coords;
   scrollDisabled?: boolean;
+  allowForeignTarget?: boolean;
+  selector?: string;
 }
 
 function getTooltipPositionCandidates(target: HTMLElement, tooltip: HTMLElement, padding: number, tooltipDistance: number, includeAllPositions?: boolean): OrientationCoords[] {
@@ -190,7 +192,7 @@ function getInBoundsFilter(tooltipDims: Dims, viewportScrollStart: Coords, viewp
 }
 
 // filters out any positions which would cause the target/tooltip to not fit within the viewport
-function getAbsoluteCompatibleArrangementFilter(curriedGetCombinedData: (coords: Coords) => {dims: Dims, coords: Coords}, viewportDims: Dims): (oc: OrientationCoords) => boolean {
+function getAbsoluteCompatibleArrangementFilter(curriedGetCombinedData: (coords: Coords) => { dims: Dims, coords: Coords }, viewportDims: Dims): (oc: OrientationCoords) => boolean {
   return (oc: OrientationCoords): boolean => {
     const coords: Coords = oc.coords;
     // we only care about the resultant dims but the input coords are critical here
@@ -200,11 +202,11 @@ function getAbsoluteCompatibleArrangementFilter(curriedGetCombinedData: (coords:
   }
 }
 
-function getCurrentInViewFilter(curriedGetCombinedData: (coords: Coords) => {dims: Dims, coords: Coords}, viewportDims: Dims, viewportCurrentStart: Coords): (oc: OrientationCoords) => boolean {
+function getCurrentInViewFilter(curriedGetCombinedData: (coords: Coords) => { dims: Dims, coords: Coords }, viewportDims: Dims, viewportCurrentStart: Coords): (oc: OrientationCoords) => boolean {
   return (oc: OrientationCoords): boolean => {
     const coords: Coords = oc.coords;
 
-    const {dims: combinedDims, coords: combinedCoords} = curriedGetCombinedData(coords);
+    const { dims: combinedDims, coords: combinedCoords } = curriedGetCombinedData(coords);
 
     return isWithinAt(combinedDims, viewportDims, combinedCoords, viewportCurrentStart);
   }
@@ -226,21 +228,57 @@ function getPreferredCandidates(candidates: OrientationCoords[], orientationPref
   }
 }
 
+function restrictToCurrentViewport(root: Element, coords: Coords, dims: Dims, padding: number): Coords {
+  if (!root) {
+    return coords;
+  }
+
+  const viewportStart: Coords = getCurrentScrollOffset(root);
+  const viewportDims: Dims = getViewportDims(root);
+  const viewportEnd: Coords = {
+    x: viewportStart.x + viewportDims.width,
+    y: viewportStart.y + viewportDims.height
+  }
+  const sx = viewportStart.x + padding;
+  const sy = viewportStart.y + padding;
+  const ex = viewportEnd.x - dims.width - padding;
+  const ey = viewportEnd.y - dims.height - padding;
+
+  let x: number = coords.x;
+  let y: number = coords.y;
+
+  if (coords.x < sx) {
+    x = sx;
+  } else if ((coords.x + dims.width) > ex) {
+    x = ex;
+  }
+
+  if (coords.y < sy) {
+    y = sy;
+  } else if ((coords.y + dims.height) > ey) {
+    y = ey;
+  }
+
+  return { x, y }
+}
+
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, getPositionFromCandidates, tourRoot, scrollDisabled } = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, getPositionFromCandidates, tourRoot, scrollDisabled, allowForeignTarget, selector } = args;
   const center: Coords = target ? getViewportCenter(tourRoot, tooltip, getScrolledViewportPosition(tourRoot, centerViewportAroundElement(tourRoot, target))) : getViewportCenter(tourRoot, tooltip)
   const defaultPosition: Coords = addAppropriateOffset(tourRoot, center);
 
   if (!tooltip || !tourRoot) {
     return;
-  } 
-  
+  }
+
   if (!target) {
     return defaultPosition;
   }
 
+  const foreignTarget: boolean = allowForeignTarget && isForeignTarget(tourRoot, selector);
+  const noScroll: boolean = scrollDisabled || foreignTarget;
   const candidates: OrientationCoords[] = getTooltipPositionCandidates(target, tooltip, padding, tooltipSeparation, true);
-  const choosePosition = getPositionFromCandidates || ((cans: OrientationCoords[]) => chooseBestTooltipPosition(cans, tourRoot, tooltip, target, scrollDisabled));
+  const choosePosition = getPositionFromCandidates || ((cans: OrientationCoords[]) => chooseBestTooltipPosition(cans, tourRoot, tooltip, target, noScroll));
 
   const rawPosition: Coords = choosePosition(getPreferredCandidates(candidates, orientationPreferences)); //position relative to current viewport
 
@@ -248,7 +286,13 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
     return defaultPosition;
   }
 
-  return addAppropriateOffset(tourRoot, rawPosition);
+  const adjustedPosition: Coords = addAppropriateOffset(tourRoot, rawPosition);
+
+  if (foreignTarget) {
+    return restrictToCurrentViewport(tourRoot, adjustedPosition, getElementDims(tooltip), padding + tooltipSeparation)
+  }
+
+  return adjustedPosition;
 }
 
 export function getTargetPosition(root: Element, target: HTMLElement): Coords {

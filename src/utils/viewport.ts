@@ -63,7 +63,7 @@ export function getViewportScrollStart(root: Element): Coords {
 
 export function getViewportScrollEnd(root: Element): Coords {
   const startCoords: Coords = getViewportScrollStart(root);
-  const {width, height} = getViewportScrollDims(root);
+  const { width, height } = getViewportScrollDims(root);
   return {
     x: startCoords.x + width,
     y: startCoords.y + height
@@ -79,7 +79,7 @@ export function isElementInView(root: Element, element: HTMLElement, atPosition?
   const elementDims: Dims = getElementDims(element);
   const startCoords: Coords = addAppropriateOffset(root, getViewportStart(root));
   const viewportDims: Dims = getViewportDims(root);
-  
+
   return isWithinAt(elementDims, viewportDims, position, startCoords);
 }
 

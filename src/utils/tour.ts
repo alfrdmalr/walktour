@@ -1,4 +1,4 @@
-import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getEdgeFocusables } from "./dom";
+import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getEdgeFocusables, isForeignTarget } from "./dom";
 import { getTargetPosition } from "./positioning";
 import { isElementInView, getViewportDims } from "./viewport";
 import { TAB_KEYCODE } from "./constants";
@@ -126,10 +126,12 @@ function naiveShouldScroll(args: NaiveShouldScrollArgs): boolean {
 }
 export interface ShouldScrollArgs extends NaiveShouldScrollArgs {
   disableAutoScroll: boolean;
+  allowForeignTarget: boolean;
+  targetSelector: string;
 }
 
 export function shouldScroll(args: ShouldScrollArgs): boolean {
-  const { root, tooltip, target, disableAutoScroll } = args;
+  const { root, tooltip, target, disableAutoScroll, allowForeignTarget, targetSelector } = args;
   if (!root || !tooltip || !target) {
     return false;
   }
@@ -138,6 +140,9 @@ export function shouldScroll(args: ShouldScrollArgs): boolean {
     return false;
   }
 
+  if (allowForeignTarget) {
+    return !isForeignTarget(root, targetSelector);
+  }
   return naiveShouldScroll({ ...args });
 }
 
