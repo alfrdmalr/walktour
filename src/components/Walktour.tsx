@@ -188,7 +188,7 @@ export const Walktour = (props: WalktourProps) => {
       tooltip.current.focus();
       updateTour();
     }
-  }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current, props.steps])
+  }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current])
   
   // update tooltip and target position in state
   const updateTour = () => {
