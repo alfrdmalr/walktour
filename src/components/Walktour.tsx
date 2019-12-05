@@ -272,7 +272,7 @@ export const Walktour = (props: WalktourProps) => {
         cleanupRefs.current.push(cleanupWatcher);
       }
 
-      if (nextOnTargetClick && target) {
+      if (nextOnTargetClick && currentTarget) {
         const cleanupTargetTether = setNextOnTargetClick(currentTarget, tourLogic.next, validateNextOnTargetClick)
         cleanupRefs.current.push(cleanupTargetTether);
       }
@@ -287,9 +287,7 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   const cleanup = () => {
-    for (let i: number = 0; i < cleanupRefs.current.length; i++) {
-      cleanupRefs.current[i]();
-    }
+    cleanupRefs.current.forEach(f => f());
     cleanupRefs.current = [];
   }
 
