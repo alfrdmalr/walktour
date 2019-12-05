@@ -188,7 +188,7 @@ export const Walktour = (props: WalktourProps) => {
       tooltip.current.focus();
       updateTour();
     }
-  }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current])
+  }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current, props.steps])
   
   // update tooltip and target position in state
   const updateTour = () => {
@@ -287,11 +287,7 @@ export const Walktour = (props: WalktourProps) => {
   }
 
   const cleanup = () => {
-    console.log('length', cleanupRefs.current.length)
-    for (let i: number = 0; i < cleanupRefs.current.length; i++) {
-      console.log(cleanupRefs.current[i])
-      cleanupRefs.current[i]();
-    }
+    cleanupRefs.current.forEach(f => f());
     cleanupRefs.current = [];
   }
 
