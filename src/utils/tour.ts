@@ -183,3 +183,33 @@ export function shouldUpdate(args: ShouldUpdateArgs): boolean {
 
   return targetChanged({ ...args }) || shouldScroll({ ...args }); // future todo: if no target, check if tooltip is correctly positioned (null selector -> tooltip out of place)
 }
+
+export const takeActionIfValid = async (action: () => void, actionValidator?: () => Promise<boolean>) => {
+  if (actionValidator) {
+    const valid: boolean = await actionValidator();
+    if (valid) {
+      action();
+    }
+  } else {
+    action();
+  }
+}
+
+export const setNextOnTargetClick = (target: HTMLElement, next: (fromTarget?: boolean) => void, validateNext?: () => Promise<boolean>): (() => void) => {
+  if (!target) {
+    return;
+  }
+
+  // if valid, call a handler which 1. calls the tetheredAction function and 2. removes itself from the target
+  const clickHandler = () => {
+    const actionWithCleanup = () => {
+      next(true);
+      target.removeEventListener('click', clickHandler);
+    }
+
+    takeActionIfValid(actionWithCleanup, validateNext)
+  }
+
+  target.addEventListener('click', clickHandler);
+  return () => target.removeEventListener('click', clickHandler); // return so we can remove the event elsewhere if the action doesn't get called
+}
