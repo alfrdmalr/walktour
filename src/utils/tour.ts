@@ -2,7 +2,6 @@ import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getEdgeFocusa
 import { getTargetPosition } from "./positioning";
 import { isElementInView, getViewportDims } from "./viewport";
 import { TAB_KEYCODE } from "./constants";
-import { WalktourLogic } from "..";
 
 //miscellaneous tour utilities
 
@@ -185,13 +184,12 @@ export function shouldUpdate(args: ShouldUpdateArgs): boolean {
   return targetChanged({ ...args }) || shouldScroll({ ...args }); // future todo: if no target, check if tooltip is correctly positioned (null selector -> tooltip out of place)
 }
 
-export const takeActionIfValid = (action: () => void, actionValidator?: () => Promise<boolean>) => {
+export const takeActionIfValid = async (action: () => void, actionValidator?: () => Promise<boolean>) => {
   if (actionValidator) {
-    actionValidator().then(result => {
-      if (result) {
-        action();
-      }
-    });
+    const valid: boolean = await actionValidator();
+    if (valid) {
+      action();
+    }
   } else {
     action();
   }
