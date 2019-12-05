@@ -78,9 +78,9 @@ Step-level options will take precedence over global options, so take care when u
 | _customTitleRenderer_ | (_title_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom title content. The function is passed the specified title string, as well as some [exposed tour logic](#walktourlogic). |
 | _customDescriptionRenderer_ | (_description_: string, _tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom description content. The function is passed the specified description string, as well as some [exposed tour logic](#walktourlogic). |
 | _customFooterRenderer_ | (_tourLogic_: `WalktourLogic`) => JSX.Element | Optional callback to generate custom footer content. The function is passed some [exposed tour logic](#walktourlogic) to allow for navigation control.|
-| _customNextFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'next' function. This is called each time that `next()` would normally be called. |
-| _customPrevFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'prev' function. This is called each time that `prev()` would normally be called. |
-| _customCloseFunc_ | (_tourLogic_: `WalktourLogic`) => void | Callback function to replace the default 'close' function. This is called each time that `close()` would normally be called. |
+| _customNextFunc_ | (tourLogic: `WalktourLogic`, _fromTarget_: boolean) => void | Callback function to replace the default 'next' function. This is called each time that `next()` would normally be called. The 'fromTarget' flag is true iff this function gets called by clicking on the highlighted element. |
+| _customPrevFunc_ | (tourLogic: `WalktourLogic`) => void | Callback function to replace the default 'prev' function. This is called each time that `prev()` would normally be called. |
+| _customCloseFunc_ | (tourLogic: `WalktourLogic`) => void | Callback function to replace the default 'close' function. This is called each time that `close()` would normally be called. |
 | _disableAutoScroll_ | boolean | Disable automatically scrolling elements into view. Default is false. |
 | _getPositionFromCandidates_ | (candidates: `OrientationCoords[]`) => Coords | Optional callback to specify how the tooltip position is chosen. Only use if positioning is more complex than can be achieved with `orientationPreferences`; for instance, the tooltip position could be based on proximity to the cursor position or some other factor that's not known ahead of time. |
 | _movingTarget_ | boolean | If true, the tour will watch the target element for position changes. If the position is sufficiently different (as specified by `renderTolerance`) from its initial position or size, the tooltip and mask will adjust themselves accordingly. This can also be used if a particular target element is hidden or does not yet exist at the time the tour arrives to it. |
@@ -89,7 +89,8 @@ Step-level options will take precedence over global options, so take care when u
 | _disableMask_ | boolean | Disable the overlay and cutout. Default is false. |
 | _disableSmoothScroll_ | boolean | Disable supporting browsers scrolling smoothly to offscreen elements. Default is false. |
 | _allowForeignTarget_ | boolean | Allows the tour to target elements outside of it's root container. The tour and its elements will still be bound to that container, so it's best used for elements that are immediately bordering the container, like a menu shell. Foreign targets cannot be highlighted. |
-
+| _nextOnTargetClick_ | boolean | Determines whether interacting with the target should advance the tour. Currently only supports clickable targets (buttons). |
+| _validateNextOnTargetClick_ | () => Promise\<boolean\> | If specified, the output of this function will determine whether or not the tour will actually advance after having clicked the target element. To be used in conjunction with _nextOnTargetClick_ |
 
 
 ### WalktourLogic

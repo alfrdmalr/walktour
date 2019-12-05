@@ -78,7 +78,7 @@ export function Tooltip(props: TooltipProps) {
               {prevLabel || "prev"}
             </button>
             <button
-              onClick={next}
+              onClick={() => next()}
               disabled={nextDisabled}
               style={{...styles.primaryButton, ...nextDisabled && styles.disabledButton}}
             >

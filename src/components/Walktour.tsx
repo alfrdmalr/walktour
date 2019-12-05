@@ -6,10 +6,10 @@ import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPo
 import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
-import { debounce, getIdString, shouldUpdate, setFocusTrap, setTargetWatcher, setTourUpdateListener, shouldScroll } from '../utils/tour';
+import { debounce, getIdString, shouldUpdate, setFocusTrap, setTargetWatcher, setTourUpdateListener, shouldScroll, setNextOnTargetClick } from '../utils/tour';
 
 export interface WalktourLogic {
-  next: () => void;
+  next: (fromTarget?: boolean) => void;
   prev: () => void;
   close: (reset?: boolean) => void;
   goToStep: (stepNumber: number) => void;
@@ -29,7 +29,7 @@ export interface WalktourOptions {
   customDescriptionRenderer?: (description: string, tourLogic?: WalktourLogic) => JSX.Element;
   customFooterRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
   customTooltipRenderer?: (tourLogic?: WalktourLogic) => JSX.Element;
-  customNextFunc?: (tourLogic: WalktourLogic) => void;
+  customNextFunc?: (tourLogic: WalktourLogic, fromTarget?: boolean) => void;
   customPrevFunc?: (tourLogic: WalktourLogic) => void;
   customCloseFunc?: (tourLogic: WalktourLogic) => void;
   prevLabel?: string;
@@ -46,6 +46,8 @@ export interface WalktourOptions {
   disableMask?: boolean;
   disableSmoothScroll?: boolean;
   allowForeignTarget?: boolean;
+  nextOnTargetClick?: boolean;
+  validateNextOnTargetClick?: () => Promise<boolean>;
 }
 
 export interface Step extends WalktourOptions {
@@ -142,6 +144,8 @@ export const Walktour = (props: WalktourProps) => {
     disableSmoothScroll,
     debug,
     allowForeignTarget,
+    nextOnTargetClick,
+    validateNextOnTargetClick,
   } = options;
 
   React.useEffect(() => {
@@ -267,6 +271,11 @@ export const Walktour = (props: WalktourProps) => {
         const cleanupWatcher = setTargetWatcher(conditionalUpdate, updateInterval)
         cleanupRefs.current.push(cleanupWatcher);
       }
+
+      if (nextOnTargetClick && target) {
+        const cleanupTargetTether = setNextOnTargetClick(currentTarget, tourLogic.next, validateNextOnTargetClick)
+        cleanupRefs.current.push(cleanupTargetTether);
+      }
     }
   }
 
@@ -303,7 +312,7 @@ export const Walktour = (props: WalktourProps) => {
 
   const tourLogic: WalktourLogic = {
     ...baseLogic,
-    ...customNextFunc && { next: () => customNextFunc(baseLogic) },
+    ...customNextFunc && { next: (fromTarget?: boolean) => customNextFunc(baseLogic, fromTarget) },
     ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) },
     ...customCloseFunc && { close: () => customCloseFunc(baseLogic) }
   };

@@ -10,12 +10,11 @@ const App = () => {
 
   return (
     <>
-      {playgroundSetup({ buttonText: "Toggle Tour", onButtonClick: () => setTourOpen(!tourOpen) })}
+      {playgroundSetup({ buttonText: "Toggle Tour", onButtonClick: () => setTourOpen(!tourOpen)})}
       <Walktour
         steps={secondarySteps()}
         identifier={"2"}
         rootSelector={"#demo-container"}
-        // disableListeners
       />
       <Walktour
         steps={primaryIntoSecondary()}
