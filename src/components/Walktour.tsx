@@ -187,6 +187,8 @@ export const Walktour = (props: WalktourProps) => {
     if (tooltip.current && tourOpen) {
       tooltip.current.focus();
       updateTour();
+    } else {
+      cleanup();
     }
   }, [currentStepIndex, currentStepContent, tourOpen, tourRoot, tooltip.current])
   
