@@ -220,3 +220,19 @@ export function getEdgeFocusables(defaultElement: HTMLElement, container?: HTMLE
 export function isForeignTarget(root: Element, selector: string): boolean {
   return !root.querySelector(selector);
 }
+
+export function addClass(element: Element, className: string): void {
+  if (!element) {
+    return;
+  }
+
+  element.classList.add(className)
+}
+
+export function removeClass(element: Element, className: string): void {
+  if (!element) {
+    return;
+  }
+
+  element.classList.remove(className)
+}

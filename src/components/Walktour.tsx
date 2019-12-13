@@ -3,10 +3,12 @@ import * as ReactDOM from 'react-dom';
 import { Mask } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
-import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
+import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementDims, removeClass, addClass } from '../utils/dom';
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { debounce, getIdString, shouldUpdate, setFocusTrap, setTargetWatcher, setTourUpdateListener, shouldScroll, setNextOnTargetClick } from '../utils/tour';
+// import '../utils/styles';
+// require('../utils/styles.css');
 
 export interface WalktourLogic {
   next: (fromTarget?: boolean) => void;
@@ -48,6 +50,7 @@ export interface WalktourOptions {
   allowForeignTarget?: boolean;
   nextOnTargetClick?: boolean;
   validateNextOnTargetClick?: () => Promise<boolean>;
+  disableRootScroll?: boolean;
 }
 
 export interface Step extends WalktourOptions {
@@ -83,6 +86,7 @@ const walktourDefaultProps: Partial<WalktourProps> = {
 const basePortalString: string = 'walktour-portal';
 const baseMaskString: string = 'walktour-mask';
 const baseTooltipContainerString: string = 'walktour-tooltip-container';
+const disableRootScrollClass: string = 'walktour__root--scroll-lock';
 
 export const Walktour = (props: WalktourProps) => {
 
@@ -100,6 +104,7 @@ export const Walktour = (props: WalktourProps) => {
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined);
 
   const cleanupRefs = React.useRef<Array<() => void>>([]);
+  const rootRef = React.useRef<Element>(undefined); // need this to remove scroll-lock on forced unmount
   const tooltip = React.useRef<HTMLElement>(undefined);
   const portal = React.useRef<HTMLElement>(undefined);
   const targetPosition = React.useRef<Coords>(undefined);
@@ -146,6 +151,7 @@ export const Walktour = (props: WalktourProps) => {
     allowForeignTarget,
     nextOnTargetClick,
     validateNextOnTargetClick,
+    disableRootScroll,
   } = options;
 
   React.useEffect(() => {
@@ -162,9 +168,13 @@ export const Walktour = (props: WalktourProps) => {
       root = getNearestScrollAncestor(portal.current);
     }
 
-    if (tourOpen !== false && root !== tourRoot) {
-      setTourRoot(root);
-    }
+    if (tourOpen) {
+      if (root !== tourRoot) {
+        cleanupRoot(tourRoot);
+        setTourRoot(root);
+        rootRef.current = root; // should be synced with state, but never used outside of cleanup 
+      }
+    } 
   }, [rootSelector, portal.current, tourOpen])
 
   // update tour when step changes
@@ -194,7 +204,7 @@ export const Walktour = (props: WalktourProps) => {
   
   // update tooltip and target position in state
   const updateTour = () => {
-    cleanup();
+    cleanupListeners();
     const root: Element = tourRoot;
     const tooltipContainer: HTMLElement = tooltip.current;
 
@@ -245,6 +255,12 @@ export const Walktour = (props: WalktourProps) => {
       scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, currentTarget, tooltipPosition, currentTargetPosition), disableSmoothScroll)
     }
 
+    if (disableRootScroll) {
+      addClass(root, disableRootScrollClass)
+    } else {
+      removeClass(root, disableRootScrollClass);
+    }
+
     if (!disableListeners) {
       const conditionalUpdate = () => {
         const availableTarget = getTarget();
@@ -288,16 +304,27 @@ export const Walktour = (props: WalktourProps) => {
     setCurrentStepIndex(stepIndex);
   }
 
-  const cleanup = () => {
+  const cleanupListeners = () => {
     cleanupRefs.current.forEach(f => f());
     cleanupRefs.current = [];
+  }
+
+  const cleanupRoot = (tourRoot?: Element) => {
+    const root = tourRoot || rootRef.current;
+    if (root) {
+      removeClass(root, disableRootScrollClass);
+    } 
+  }
+
+  const cleanup = () => {
+    cleanupListeners();
+    cleanupRoot();
   }
 
   const closeTour = (reset?: boolean) => {
     reset && goToStep(0);
     !controlled && setIsOpenState(false);
     cleanup();
-    target && target.focus(); // return focus to last target when closed
   }
 
   const baseLogic: WalktourLogic = {

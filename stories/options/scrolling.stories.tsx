@@ -26,13 +26,14 @@ export const all = () => (
     steps={scrollingSteps("Adjust the scrolling-related options from the Knobs tab to see how they might interact.")}
     disableAutoScroll={boolean('disableAutoScroll', false)}
     disableSmoothScroll={boolean('disableSmoothScroll', false)}
+    disableRootScroll={boolean('disableRootScroll', true)}
   />
 )
 
 export const disableAutoScroll = () => (
   <Walktour
     customCloseFunc={() => actions('close')}
-    steps={scrollingSteps("Disable automatic scrolling by changing the value of 'disableAutoScroll' in the Knobs tab.")}
+    steps={scrollingSteps("Disable automatic scrolling by changing the value of 'disableAutoScroll' from the Knobs tab.")}
     disableAutoScroll={boolean('disableAutoScroll', true)}
   />
 )
@@ -42,5 +43,12 @@ export const disableSmoothScroll = () => (
     customCloseFunc={() => actions('close')} 
     steps={scrollingSteps("Disable smooth scrolling by changing the value of 'disableSmoothScroll' from the Knobs tab.")}
     disableSmoothScroll={boolean('disableSmoothScroll', true)}
+  />
+)
+
+export const disableRootScroll = () =>  (
+  <Walktour
+    steps={scrollingSteps("Disable user scroll by changing the value of 'disableRootScroll' from the Knobs tab." )}
+    disableRootScroll={boolean('disableRootScroll', true)}
   />
 )

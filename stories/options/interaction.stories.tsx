@@ -26,6 +26,7 @@ export const all = () => (
     disableNext={boolean('disableNext', false)}
     disablePrev={boolean('disablePrev', false)}
     disableClose={boolean('disableClose', true)}
+    disableRootScroll={boolean('disableRootScroll', true)}
   />
 )
 
@@ -51,5 +52,13 @@ export const disableActions = () => (
     disableNext={boolean('disableNext', false)}
     disablePrev={boolean('disablePrev', false)}
     disableClose={boolean('disableClose', true)}
+  />
+)
+
+export const disableRootScroll = () => (
+
+  <Walktour
+    steps={primarySteps()}
+    disableRootScroll={boolean('disableRootScroll', true)}
   />
 )

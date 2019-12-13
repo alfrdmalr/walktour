@@ -109,7 +109,7 @@ export const primaryIntoSecondary = (): Step[] => [
 
 export const secondarySteps = (): Step[] => [
   { selector: '#oneTwo', description: '...you can also have scoped tours' },
-  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it' },
+  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it', disableRootScroll: false },
   { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', },
   {
     selector: '#ten',

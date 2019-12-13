@@ -91,6 +91,7 @@ Step-level options will take precedence over global options, so take care when u
 | _allowForeignTarget_ | boolean | Allows the tour to target elements outside of it's root container. The tour and its elements will still be bound to that container, so it's best used for elements that are immediately bordering the container, like a menu shell. Foreign targets cannot be highlighted. |
 | _nextOnTargetClick_ | boolean | Determines whether interacting with the target should advance the tour. Currently only supports clickable targets (buttons). |
 | _validateNextOnTargetClick_ | () => Promise\<boolean\> | If specified, the output of this function will determine whether or not the tour will actually advance after having clicked the target element. To be used in conjunction with _nextOnTargetClick_ |
+| _disableRootScroll_ | boolean | Determines whether the user should be allowed to scroll the tour's container while active. This does not prevent automatic scrolling done by the tour. |
 
 
 ### WalktourLogic

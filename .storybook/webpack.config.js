@@ -8,6 +8,14 @@ module.exports = ({ config }) => {
       }
     ]
   });
+
+  // config.module.rules.push({
+  //   test: /\.s?css$/,
+  //   loaders: [
+  //     require.resolve('style-loader'),
+  //     require.resolve('css-loader'),
+  //   ]
+  // })
   config.resolve.extensions.push('.ts', '.tsx');
   return config;
   };

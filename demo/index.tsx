@@ -15,6 +15,7 @@ const App = () => {
         steps={secondarySteps()}
         identifier={"2"}
         rootSelector={"#demo-container"}
+        disableRootScroll
       />
       <Walktour
         steps={primaryIntoSecondary()}
@@ -22,6 +23,7 @@ const App = () => {
         isOpen={tourOpen}
         customCloseFunc={(logic: WalktourLogic) => { setTourOpen(false); logic.close(); }}
         disableCloseOnClick
+        disableRootScroll
       />
     </>
   )
