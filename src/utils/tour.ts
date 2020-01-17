@@ -176,12 +176,12 @@ export function targetChanged(args: TargetChangedArgs): boolean {
 export interface ShouldUpdateArgs extends TargetChangedArgs, ShouldScrollArgs { }
 
 export function shouldUpdate(args: ShouldUpdateArgs): boolean {
-  const { root, tooltip } = args;
+  const { root, tooltip, target } = args;
   if (!root || !tooltip) {
     return false; // bail if these aren't present; need them for calculations
   }
 
-  return targetChanged({ ...args }) || shouldScroll({ ...args }); // future todo: if no target, check if tooltip is correctly positioned (null selector -> tooltip out of place)
+  return targetChanged({ ...args }) || shouldScroll({ ...args }) || target === null;
 }
 
 export const takeActionIfValid = async (action: () => void, actionValidator?: () => Promise<boolean>) => {
