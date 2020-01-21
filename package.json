@@ -1,6 +1,6 @@
 {
   "name": "@rocketsoftware/walktour",
-  "version": "4.3.2",
+  "version": "0.0.0",
   "description": "Guided tour/walkthrough component for react",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
