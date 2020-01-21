@@ -1,6 +1,6 @@
 {
-  "name": "walktour",
-  "version": "4.3.1",
+  "name": "@rocketsoftware/walktour",
+  "version": "4.3.2",
   "description": "Guided tour/walkthrough component for react",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alfrdmalr/walktour"
+    "url": "https://github.com/RocketSoftware/walktour"
   },
   "license": "MIT",
   "peerDependencies": {
