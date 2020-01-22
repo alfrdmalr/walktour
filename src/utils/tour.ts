@@ -189,14 +189,7 @@ export function tooltipDesync(args: TooltipDesyncArgs): boolean {
   const newPosition: Coords = getTooltipPosition({...args})
 
   // if there's a difference between the newly calculated position and the current position, we need to update
-
-  if (dist(newPosition, currentPosition) !== 0) {
-    console.log('difference in position', newPosition, currentPosition);
-    return true;
-  } else {
-    return false; 
-  }
-  // return dist(newPosition, currentPosition) !== 0;
+  return dist(newPosition, currentPosition) !== 0;
   
 }
 
