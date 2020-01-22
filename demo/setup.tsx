@@ -90,7 +90,7 @@ export const primarySteps = (): Step[] => [
   { selector: '#five', title: 'Interact with the highlighted element', description: 'click the button to see for yourself!' },
   { selector: '#eight', title: 'Supply Custom HTML Content', description: null, customDescriptionRenderer: () => <><h1>H1 Element</h1><p>Paragraph Element</p><input type='text' placeholder={'text input element'} /></> },
   {
-    selector: '#eight', title: 'Access the Tour API...', description: "return the to first step", customDescriptionRenderer: (description: string, logic: WalktourLogic) =>
+    selector: null, title: 'Access the Tour API...', description: "return the to first step", customDescriptionRenderer: (description: string, logic: WalktourLogic) =>
       <div>...from inside your custom content<button onClick={() => logic.goToStep(0)}>{description}</button></div>
   },
   { selector: '#three', title: 'Smart Positioning', description: 'The tooltip is automatically positioned within view. Try resizing the window!' },
@@ -109,7 +109,7 @@ export const primaryIntoSecondary = (): Step[] => [
 
 export const secondarySteps = (): Step[] => [
   { selector: '#oneTwo', description: '...you can also have scoped tours' },
-  { selector: "#twoTwo", description: 'The tour component will automatically find the nearest suitable ancestor to hold it' },
+  { selector: "fakeselector", description: 'The tour component will automatically find the nearest suitable ancestor to hold it' },
   { selector: '#threeTwo', title: 'Smart Masking!', description: 'The overlay will be constrained by this ancestor container, and scrolling works within the component', },
   {
     selector: '#ten',
