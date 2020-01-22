@@ -219,9 +219,9 @@ export const Walktour = (props: WalktourProps) => {
       padding: smartPadding,
       tooltipSeparation,
       orientationPreferences,
-      tourRoot: root,
+      root,
       getPositionFromCandidates,
-      scrollDisabled: disableAutoScroll,
+      disableAutoScroll,
       allowForeignTarget,
       selector
     });
@@ -238,7 +238,7 @@ export const Walktour = (props: WalktourProps) => {
     if (shouldScroll({
       disableAutoScroll,
       allowForeignTarget,
-      targetSelector: selector,
+      selector,
       root,
       target: currentTarget,
       tooltip: tooltipContainer,
@@ -261,7 +261,11 @@ export const Walktour = (props: WalktourProps) => {
           targetCoords: targetPosition.current,
           targetDims: targetSize.current,
           allowForeignTarget,
-          targetSelector: selector
+          selector,
+          getPositionFromCandidates,
+          orientationPreferences, 
+          padding: smartPadding, 
+          tooltipSeparation
         })) {
           updateTour();
         }

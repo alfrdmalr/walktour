@@ -24,15 +24,15 @@ export interface OrientationCoords {
   coords: Coords;
 }
 
-interface GetTooltipPositionArgs {
+export interface GetTooltipPositionArgs {
   target: HTMLElement;
   tooltip: HTMLElement;
   padding: number;
   tooltipSeparation: number;
-  tourRoot: Element;
+  root: Element;
   orientationPreferences?: CardinalOrientation[];
   getPositionFromCandidates?: (candidates: OrientationCoords[]) => Coords;
-  scrollDisabled?: boolean;
+  disableAutoScroll?: boolean;
   allowForeignTarget?: boolean;
   selector?: string;
 }
@@ -263,7 +263,7 @@ function restrictToCurrentViewport(root: Element, coords: Coords, dims: Dims, pa
 }
 
 export function getTooltipPosition(args: GetTooltipPositionArgs): Coords {
-  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, getPositionFromCandidates, tourRoot, scrollDisabled, allowForeignTarget, selector } = args;
+  const { target, tooltip, padding, tooltipSeparation, orientationPreferences, getPositionFromCandidates, root: tourRoot, disableAutoScroll: scrollDisabled, allowForeignTarget, selector } = args;
   const center: Coords = target ? getViewportCenter(tourRoot, tooltip, getScrolledViewportPosition(tourRoot, centerViewportAroundElement(tourRoot, target))) : getViewportCenter(tourRoot, tooltip)
   const defaultPosition: Coords = addAppropriateOffset(tourRoot, center);
 
