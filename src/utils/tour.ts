@@ -1,5 +1,5 @@
 import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getEdgeFocusables, isForeignTarget } from "./dom";
-import { getTargetPosition } from "./positioning";
+import { getTargetPosition, GetTooltipPositionArgs, getTooltipPosition } from "./positioning";
 import { isElementInView, getViewportDims } from "./viewport";
 import { TAB_KEYCODE } from "./constants";
 
@@ -107,7 +107,7 @@ export const setFocusTrap = (tooltipContainer: HTMLElement, target?: HTMLElement
 interface NaiveShouldScrollArgs {
   root: Element;
   tooltip: HTMLElement;
-  tooltipPosition?: Coords;
+  tooltipPosition: Coords;
   target: HTMLElement;
 }
 
@@ -125,13 +125,13 @@ function naiveShouldScroll(args: NaiveShouldScrollArgs): boolean {
   return false;
 }
 export interface ShouldScrollArgs extends NaiveShouldScrollArgs {
-  disableAutoScroll: boolean;
-  allowForeignTarget: boolean;
-  targetSelector: string;
+  disableAutoScroll?: boolean;
+  allowForeignTarget?: boolean;
+  selector?: string;
 }
 
 export function shouldScroll(args: ShouldScrollArgs): boolean {
-  const { root, tooltip, target, disableAutoScroll, allowForeignTarget, targetSelector } = args;
+  const { root, tooltip, target, disableAutoScroll, allowForeignTarget, selector: targetSelector } = args;
   if (!root || !tooltip || !target) {
     return false;
   }
@@ -140,7 +140,7 @@ export function shouldScroll(args: ShouldScrollArgs): boolean {
     return false;
   }
 
-  if (allowForeignTarget) {
+  if (allowForeignTarget && targetSelector) {
     return !isForeignTarget(root, targetSelector);
   }
   return naiveShouldScroll({ ...args });
@@ -173,7 +173,27 @@ export function targetChanged(args: TargetChangedArgs): boolean {
   return sizeChanged || positionChanged;
 }
 
-export interface ShouldUpdateArgs extends TargetChangedArgs, ShouldScrollArgs { }
+export interface TooltipDesyncArgs extends GetTooltipPositionArgs {
+ tooltipPosition: Coords;
+}
+
+// if there's no target, we need to ensure that the tooltip is centered, even if the window/container/scroll changes 
+// if a target exists, there's not a tooltip desync in this context; there are two other functions
+// to determine if the tooltip/target are out of sync - this is solely for non-target cases
+export function tooltipDesync(args: TooltipDesyncArgs): boolean {
+  const { target, root, tooltip, tooltipPosition: currentPosition } = args;
+  if (target || !root || !tooltip) {
+    return false;
+  }
+
+  const newPosition: Coords = getTooltipPosition({...args})
+
+  // if there's a difference between the newly calculated position and the current position, we need to update
+  return dist(newPosition, currentPosition) !== 0;
+  
+}
+
+export interface ShouldUpdateArgs extends TargetChangedArgs, ShouldScrollArgs, TooltipDesyncArgs { }
 
 export function shouldUpdate(args: ShouldUpdateArgs): boolean {
   const { root, tooltip } = args;
@@ -181,7 +201,7 @@ export function shouldUpdate(args: ShouldUpdateArgs): boolean {
     return false; // bail if these aren't present; need them for calculations
   }
 
-  return targetChanged({ ...args }) || shouldScroll({ ...args }); // future todo: if no target, check if tooltip is correctly positioned (null selector -> tooltip out of place)
+  return targetChanged({ ...args }) || shouldScroll({ ...args }) || tooltipDesync({...args})
 }
 
 export const takeActionIfValid = async (action: () => void, actionValidator?: () => Promise<boolean>) => {

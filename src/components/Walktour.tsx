@@ -211,15 +211,17 @@ export const Walktour = (props: WalktourProps) => {
     const currentTarget: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, currentTarget);
     const currentTargetDims: Dims = getElementDims(currentTarget);
+    const smartPadding: number = disableMask ? 0 : maskPadding;
+    
     const tooltipPosition: Coords = getTooltipPosition({
       target: currentTarget,
       tooltip: tooltipContainer,
-      padding: disableMask ? 0 : maskPadding,
+      padding: smartPadding,
       tooltipSeparation,
       orientationPreferences,
-      tourRoot: root,
+      root,
       getPositionFromCandidates,
-      scrollDisabled: disableAutoScroll,
+      disableAutoScroll,
       allowForeignTarget,
       selector
     });
@@ -236,7 +238,7 @@ export const Walktour = (props: WalktourProps) => {
     if (shouldScroll({
       disableAutoScroll,
       allowForeignTarget,
-      targetSelector: selector,
+      selector,
       root,
       target: currentTarget,
       tooltip: tooltipContainer,
@@ -259,7 +261,11 @@ export const Walktour = (props: WalktourProps) => {
           targetCoords: targetPosition.current,
           targetDims: targetSize.current,
           allowForeignTarget,
-          targetSelector: selector
+          selector,
+          getPositionFromCandidates,
+          orientationPreferences, 
+          padding: smartPadding, 
+          tooltipSeparation
         })) {
           updateTour();
         }
