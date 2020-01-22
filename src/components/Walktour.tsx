@@ -211,10 +211,12 @@ export const Walktour = (props: WalktourProps) => {
     const currentTarget: HTMLElement = getTarget();
     const currentTargetPosition: Coords = getTargetPosition(root, currentTarget);
     const currentTargetDims: Dims = getElementDims(currentTarget);
+    const smartPadding: number = disableMask ? 0 : maskPadding;
+    
     const tooltipPosition: Coords = getTooltipPosition({
       target: currentTarget,
       tooltip: tooltipContainer,
-      padding: disableMask ? 0 : maskPadding,
+      padding: smartPadding,
       tooltipSeparation,
       orientationPreferences,
       tourRoot: root,
