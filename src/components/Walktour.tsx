@@ -16,6 +16,7 @@ export interface WalktourLogic {
   stepContent: Step;
   stepIndex: number;
   allSteps: Step[];
+  tooltipPosition: OrientationCoords;
 }
 
 export interface WalktourOptions {
@@ -39,7 +40,7 @@ export interface WalktourOptions {
   disablePrev?: boolean;
   disableClose?: boolean;
   disableAutoScroll?: boolean;
-  getPositionFromCandidates?: (candidates: OrientationCoords[]) => Coords;
+  getPositionFromCandidates?: (candidates: OrientationCoords[]) => OrientationCoords;
   movingTarget?: boolean;
   updateInterval?: number;
   renderTolerance?: number;
@@ -95,7 +96,7 @@ export const Walktour = (props: WalktourProps) => {
   const controlled = isOpen !== undefined;
   const [isOpenState, setIsOpenState] = React.useState<boolean>(isOpen == undefined);
   const [target, setTarget] = React.useState<HTMLElement>(undefined);
-  const [tooltipPosition, setTooltipPosition] = React.useState<Coords>(undefined);
+  const [tooltipPosition, setTooltipPosition] = React.useState<OrientationCoords>(undefined);
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(initialStepIndex || 0);
   const [tourRoot, setTourRoot] = React.useState<Element>(undefined);
 
@@ -213,7 +214,7 @@ export const Walktour = (props: WalktourProps) => {
     const currentTargetDims: Dims = getElementDims(currentTarget);
     const smartPadding: number = disableMask ? 0 : maskPadding;
     
-    const tooltipPosition: Coords = getTooltipPosition({
+    const tooltipPosition: OrientationCoords = getTooltipPosition({
       target: currentTarget,
       tooltip: tooltipContainer,
       padding: smartPadding,
@@ -242,9 +243,9 @@ export const Walktour = (props: WalktourProps) => {
       root,
       target: currentTarget,
       tooltip: tooltipContainer,
-      tooltipPosition
+      tooltipPosition: tooltipPosition.coords
     })) {
-      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, currentTarget, tooltipPosition, currentTargetPosition), disableSmoothScroll)
+      scrollToDestination(root, centerViewportAroundElements(root, tooltipContainer, currentTarget, tooltipPosition.coords, currentTargetPosition), disableSmoothScroll)
     }
 
     if (!disableListeners) {
@@ -253,7 +254,7 @@ export const Walktour = (props: WalktourProps) => {
 
         if (shouldUpdate({
           root,
-          tooltipPosition,
+          tooltipPosition: tooltipPosition.coords,
           tooltip: tooltipContainer,
           target: availableTarget,
           disableAutoScroll,
@@ -313,7 +314,8 @@ export const Walktour = (props: WalktourProps) => {
     goToStep: goToStep,
     stepContent: { ...options }, //pass options in as well to expose any defaults that aren't specified
     stepIndex: currentStepIndex,
-    allSteps: steps
+    allSteps: steps,
+    tooltipPosition
   };
 
   const tourLogic: WalktourLogic = {
@@ -362,8 +364,8 @@ export const Walktour = (props: WalktourProps) => {
 
   const tooltipContainerStyle: React.CSSProperties = {
     position: 'absolute',
-    top: tooltipPosition && tooltipPosition.y,
-    left: tooltipPosition && tooltipPosition.x,
+    top: tooltipPosition?.coords?.y,
+    left: tooltipPosition?.coords?.x,
     transition: transition,
     pointerEvents: 'auto'
   }
