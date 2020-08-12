@@ -272,7 +272,7 @@ export function getTooltipPosition(args: GetTooltipPositionArgs): OrientationCoo
   }
 
   if (!target) {
-    return {orientation: CardinalOrientation.CENTER, coords: defaultPosition};
+    return {orientation: null, coords: defaultPosition};
   }
 
   const foreignTarget: boolean = allowForeignTarget && isForeignTarget(tourRoot, selector);
