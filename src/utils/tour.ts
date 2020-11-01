@@ -1,5 +1,5 @@
 import { Coords, dist, Dims, areaDiff, fitsWithin, getElementDims, getEdgeFocusables, isForeignTarget } from "./dom";
-import { getTargetPosition, GetTooltipPositionArgs, getTooltipPosition } from "./positioning";
+import { getTargetPosition, GetTooltipPositionArgs, getTooltipPosition, OrientationCoords } from "./positioning";
 import { isElementInView, getViewportDims } from "./viewport";
 import { TAB_KEYCODE } from "./constants";
 
@@ -186,10 +186,10 @@ export function tooltipDesync(args: TooltipDesyncArgs): boolean {
     return false;
   }
 
-  const newPosition: Coords = getTooltipPosition({...args})
+  const newPosition: OrientationCoords = getTooltipPosition({...args})
 
   // if there's a difference between the newly calculated position and the current position, we need to update
-  return dist(newPosition, currentPosition) !== 0;
+  return dist(newPosition.coords, currentPosition) !== 0;
   
 }
 
