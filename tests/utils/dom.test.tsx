@@ -1,5 +1,5 @@
 import { dist, Coords, getElementCoords, getNearestScrollAncestor, Dims, fitsWithin, isWithinAt, isValidCoords, isValidDims, areaDiff } from '../../src/utils/dom';
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
 import * as React from 'react';
 import { mockGBCR } from '../mocks';
 
@@ -127,7 +127,7 @@ describe('dist', () => {
 })
 
 describe('areaDiff', () => {
-  const {dimsUndef, dimsEmpty, dimsLarge, dimsSmall, dimsNegative} = mockDataGen();
+  const {dimsEmpty, dimsLarge, dimsSmall} = mockDataGen();
 
   test('no diff with self', () => {
     expect(areaDiff(dimsEmpty, dimsEmpty)).toBe(0);
@@ -178,10 +178,10 @@ describe('getNearestScrollAncestor', () => {
         </div>
       </div>
       <div id='grandchild-2' style={{ overflowY: 'auto' }}>
-        <div id="great-grandchild-2">overflow y child</div>>
+        <div id="great-grandchild-2">overflow y child</div>
       </div>
       <div id='grandchild-3' style={{ overflowX: 'hidden' }}>
-        <div id="great-grandchild-3">overflow hidden child</div>>
+        <div id="great-grandchild-3">overflow hidden child</div>
       </div>
       <div id='child-3' style={{ overflowX: 'visible', overflowY: 'scroll' }}>
         <div id="grandchild-4"></div>
@@ -215,7 +215,7 @@ describe('getNearestScrollAncestor', () => {
     const grandchild = page.find('#grandchild').getDOMNode()
     const c2 = page.find('#child-2').getDOMNode();
 
-    expect(getNearestScrollAncestor(grandchild)).toBe(page.find('#child-2').getDOMNode());
+    expect(getNearestScrollAncestor(grandchild)).toBe(c2);
   })
 
   test('self returns self', () => {

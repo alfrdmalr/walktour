@@ -10,7 +10,17 @@ export function mockGBCR(args: { x?: number, y?: number, w?: number, h?: number 
       right: x + w,
       bottom: y + h,
       x: x,
-      y: y
+      y: y,
+      toJSON: () => ({
+        width: w,
+        height: h,
+        top: y,
+        left: x,
+        right: x + w,
+        bottom: y + h,
+        x: x,
+        y: y,
+      })
     }
   })
 }
