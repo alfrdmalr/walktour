@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
+//import { Walktour, WalktourLogic } from 'walktour'; // test with npm pack
 import { Walktour, WalktourLogic } from '../src/components/Walktour'
 import { playgroundSetup, secondarySteps, primaryIntoSecondary } from './setup'
 
