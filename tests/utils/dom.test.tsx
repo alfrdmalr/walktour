@@ -1,7 +1,7 @@
-import { dist, Coords, getElementCoords, getNearestScrollAncestor, Dims, fitsWithin, isWithinAt, isValidCoords, isValidDims, areaDiff } from '../../src/utils/dom';
-import { mount } from 'enzyme';
 import * as React from 'react';
 import { mockGBCR } from '../mocks';
+import { dist, Coords, getElementCoords, getNearestScrollAncestor, Dims, fitsWithin, isWithinAt, isValidCoords, isValidDims, areaDiff } from '../../src/utils/dom';
+import { mount } from 'enzyme';
 
 // casting undefined as number to bypass noImplicitAny, which stops the tests from running 
 const mockDataGen = () => ({
