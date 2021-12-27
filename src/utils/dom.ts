@@ -11,7 +11,7 @@ export interface Dims {
   height: number;
 }
 
-export interface TargetInfo {
+export interface ElementInfo {
   dims: Dims;
   coords: Coords;
 }
@@ -223,7 +223,7 @@ export function getEdgeFocusables(defaultElement: HTMLElement, container?: HTMLE
   }
 }
 
-export function getTargetInfo(root: Element, target?: HTMLElement) {
+export function getTargetInfo(root: Element, target?: HTMLElement): ElementInfo | undefined {
   if (!root || !target) {
     return;
   }

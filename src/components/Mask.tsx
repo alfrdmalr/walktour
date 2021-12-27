@@ -1,12 +1,9 @@
 import * as React from 'react';
-import { Coords, Dims } from '../utils/dom';
+import { Coords, Dims, ElementInfo } from '../utils/dom';
 import { getViewportScrollDims } from '../utils/viewport';
 
 export interface MaskOptions {
-  targetInfo?: {
-    coords: Coords,
-    dims: Dims
-  };
+  targetInfo?: ElementInfo;
   padding: number;
   close: () => void;
   tourRoot: Element;
