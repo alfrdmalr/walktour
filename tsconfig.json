@@ -13,10 +13,9 @@
     "strict": true,
     "moduleResolution": "node",
     "declaration": true,
-    "declarationDir": "dist",
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "src/**/*"

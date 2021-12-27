@@ -213,3 +213,16 @@ Launch the development server:
 
 Once the server is running, it will specify a URL (typically http://localhost:1234). Navigate there in your browser to see your changes and interact with the demo app!
 
+### Publishing
+#### Test
+`npm pack` will generate a tarball without actually publishing; this can then
+be installed via `npm install [path-to-tarball]` for testing that the package
+works as intended.
+
+#### Bump Version
+```
+npm version [major | minor | patch]
+```
+
+####
+Publish
