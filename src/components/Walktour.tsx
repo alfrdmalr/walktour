@@ -379,16 +379,17 @@ export const Walktour = (props: WalktourProps) => {
     >
       {tourRoot &&
         <>
-          <Mask
-            maskId={getIdString(baseMaskString, identifier)}
-            target={target}
-            disableMaskInteraction={disableMaskInteraction}
-            disableCloseOnClick={disableCloseOnClick}
-            disableMask={disableMask}
-            padding={maskPadding}
-            tourRoot={tourRoot}
-            close={tourLogic.close}
-          />
+          {!disableMask &&
+            <Mask
+              maskId={getIdString(baseMaskString, identifier)}
+              target={target}
+              disableMaskInteraction={disableMaskInteraction}
+              disableCloseOnClick={disableCloseOnClick}
+              padding={maskPadding}
+              tourRoot={tourRoot}
+              close={tourLogic.close}
+            />
+        }
 
           <div
             ref={ref => tooltip.current = ref}
