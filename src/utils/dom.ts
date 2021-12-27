@@ -1,4 +1,5 @@
 import { focusableSelector } from "./constants";
+import { getTargetPosition } from "./positioning";
 
 export interface Coords {
   x: number;
@@ -8,6 +9,11 @@ export interface Coords {
 export interface Dims {
   width: number;
   height: number;
+}
+
+export interface TargetInfo {
+  dims: Dims;
+  coords: Coords;
 }
 
 export function isValidCoords(coords: Coords): boolean {
@@ -214,6 +220,19 @@ export function getEdgeFocusables(defaultElement: HTMLElement, container?: HTMLE
   return {
     start: defaultElement,
     end: defaultElement
+  }
+}
+
+export function getTargetInfo(root: Element, target?: HTMLElement) {
+  if (!root || !target) {
+    return;
+  }
+  const dims: Dims = getElementDims(target);
+  const coords: Coords = getTargetPosition(root, target);
+
+  return {
+    coords,
+    dims
   }
 }
 

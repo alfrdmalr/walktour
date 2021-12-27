@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Mask } from './Mask';
+import { Mask, MaskOptions } from './Mask';
 import { Tooltip } from './Tooltip';
 import { CardinalOrientation, OrientationCoords, getTargetPosition, getTooltipPosition } from '../utils/positioning';
-import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementDims } from '../utils/dom';
+import { Coords, getNearestScrollAncestor, getValidPortalRoot, Dims, getElementDims, getTargetInfo } from '../utils/dom';
 import { scrollToDestination } from '../utils/scroll';
 import { centerViewportAroundElements } from '../utils/offset';
 import { debounce, getIdString, shouldUpdate, setFocusTrap, setTargetWatcher, setTourUpdateListener, shouldScroll, setNextOnTargetClick } from '../utils/tour';
@@ -45,6 +45,7 @@ export interface WalktourOptions {
   updateInterval?: number;
   renderTolerance?: number;
   disableMask?: boolean;
+  renderMask?: (maskOptions: MaskOptions) => JSX.Element;
   disableSmoothScroll?: boolean;
   allowForeignTarget?: boolean;
   nextOnTargetClick?: boolean;
@@ -147,6 +148,7 @@ export const Walktour = (props: WalktourProps) => {
     allowForeignTarget,
     nextOnTargetClick,
     validateNextOnTargetClick,
+    renderMask
   } = options;
 
   React.useEffect(() => {
@@ -370,6 +372,8 @@ export const Walktour = (props: WalktourProps) => {
     pointerEvents: 'auto'
   }
 
+  const MaskTag = renderMask ? renderMask : Mask;
+
   // render mask, tooltip, and their shared "portal" container
   const render = () => (
     <div
@@ -380,16 +384,16 @@ export const Walktour = (props: WalktourProps) => {
       {tourRoot &&
         <>
           {!disableMask &&
-            <Mask
+            <MaskTag
               maskId={getIdString(baseMaskString, identifier)}
-              target={target}
+              targetInfo={getTargetInfo(tourRoot, target)}
               disableMaskInteraction={disableMaskInteraction}
               disableCloseOnClick={disableCloseOnClick}
               padding={maskPadding}
               tourRoot={tourRoot}
               close={tourLogic.close}
             />
-        }
+          }
 
           <div
             ref={ref => tooltip.current = ref}

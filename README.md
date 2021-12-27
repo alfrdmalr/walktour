@@ -87,6 +87,7 @@ Step-level options will take precedence over global options, so take care when u
 | _renderTolerance_ | number | Distance, in pixels, for the target element to have moved/resized before triggering an update. Applies to the `movingTarget` option as well as the default window resize recalculation. Default is 2. |
 | _updateInterval_ | number | Duration, in milliseconds, between polling for changes to a target's positioning. For use with `movingTarget` option. Default is 500. |
 | _disableMask_ | boolean | Disable the overlay and cutout. Default is false. |
+| _renderMask | (options: MaskOptions) => JSX.Element | Optional replacement mask renderer. |
 | _disableSmoothScroll_ | boolean | Disable supporting browsers scrolling smoothly to offscreen elements. Default is false. |
 | _allowForeignTarget_ | boolean | Allows the tour to target elements outside of it's root container. The tour and its elements will still be bound to that container, so it's best used for elements that are immediately bordering the container, like a menu shell. Foreign targets cannot be highlighted. |
 | _nextOnTargetClick_ | boolean | Determines whether interacting with the target should advance the tour. Currently only supports clickable targets (buttons). |
