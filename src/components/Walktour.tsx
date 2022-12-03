@@ -24,6 +24,7 @@ export interface WalktourOptions {
   disableCloseOnClick?: boolean;
   orientationPreferences?: CardinalOrientation[];
   maskPadding?: number;
+  maskRadius?: number;
   tooltipSeparation?: number;
   transition?: string;
   customTitleRenderer?: (title?: string, tourLogic?: WalktourLogic) => JSX.Element;
@@ -73,6 +74,7 @@ export interface WalktourProps extends WalktourOptions {
 
 const walktourDefaultProps: Partial<WalktourProps> = {
   maskPadding: 5,
+  maskRadius: 0,
   tooltipSeparation: 10,
   transition: 'top 300ms ease, left 300ms ease',
   disableMaskInteraction: false,
@@ -119,6 +121,7 @@ export const Walktour = (props: WalktourProps) => {
   const {
     selector,
     maskPadding,
+    maskRadius,
     disableMaskInteraction,
     disableCloseOnClick,
     tooltipSeparation,
@@ -390,6 +393,7 @@ export const Walktour = (props: WalktourProps) => {
               disableMaskInteraction={disableMaskInteraction}
               disableCloseOnClick={disableCloseOnClick}
               padding={maskPadding}
+              radius={maskRadius}
               tourRoot={tourRoot}
               close={tourLogic.close}
             />

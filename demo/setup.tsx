@@ -99,6 +99,7 @@ export const primarySteps = (): Step[] => [
   { selector: '#six', title: "Get More Specific!", description: 'North with West alignment!', orientationPreferences: [CardinalOrientation.NORTHWEST] },
   { selector: '#six', title: "Get More Specific!", description: 'West with North alignment!', orientationPreferences: [CardinalOrientation.WESTNORTH] },
   { selector: '#seven', title: 'Scrolling', description: 'Offscreen elements can be automatically scrolled into view' },
+  { selector: '.four', title: 'Corners', description: 'Mask with rounded corners!', maskRadius: 20, maskPadding: 15 },
   { selector: '#six', title: null, description: null, customTooltipRenderer: (logic: WalktourLogic) => <CustomTooltip {...logic} {...logic.stepContent} />, },
 ]
 
