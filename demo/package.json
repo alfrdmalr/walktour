@@ -1,0 +1,11 @@
+{
+  "name": "walktour-demo",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Walktour demo",
+  "main": "index.js",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+  }
+
