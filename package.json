@@ -35,7 +35,7 @@
     "@parcel/packager-ts": "^2.0.1",
     "@parcel/transformer-typescript-types": "^2.0.1",
     "@storybook/addon-actions": "^6.4.9",
-    "@storybook/addon-knobs": "^5.2.5",
+    "@storybook/addon-knobs": "^6.4.0",
     "@storybook/addon-links": "^6.4.9",
     "@storybook/addons": "^6.4.9",
     "@storybook/react": "^6.4.9",
